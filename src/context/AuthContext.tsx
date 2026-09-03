@@ -71,10 +71,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [user, isLoading, pathname, router]);
 
   const login = (session: AuthSession) => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('auth_token', session.accessToken);
+    const token = session.accessToken || session.token || '';
+    if (typeof window !== 'undefined' && token) {
+      localStorage.setItem('auth_token', token);
     }
-    setAccessToken(session.accessToken);
+    setAccessToken(token || null);
     setUser(session.user);
     router.push('/');
   };

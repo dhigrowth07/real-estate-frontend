@@ -6,6 +6,10 @@ export const API_ENDPOINTS = {
     ME: '/auth/me',
     INVITES: '/auth/invites',
   },
+  USERS: {
+    LIST: '/users',
+    DETAIL: (id: string) => `/users/${id}`,
+  },
   LEADS: {
     LIST: '/leads',
     DETAIL: (id: string) => `/leads/${id}`,

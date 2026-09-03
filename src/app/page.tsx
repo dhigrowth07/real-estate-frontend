@@ -71,7 +71,7 @@ function getStageBadge(stage: string) {
     case 'NEW':
     case 'NEW_LEAD':
       return (
-        <span className="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-semibold text-blue-700 border border-blue-200">
+        <span className="inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-2.5 py-0.5 text-xs font-semibold text-blue-700">
           New Lead
         </span>
       );
@@ -79,13 +79,13 @@ function getStageBadge(stage: string) {
     case 'SHOWING':
     case 'REQUIREMENT_GATHERED':
       return (
-        <span className="inline-flex items-center rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-semibold text-amber-700 border border-amber-200">
+        <span className="inline-flex items-center rounded-full border border-amber-200 bg-amber-50 px-2.5 py-0.5 text-xs font-semibold text-amber-700">
           Showing
         </span>
       );
     case 'NEGOTIATION':
       return (
-        <span className="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700 border border-emerald-200">
+        <span className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700">
           Negotiation
         </span>
       );
@@ -97,7 +97,7 @@ function getStageBadge(stage: string) {
       );
     default:
       return (
-        <span className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-700 border border-slate-200">
+        <span className="inline-flex items-center rounded-full border border-slate-200 bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-700">
           {stage.replace(/_/g, ' ')}
         </span>
       );
@@ -248,16 +248,16 @@ export default function DashboardPage() {
 
   if (isLoading) {
     return (
-      <div className="space-y-6 animate-pulse">
-        <div className="h-10 w-48 bg-slate-200 rounded-lg" />
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="animate-pulse space-y-6">
+        <div className="h-10 w-48 rounded-lg bg-slate-200" />
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-28 bg-white rounded-xl border border-slate-200 p-4" />
+            <div key={i} className="h-28 rounded-xl border border-slate-200 bg-white p-4" />
           ))}
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 h-96 bg-white rounded-xl border border-slate-200 p-6" />
-          <div className="h-96 bg-white rounded-xl border border-slate-200 p-4" />
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          <div className="h-96 rounded-xl border border-slate-200 bg-white p-6 lg:col-span-2" />
+          <div className="h-96 rounded-xl border border-slate-200 bg-white p-4" />
         </div>
       </div>
     );
@@ -266,25 +266,23 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6">
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+      <div className="flex flex-col items-start justify-between gap-3 md:flex-row md:items-center">
         <div>
-          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">
-            Overview
-          </h2>
-          <p className="text-sm text-slate-500 mt-0.5">
+          <h2 className="text-2xl font-bold tracking-tight text-slate-900 md:text-3xl">Overview</h2>
+          <p className="mt-0.5 text-sm text-slate-500">
             Here&apos;s what&apos;s happening with your portfolio today.
           </p>
         </div>
         <div className="flex items-center gap-2.5">
           <button
             onClick={handleRefresh}
-            className="border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold px-3.5 py-2 rounded-lg shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
+            className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 shadow-xs transition-colors hover:bg-slate-50"
           >
             <RefreshCw className={`h-3.5 w-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
             <span>Refresh</span>
           </button>
           <Link href="/leads">
-            <button className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold uppercase tracking-wider px-5 py-2.5 rounded-lg shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer">
+            <button className="flex cursor-pointer items-center gap-1.5 rounded-lg bg-blue-600 px-5 py-2.5 text-xs font-semibold tracking-wider text-white uppercase shadow-xs transition-colors hover:bg-blue-700">
               <Plus className="h-4 w-4" />
               <span>New Lead</span>
             </button>
@@ -293,80 +291,80 @@ export default function DashboardPage() {
       </div>
 
       {/* 4 Stat Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
         {/* Card 1: Total Active Leads */}
-        <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-xs flex flex-col gap-2">
-          <div className="flex justify-between items-start">
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+        <div className="flex flex-col gap-2 rounded-xl border border-slate-200 bg-white p-4 shadow-xs">
+          <div className="flex items-start justify-between">
+            <span className="text-xs font-semibold tracking-wider text-slate-500 uppercase">
               Total Active Leads
             </span>
-            <span className="p-1 bg-blue-50 text-blue-600 rounded-md">
+            <span className="rounded-md bg-blue-50 p-1 text-blue-600">
               <Users className="h-4 w-4" />
             </span>
           </div>
-          <div className="flex items-end gap-2 mt-1">
+          <div className="mt-1 flex items-end gap-2">
             <span className="text-3xl font-bold text-slate-900">
               {stats?.kpis?.totalActiveLeads ?? 342}
             </span>
-            <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md mb-1">
+            <span className="mb-1 rounded-md bg-emerald-50 px-2 py-0.5 text-xs font-bold text-emerald-600">
               +12%
             </span>
           </div>
         </div>
 
         {/* Card 2: Total Properties Listed */}
-        <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-xs flex flex-col gap-2">
-          <div className="flex justify-between items-start">
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+        <div className="flex flex-col gap-2 rounded-xl border border-slate-200 bg-white p-4 shadow-xs">
+          <div className="flex items-start justify-between">
+            <span className="text-xs font-semibold tracking-wider text-slate-500 uppercase">
               Total Properties Listed
             </span>
-            <span className="p-1 bg-blue-50 text-blue-600 rounded-md">
+            <span className="rounded-md bg-blue-50 p-1 text-blue-600">
               <Building2 className="h-4 w-4" />
             </span>
           </div>
-          <div className="flex items-end gap-2 mt-1">
+          <div className="mt-1 flex items-end gap-2">
             <span className="text-3xl font-bold text-slate-900">
               {stats?.kpis?.totalProperties ?? 89}
             </span>
-            <span className="text-xs text-slate-500 mb-1 font-medium">active</span>
+            <span className="mb-1 text-xs font-medium text-slate-500">active</span>
           </div>
         </div>
 
         {/* Card 3: Hot Matches Today */}
-        <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-xs flex flex-col gap-2">
-          <div className="flex justify-between items-start">
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+        <div className="flex flex-col gap-2 rounded-xl border border-slate-200 bg-white p-4 shadow-xs">
+          <div className="flex items-start justify-between">
+            <span className="text-xs font-semibold tracking-wider text-slate-500 uppercase">
               Hot Matches Today
             </span>
-            <span className="p-1 bg-emerald-50 text-emerald-600 rounded-md">
+            <span className="rounded-md bg-emerald-50 p-1 text-emerald-600">
               <Flame className="h-4 w-4" />
             </span>
           </div>
-          <div className="flex items-end gap-2 mt-1">
+          <div className="mt-1 flex items-end gap-2">
             <span className="text-3xl font-bold text-slate-900">
               {stats?.kpis?.hotMatchesToday ?? 14}
             </span>
-            <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md mb-1">
+            <span className="mb-1 rounded-md bg-emerald-50 px-2 py-0.5 text-xs font-bold text-emerald-600">
               Action Required
             </span>
           </div>
         </div>
 
         {/* Card 4: Deals Closed This Month */}
-        <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-xs flex flex-col gap-2">
-          <div className="flex justify-between items-start">
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+        <div className="flex flex-col gap-2 rounded-xl border border-slate-200 bg-white p-4 shadow-xs">
+          <div className="flex items-start justify-between">
+            <span className="text-xs font-semibold tracking-wider text-slate-500 uppercase">
               Deals Closed This Month
             </span>
-            <span className="p-1 bg-blue-50 text-blue-600 rounded-md">
+            <span className="rounded-md bg-blue-50 p-1 text-blue-600">
               <Award className="h-4 w-4" />
             </span>
           </div>
-          <div className="flex items-end gap-2 mt-1">
+          <div className="mt-1 flex items-end gap-2">
             <span className="text-3xl font-bold text-slate-900">
               {stats?.kpis?.dealsClosedThisMonth ?? 8}
             </span>
-            <span className="text-xs font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md mb-1">
+            <span className="mb-1 rounded-md bg-amber-50 px-2 py-0.5 text-xs font-bold text-amber-600">
               Target: 10
             </span>
           </div>
@@ -374,23 +372,23 @@ export default function DashboardPage() {
       </div>
 
       {/* Bento Grid: Matches (2 Columns) & Widgets (1 Column) */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Hot Matches Section */}
-        <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200 p-6 shadow-xs flex flex-col gap-4">
-          <div className="flex justify-between items-center border-b border-slate-100 pb-3">
-            <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+        <div className="flex flex-col gap-4 rounded-xl border border-slate-200 bg-white p-6 shadow-xs lg:col-span-2">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+            <h3 className="flex items-center gap-2 text-base font-bold text-slate-900">
               <BellRing className="h-4.5 w-4.5 text-emerald-600" />
               <span>High Probability Matches</span>
             </h3>
             <Link
               href="/matches"
-              className="text-xs font-semibold text-blue-600 hover:underline cursor-pointer"
+              className="cursor-pointer text-xs font-semibold text-blue-600 hover:underline"
             >
               View All
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {displayMatches.map((match) => {
               const leadName =
                 'lead' in match && match.lead
@@ -408,23 +406,21 @@ export default function DashboardPage() {
               return (
                 <div
                   key={match.id}
-                  className="border border-slate-200 rounded-lg p-4 hover:border-blue-500 transition-colors shadow-xs bg-slate-50/50 flex flex-col justify-between"
+                  className="flex flex-col justify-between rounded-lg border border-slate-200 bg-slate-50/50 p-4 shadow-xs transition-colors hover:border-blue-500"
                 >
                   <div>
-                    <div className="flex justify-between items-start mb-3">
+                    <div className="mb-3 flex items-start justify-between">
                       <div>
-                        <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                        <p className="text-[11px] font-semibold tracking-wider text-slate-400 uppercase">
                           Lead
                         </p>
-                        <p className="text-sm font-bold text-slate-900 mt-0.5">
-                          {leadName}
-                        </p>
+                        <p className="mt-0.5 text-sm font-bold text-slate-900">{leadName}</p>
                       </div>
                       <div
-                        className={`text-sm font-bold px-3 py-0.5 rounded-full border ${
+                        className={`rounded-full border px-3 py-0.5 text-sm font-bold ${
                           match.score >= 80
-                            ? 'bg-emerald-50 text-emerald-700 border-emerald-500'
-                            : 'bg-amber-50 text-amber-700 border-amber-500'
+                            ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
+                            : 'border-amber-500 bg-amber-50 text-amber-700'
                         }`}
                       >
                         {match.score}%
@@ -432,17 +428,17 @@ export default function DashboardPage() {
                     </div>
 
                     <div className="mb-3">
-                      <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                      <p className="text-[11px] font-semibold tracking-wider text-slate-400 uppercase">
                         Property Match
                       </p>
-                      <p className="text-xs font-medium text-slate-700 truncate mt-0.5">
+                      <p className="mt-0.5 truncate text-xs font-medium text-slate-700">
                         {propTitle}
                       </p>
                     </div>
                   </div>
 
                   <Link href="/matches">
-                    <button className="w-full bg-slate-100 hover:bg-blue-600 hover:text-white text-slate-800 text-xs font-semibold py-2 rounded-md transition-colors border border-slate-200 hover:border-blue-600 text-center cursor-pointer">
+                    <button className="w-full cursor-pointer rounded-md border border-slate-200 bg-slate-100 py-2 text-center text-xs font-semibold text-slate-800 transition-colors hover:border-blue-600 hover:bg-blue-600 hover:text-white">
                       View Match
                     </button>
                   </Link>
@@ -455,25 +451,23 @@ export default function DashboardPage() {
         {/* Right Column (Widgets) */}
         <div className="flex flex-col gap-6">
           {/* Aging Inventory Widget */}
-          <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-xs flex flex-col gap-2">
-            <div className="flex justify-between items-center border-b border-slate-100 pb-2">
-              <h3 className="text-base font-bold text-slate-900 flex items-center gap-1.5">
+          <div className="flex flex-col gap-2 rounded-xl border border-slate-200 bg-white p-4 shadow-xs">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+              <h3 className="flex items-center gap-1.5 text-base font-bold text-slate-900">
                 <AlertTriangle className="h-4 w-4 text-amber-600" />
                 <span>Aging Inventory</span>
               </h3>
             </div>
 
-            <div className="flex flex-col divide-y divide-slate-100 mt-1">
+            <div className="mt-1 flex flex-col divide-y divide-slate-100">
               {agingWithDays.map((prop) => (
                 <Link
                   key={prop.id}
                   href="/properties"
-                  className="flex justify-between items-center py-2.5 hover:bg-slate-50 rounded-md transition-colors px-1"
+                  className="flex items-center justify-between rounded-md px-1 py-2.5 transition-colors hover:bg-slate-50"
                 >
-                  <div className="flex flex-col min-w-0 pr-2">
-                    <span className="text-xs font-bold text-slate-900 truncate">
-                      {prop.title}
-                    </span>
+                  <div className="flex min-w-0 flex-col pr-2">
+                    <span className="truncate text-xs font-bold text-slate-900">{prop.title}</span>
                     <span
                       className={`text-[11px] font-semibold ${
                         prop.isDanger ? 'text-rose-600' : 'text-amber-600'
@@ -482,46 +476,44 @@ export default function DashboardPage() {
                       {prop.daysOnMarket} Days on Market
                     </span>
                   </div>
-                  <ChevronRight className="h-4 w-4 text-slate-400 shrink-0" />
+                  <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" />
                 </Link>
               ))}
             </div>
           </div>
 
           {/* Leads by Source Widget */}
-          <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-xs flex flex-col gap-2 flex-1">
-            <h3 className="text-base font-bold text-slate-900 border-b border-slate-100 pb-2">
+          <div className="flex flex-1 flex-col gap-2 rounded-xl border border-slate-200 bg-white p-4 shadow-xs">
+            <h3 className="border-b border-slate-100 pb-2 text-base font-bold text-slate-900">
               Lead Sources
             </h3>
-            <div className="flex-1 flex flex-col items-center justify-center py-4 relative">
+            <div className="relative flex flex-1 flex-col items-center justify-center py-4">
               {/* Reference Donut Chart */}
-              <div className="w-32 h-32 rounded-full border-[12px] border-slate-100 relative overflow-hidden flex items-center justify-center">
+              <div className="relative flex h-32 w-32 items-center justify-center overflow-hidden rounded-full border-[12px] border-slate-100">
                 <div
-                  className="absolute top-0 right-0 w-1/2 h-full border-r-[12px] border-blue-600 rounded-r-full"
+                  className="absolute top-0 right-0 h-full w-1/2 rounded-r-full border-r-[12px] border-blue-600"
                   style={{
                     transform: 'rotate(30deg)',
                     transformOrigin: 'left center',
                   }}
                 />
-                <div className="absolute bottom-0 right-0 w-1/2 h-1/2 border-b-[12px] border-r-[12px] border-emerald-500 rounded-br-full" />
-                <div className="absolute bottom-0 left-0 w-1/2 h-1/2 border-b-[12px] border-l-[12px] border-amber-500 rounded-bl-full" />
-                <div className="bg-white w-20 h-20 rounded-full z-10 flex flex-col items-center justify-center shadow-xs">
-                  <span className="text-2xl font-bold text-slate-900">
-                    {totalLeadsCount}
-                  </span>
+                <div className="absolute right-0 bottom-0 h-1/2 w-1/2 rounded-br-full border-r-[12px] border-b-[12px] border-emerald-500" />
+                <div className="absolute bottom-0 left-0 h-1/2 w-1/2 rounded-bl-full border-b-[12px] border-l-[12px] border-amber-500" />
+                <div className="z-10 flex h-20 w-20 flex-col items-center justify-center rounded-full bg-white shadow-xs">
+                  <span className="text-2xl font-bold text-slate-900">{totalLeadsCount}</span>
                 </div>
               </div>
 
               {/* Legend */}
-              <div className="w-full flex justify-around mt-4">
+              <div className="mt-4 flex w-full justify-around">
                 <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-700">
-                  <span className="w-2 h-2 rounded-full bg-blue-600" /> Web
+                  <span className="h-2 w-2 rounded-full bg-blue-600" /> Web
                 </div>
                 <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-700">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500" /> Social
+                  <span className="h-2 w-2 rounded-full bg-emerald-500" /> Social
                 </div>
                 <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-700">
-                  <span className="w-2 h-2 rounded-full bg-amber-500" /> Direct
+                  <span className="h-2 w-2 rounded-full bg-amber-500" /> Direct
                 </div>
               </div>
             </div>
@@ -530,12 +522,12 @@ export default function DashboardPage() {
       </div>
 
       {/* Recent Leads Table */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
-        <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xs">
+        <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/50 p-4">
           <h3 className="text-base font-bold text-slate-900">Recent Leads</h3>
           <Link
             href="/leads"
-            className="text-xs font-semibold text-blue-600 hover:underline flex items-center gap-1"
+            className="flex items-center gap-1 text-xs font-semibold text-blue-600 hover:underline"
           >
             <span>Filter</span>
             <Filter className="h-3.5 w-3.5" />
@@ -543,46 +535,42 @@ export default function DashboardPage() {
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+          <table className="w-full border-collapse text-left">
             <thead>
               <tr className="border-b border-slate-200 bg-white">
-                <th className="p-4 text-xs font-semibold uppercase tracking-wider text-slate-400">
+                <th className="p-4 text-xs font-semibold tracking-wider text-slate-400 uppercase">
                   Name
                 </th>
-                <th className="p-4 text-xs font-semibold uppercase tracking-wider text-slate-400">
+                <th className="p-4 text-xs font-semibold tracking-wider text-slate-400 uppercase">
                   Source
                 </th>
-                <th className="p-4 text-xs font-semibold uppercase tracking-wider text-slate-400">
+                <th className="p-4 text-xs font-semibold tracking-wider text-slate-400 uppercase">
                   Stage
                 </th>
-                <th className="p-4 text-xs font-semibold uppercase tracking-wider text-slate-400">
+                <th className="p-4 text-xs font-semibold tracking-wider text-slate-400 uppercase">
                   Agent
                 </th>
-                <th className="p-4 text-xs font-semibold uppercase tracking-wider text-slate-400">
+                <th className="p-4 text-xs font-semibold tracking-wider text-slate-400 uppercase">
                   Added
                 </th>
               </tr>
             </thead>
-            <tbody className="text-sm divide-y divide-slate-100">
+            <tbody className="divide-y divide-slate-100 text-sm">
               {displayLeads.map((lead) => (
-                <tr
-                  key={lead.id}
-                  className="hover:bg-slate-50/70 transition-colors"
-                >
+                <tr key={lead.id} className="transition-colors hover:bg-slate-50/70">
                   <td className="p-4 font-bold text-slate-900">{lead.name}</td>
                   <td className="p-4">
-                    <div className="flex items-center gap-1.5 text-slate-600 text-xs font-medium">
+                    <div className="flex items-center gap-1.5 text-xs font-medium text-slate-600">
                       {getSourceIcon(lead.source)}
                       <span className="capitalize">
-                        {lead.source?.toLowerCase().replace(/_/g, ' ') ||
-                          'Website'}
+                        {lead.source?.toLowerCase().replace(/_/g, ' ') || 'Website'}
                       </span>
                     </div>
                   </td>
                   <td className="p-4">{getStageBadge(lead.stage)}</td>
                   <td className="p-4">
                     <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-700 font-bold text-[10px] flex items-center justify-center border border-blue-200">
+                      <div className="flex h-6 w-6 items-center justify-center rounded-full border border-blue-200 bg-blue-100 text-[10px] font-bold text-blue-700">
                         {lead.agentName
                           ? lead.agentName
                               .split(' ')
@@ -591,14 +579,12 @@ export default function DashboardPage() {
                               .substring(0, 2)
                           : 'AG'}
                       </div>
-                      <span className="text-xs text-slate-600 font-medium hidden sm:inline">
+                      <span className="hidden text-xs font-medium text-slate-600 sm:inline">
                         {lead.agentName}
                       </span>
                     </div>
                   </td>
-                  <td className="p-4 text-xs text-slate-400">
-                    {lead.addedText}
-                  </td>
+                  <td className="p-4 text-xs text-slate-400">{lead.addedText}</td>
                 </tr>
               ))}
             </tbody>

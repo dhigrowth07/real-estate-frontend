@@ -87,7 +87,7 @@ export default function PropertiesPage() {
       header: 'Possession',
       cell: (prop) => (
         <span className="text-xs font-semibold text-slate-600">
-          {prop.possessionStatus.replace(/_/g, ' ')}
+          {prop.possessionStatus?.replace(/_/g, ' ') || 'Ready'}
         </span>
       ),
     },

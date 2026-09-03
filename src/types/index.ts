@@ -4,7 +4,7 @@ export type AgentVisibilityMode = 'ASSIGNED_ONLY' | 'ALL';
 
 export type LeadSource = 'WEBSITE' | 'REFERRAL' | 'DIRECT_CALL' | 'PORTAL' | 'WALK_IN' | 'OTHER';
 
-export type LeadPurpose = 'BUY' | 'RENT' | 'INVESTMENT';
+export type LeadPurpose = 'BUY' | 'RENT' | 'INVESTMENT' | 'INVEST';
 
 export type LeadUrgency = 'IMMEDIATE' | 'WITHIN_1_MONTH' | 'WITHIN_3_MONTHS' | 'EXPLORING';
 
@@ -17,7 +17,8 @@ export type LeadStage =
   | 'CLOSED_WON'
   | 'CLOSED_LOST';
 
-export type PropertyType = 'APARTMENT' | 'VILLA' | 'PLOT' | 'COMMERCIAL' | 'INDEPENDENT_HOUSE';
+export type PropertyType =
+  'APARTMENT' | 'VILLA' | 'PLOT' | 'COMMERCIAL' | 'INDEPENDENT_HOUSE' | 'PENTHOUSE';
 
 export type PossessionStatus =
   'READY_TO_MOVE' | 'UNDER_CONSTRUCTION' | 'WITHIN_3_MONTHS' | 'WITHIN_6_MONTHS';
@@ -84,6 +85,7 @@ export interface Lead {
   stage: LeadStage;
   assignedAgentId?: string;
   assignedAgent?: User;
+  matches?: Match[];
   createdAt: string;
   updatedAt?: string;
   _count?: {
@@ -100,13 +102,12 @@ export interface Property {
   propertyType: PropertyType;
   bhk?: string;
   sqft?: number;
-  possessionStatus: PossessionStatus;
-  amenities: string[];
-  ownerContact: string;
-  images: string[];
+  possessionStatus?: PossessionStatus;
+  amenities?: string[];
+  ownerContact?: string;
+  images?: string[];
   status: PropertyStatus;
-  assignedAgentId?: string;
-  assignedAgent?: User;
+  matches?: Match[];
   createdAt: string;
   updatedAt?: string;
   _count?: {
@@ -120,48 +121,35 @@ export interface Match {
   lead?: Lead;
   propertyId: string;
   property?: Property;
-  score: number; // 0 - 100
+  score: number;
   status: MatchStatus;
-  breakdown?: {
-    budgetScore: number;
-    locationScore: number;
-    propertyTypeScore: number;
-    bhkScore: number;
-    possessionScore: number;
-  };
   createdAt: string;
   updatedAt?: string;
-}
-
-export interface Notification {
-  id: string;
-  userId: string;
-  matchId?: string;
-  match?: Match;
-  type: NotificationType;
-  title: string;
-  message: string;
-  metadata?: {
-    score?: number;
-    leadId?: string;
-    leadName?: string;
-    propertyId?: string;
-    propertyTitle?: string;
-  };
-  isRead: boolean;
-  readAt?: string | null;
-  createdAt: string;
 }
 
 export interface Interaction {
   id: string;
   leadId: string;
+  lead?: Lead;
+  agentId: string;
+  agent?: User;
   channel: InteractionChannel;
   type: InteractionType;
   notes: string;
   timestamp: string;
-  agentId: string;
-  agent?: User;
+  createdAt?: string;
+}
+
+export interface Notification {
+  id: string;
+  userId: string;
+  title: string;
+  message: string;
+  type: NotificationType;
+  link?: string;
+  isRead: boolean;
+  metadata?: Record<string, unknown>;
+  createdAt: string;
 }
 
 export interface DashboardStats {
@@ -172,26 +160,15 @@ export interface DashboardStats {
     dealsClosedThisMonth: number;
   };
   distributions: {
-    leadsBySource: { source: LeadSource; count: number }[];
-    leadsByStage: { stage: LeadStage; count: number }[];
+    leadsBySource: { source: string; count: number }[];
+    leadsByStage: { stage: string; count: number }[];
   };
   recentLeads: Lead[];
   agingInventory: Property[];
 }
 
-export interface ApiResponse<T> {
-  success: boolean;
-  data: T;
-  message?: string;
-  meta?: {
-    total?: number;
-    page?: number;
-    limit?: number;
-    totalPages?: number;
-  };
-}
-
 export interface AuthSession {
   user: User;
-  accessToken: string;
+  token?: string;
+  accessToken?: string;
 }
