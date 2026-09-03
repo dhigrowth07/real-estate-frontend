@@ -1,9 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Drawer } from '@/components/ui/Drawer';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
+import { X, UserCheck, ChevronDown, Zap } from 'lucide-react';
 import { apiClient, API_ENDPOINTS } from '@/lib/api-client';
 import { Lead, LeadSource, PropertyType, LeadPurpose, LeadUrgency, LeadStage, User } from '@/types';
 
@@ -22,12 +20,14 @@ export function LeadFormDrawer({ isOpen, onClose, lead, onSuccess }: LeadFormDra
   const [purpose, setPurpose] = useState<LeadPurpose>('BUY');
   const [propertyType, setPropertyType] = useState<PropertyType>('APARTMENT');
   const [bhk, setBhk] = useState<string>('2BHK');
-  const [budgetMin, setBudgetMin] = useState<number>(5000000);
-  const [budgetMax, setBudgetMax] = useState<number>(10000000);
-  const [preferredLocations, setPreferredLocations] = useState<string>('Downtown, Westside');
-  const [urgency, setUrgency] = useState<LeadUrgency>('WITHIN_1_MONTH');
+  const [budgetMin, setBudgetMin] = useState<number | ''>(5000000);
+  const [budgetMax, setBudgetMax] = useState<number | ''>(10000000);
+  const [locationTags, setLocationTags] = useState<string[]>(['Downtown']);
+  const [locationInput, setLocationInput] = useState<string>('');
+  const [urgency, setUrgency] = useState<LeadUrgency>('IMMEDIATE');
   const [stage, setStage] = useState<LeadStage>('NEW');
   const [assignedAgentId, setAssignedAgentId] = useState<string>('');
+  const [notes, setNotes] = useState<string>('');
 
   const [agents, setAgents] = useState<User[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -47,10 +47,16 @@ export function LeadFormDrawer({ isOpen, onClose, lead, onSuccess }: LeadFormDra
         setBhk(lead.bhk || '2BHK');
         setBudgetMin(lead.budgetMin || 5000000);
         setBudgetMax(lead.budgetMax || 10000000);
-        setPreferredLocations(lead.preferredLocations?.join(', ') || '');
-        setUrgency(lead.urgency || 'WITHIN_1_MONTH');
+        setLocationTags(
+          lead.preferredLocations && lead.preferredLocations.length > 0
+            ? lead.preferredLocations
+            : ['Downtown']
+        );
+        setLocationInput('');
+        setUrgency(lead.urgency || 'IMMEDIATE');
         setStage(lead.stage || 'NEW');
         setAssignedAgentId(lead.assignedAgentId || '');
+        setNotes('');
       } else {
         setName('');
         setPhone('');
@@ -61,15 +67,18 @@ export function LeadFormDrawer({ isOpen, onClose, lead, onSuccess }: LeadFormDra
         setBhk('2BHK');
         setBudgetMin(5000000);
         setBudgetMax(10000000);
-        setPreferredLocations('Downtown, Westside');
-        setUrgency('WITHIN_1_MONTH');
+        setLocationTags(['Downtown']);
+        setLocationInput('');
+        setUrgency('IMMEDIATE');
         setStage('NEW');
         setAssignedAgentId('');
+        setNotes('');
       }
     }, 0);
     return () => clearTimeout(t);
   }, [isOpen, lead]);
 
+  // Load agents
   useEffect(() => {
     let isMounted = true;
     async function loadAgents() {
@@ -90,19 +99,47 @@ export function LeadFormDrawer({ isOpen, onClose, lead, onSuccess }: LeadFormDra
     };
   }, [isOpen]);
 
+  // Escape key listener
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen, onClose]);
+
+  const handleAddLocation = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      const trimmed = locationInput.trim().replace(/^,|,$/g, '');
+      if (trimmed && !locationTags.includes(trimmed)) {
+        setLocationTags([...locationTags, trimmed]);
+        setLocationInput('');
+      }
+    }
+  };
+
+  const handleRemoveLocation = (tagToRemove: string) => {
+    setLocationTags(locationTags.filter((tag) => tag !== tagToRemove));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
     if (!name || !phone) {
-      setError('Lead Name and Phone Number are required.');
+      setError('Full Name and Phone Number are required.');
       return;
     }
 
-    const locationsArray = preferredLocations
-      .split(',')
-      .map((loc) => loc.trim())
-      .filter(Boolean);
+    const minNum = typeof budgetMin === 'number' ? budgetMin : 5000000;
+    const maxNum = typeof budgetMax === 'number' ? budgetMax : 10000000;
 
     const payload = {
       name,
@@ -112,9 +149,9 @@ export function LeadFormDrawer({ isOpen, onClose, lead, onSuccess }: LeadFormDra
       purpose,
       propertyType,
       bhk,
-      budgetMin: Number(budgetMin),
-      budgetMax: Number(budgetMax),
-      preferredLocations: locationsArray,
+      budgetMin: minNum,
+      budgetMax: maxNum,
+      preferredLocations: locationTags.length > 0 ? locationTags : ['Downtown'],
       urgency,
       stage,
       assignedAgentId: assignedAgentId || undefined,
@@ -139,260 +176,412 @@ export function LeadFormDrawer({ isOpen, onClose, lead, onSuccess }: LeadFormDra
     }
   };
 
+  if (!isOpen) return null;
+
   return (
-    <Drawer
-      isOpen={isOpen}
-      onClose={onClose}
-      title={lead ? 'Edit Lead' : 'Add New Lead'}
-      description={
-        lead
-          ? 'Update client preferences, stage, and assigned agent.'
-          : 'Record a new buyer or tenant inquiry to run automated property matching.'
-      }
-      width="lg"
-    >
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {error && (
-          <div className="rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs text-rose-800">
-            {error}
-          </div>
-        )}
+    <div className="fixed inset-0 z-50 overflow-hidden">
+      {/* Overlay / Backdrop matching add-lead.html */}
+      <div
+        className="fixed inset-0 bg-slate-900/30 backdrop-blur-xs transition-opacity duration-300"
+        onClick={onClose}
+      />
 
-        {/* Section 1: Contact Information */}
-        <div className="space-y-4">
-          <h4 className="text-xs font-bold tracking-wider text-slate-400 uppercase">
-            Contact Information
-          </h4>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div>
-              <label className="mb-1 block text-xs font-bold tracking-wider text-slate-700 uppercase">
-                Full Name *
-              </label>
-              <Input
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Sarah Jenkins"
-                required
-              />
-            </div>
-            <div>
-              <label className="mb-1 block text-xs font-bold tracking-wider text-slate-700 uppercase">
-                Phone Number *
-              </label>
-              <Input
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="+1 (555) 123-4567"
-                required
-              />
-            </div>
-          </div>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div>
-              <label className="mb-1 block text-xs font-bold tracking-wider text-slate-700 uppercase">
-                Email Address
-              </label>
-              <Input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="client@gmail.com"
-              />
-            </div>
-            <div>
-              <label className="mb-1 block text-xs font-bold tracking-wider text-slate-700 uppercase">
-                Lead Source
-              </label>
-              <select
-                value={source}
-                onChange={(e) => setSource(e.target.value as LeadSource)}
-                className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-blue-600 focus:outline-hidden"
-              >
-                <option value="WEBSITE">Website</option>
-                <option value="PORTAL">Real Estate Portal</option>
-                <option value="REFERRAL">Referral</option>
-                <option value="DIRECT_CALL">Direct Call</option>
-                <option value="WALK_IN">Walk-in</option>
-                <option value="OTHER">Other</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        {/* Section 2: Property Preferences */}
-        <div className="space-y-4 border-t border-slate-100 pt-4">
-          <h4 className="text-xs font-bold tracking-wider text-slate-400 uppercase">
-            Property Requirements & Budget
-          </h4>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <div>
-              <label className="mb-1 block text-xs font-bold tracking-wider text-slate-700 uppercase">
-                Purpose
-              </label>
-              <select
-                value={purpose}
-                onChange={(e) => setPurpose(e.target.value as LeadPurpose)}
-                className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-blue-600 focus:outline-hidden"
-              >
-                <option value="BUY">Buy</option>
-                <option value="RENT">Rent</option>
-                <option value="INVESTMENT">Investment</option>
-              </select>
-            </div>
-            <div>
-              <label className="mb-1 block text-xs font-bold tracking-wider text-slate-700 uppercase">
-                Property Type
-              </label>
-              <select
-                value={propertyType}
-                onChange={(e) => setPropertyType(e.target.value as PropertyType)}
-                className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-blue-600 focus:outline-hidden"
-              >
-                <option value="APARTMENT">Apartment</option>
-                <option value="VILLA">Villa</option>
-                <option value="PLOT">Plot / Land</option>
-                <option value="COMMERCIAL">Commercial</option>
-                <option value="INDEPENDENT_HOUSE">Independent House</option>
-                <option value="PENTHOUSE">Penthouse</option>
-              </select>
-            </div>
-            <div>
-              <label className="mb-1 block text-xs font-bold tracking-wider text-slate-700 uppercase">
-                BHK Configuration
-              </label>
-              <select
-                value={bhk}
-                onChange={(e) => setBhk(e.target.value)}
-                className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-blue-600 focus:outline-hidden"
-              >
-                <option value="1BHK">1 BHK</option>
-                <option value="2BHK">2 BHK</option>
-                <option value="3BHK">3 BHK</option>
-                <option value="4BHK">4 BHK</option>
-                <option value="5BHK+">5 BHK+</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div>
-              <label className="mb-1 block text-xs font-bold tracking-wider text-slate-700 uppercase">
-                Budget Min (₹)
-              </label>
-              <Input
-                type="number"
-                value={budgetMin}
-                onChange={(e) => setBudgetMin(Number(e.target.value))}
-                step="100000"
-                required
-              />
-              <span className="mt-0.5 block text-[11px] text-slate-400">
-                ₹{(budgetMin / 100000).toFixed(0)} Lakhs
-              </span>
-            </div>
-            <div>
-              <label className="mb-1 block text-xs font-bold tracking-wider text-slate-700 uppercase">
-                Budget Max (₹)
-              </label>
-              <Input
-                type="number"
-                value={budgetMax}
-                onChange={(e) => setBudgetMax(Number(e.target.value))}
-                step="100000"
-                required
-              />
-              <span className="mt-0.5 block text-[11px] text-slate-400">
-                ₹{(budgetMax / 100000).toFixed(0)} Lakhs
-              </span>
-            </div>
-          </div>
-
+      {/* Side Panel Drawer (480px) */}
+      <aside className="fixed inset-y-0 right-0 z-50 flex w-full transform flex-col border-l border-slate-200 bg-white shadow-2xl transition-transform duration-300 ease-in-out md:w-[480px]">
+        {/* Drawer Header matching add-lead.html */}
+        <header className="flex items-center justify-between border-b border-slate-200 bg-white px-6 py-4">
           <div>
-            <label className="mb-1 block text-xs font-bold tracking-wider text-slate-700 uppercase">
-              Preferred Locations (comma separated)
-            </label>
-            <Input
-              value={preferredLocations}
-              onChange={(e) => setPreferredLocations(e.target.value)}
-              placeholder="Downtown, Westside, Indiranagar"
-            />
+            <h2 className="text-lg font-bold text-slate-900">
+              {lead ? 'Edit Lead' : 'Add New Lead'}
+            </h2>
+            <p className="mt-0.5 text-xs text-slate-500">Quick entry form for new prospects</p>
           </div>
-        </div>
-
-        {/* Section 3: Status & Team Assignment */}
-        <div className="space-y-4 border-t border-slate-100 pt-4">
-          <h4 className="text-xs font-bold tracking-wider text-slate-400 uppercase">
-            Pipeline & Assignment
-          </h4>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <div>
-              <label className="mb-1 block text-xs font-bold tracking-wider text-slate-700 uppercase">
-                Urgency
-              </label>
-              <select
-                value={urgency}
-                onChange={(e) => setUrgency(e.target.value as LeadUrgency)}
-                className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-blue-600 focus:outline-hidden"
-              >
-                <option value="IMMEDIATE">Immediate</option>
-                <option value="WITHIN_1_MONTH">Within 1 Month</option>
-                <option value="WITHIN_3_MONTHS">Within 3 Months</option>
-                <option value="EXPLORING">Exploring</option>
-              </select>
-            </div>
-            <div>
-              <label className="mb-1 block text-xs font-bold tracking-wider text-slate-700 uppercase">
-                Pipeline Stage
-              </label>
-              <select
-                value={stage}
-                onChange={(e) => setStage(e.target.value as LeadStage)}
-                className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-blue-600 focus:outline-hidden"
-              >
-                <option value="NEW">New</option>
-                <option value="CONTACTED">Contacted</option>
-                <option value="REQUIREMENT_GATHERED">Requirement Gathered</option>
-                <option value="SITE_VISIT_SCHEDULED">Site Visit Scheduled</option>
-                <option value="NEGOTIATION">Negotiation</option>
-                <option value="CLOSED_WON">Closed Won</option>
-                <option value="CLOSED_LOST">Closed Lost</option>
-              </select>
-            </div>
-            <div>
-              <label className="mb-1 block text-xs font-bold tracking-wider text-slate-700 uppercase">
-                Assigned Agent
-              </label>
-              <select
-                value={assignedAgentId}
-                onChange={(e) => setAssignedAgentId(e.target.value)}
-                className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-blue-600 focus:outline-hidden"
-              >
-                <option value="">Unassigned</option>
-                {agents.map((agent) => (
-                  <option key={agent.id} value={agent.id}>
-                    {agent.name} ({agent.role})
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-        </div>
-
-        {/* Form Actions */}
-        <div className="flex items-center justify-end gap-3 border-t border-slate-100 pt-6">
-          <Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting}>
-            Cancel
-          </Button>
-          <Button
-            type="submit"
-            variant="primary"
-            className="font-bold shadow-md shadow-blue-500/20"
-            isLoading={isSubmitting}
+          <button
+            onClick={onClose}
+            className="cursor-pointer rounded-full p-1.5 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900"
           >
-            {lead ? 'Update Lead' : 'Create & Match Lead'}
-          </Button>
+            <X className="h-5 w-5" />
+          </button>
+        </header>
+
+        {/* Scrollable Form Area */}
+        <div className="flex-1 space-y-5 overflow-y-auto bg-white p-6">
+          <form id="lead-form" onSubmit={handleSubmit} className="space-y-5">
+            {error && (
+              <div className="rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs text-rose-800">
+                {error}
+              </div>
+            )}
+
+            {/* Contact Details Section */}
+            <div className="space-y-3.5">
+              <h3 className="text-xs font-bold tracking-wider text-slate-400 uppercase">
+                Contact Details
+              </h3>
+
+              <div>
+                <label className="mb-1 block text-xs font-bold tracking-wider text-slate-700 uppercase">
+                  Full Name *
+                </label>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="e.g. John Doe"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-900 outline-hidden transition-all placeholder:text-slate-400 focus:border-blue-600 focus:bg-white focus:ring-1 focus:ring-blue-600"
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="mb-1 block text-xs font-bold tracking-wider text-slate-700 uppercase">
+                    Phone Number *
+                  </label>
+                  <input
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="+1 (555) 000-0000"
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-900 outline-hidden transition-all placeholder:text-slate-400 focus:border-blue-600 focus:bg-white focus:ring-1 focus:ring-blue-600"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs font-bold tracking-wider text-slate-700 uppercase">
+                    Email <span className="font-normal text-slate-400 lowercase">(Optional)</span>
+                  </label>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="john@example.com"
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-900 outline-hidden transition-all placeholder:text-slate-400 focus:border-blue-600 focus:bg-white focus:ring-1 focus:ring-blue-600"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="mb-1 block text-xs font-bold tracking-wider text-slate-700 uppercase">
+                  Source
+                </label>
+                <div className="relative">
+                  <select
+                    value={source}
+                    onChange={(e) => setSource(e.target.value as LeadSource)}
+                    className="w-full cursor-pointer appearance-none rounded-xl border border-slate-200 bg-slate-50 py-2 pr-8 pl-9 text-xs font-medium text-slate-800 outline-hidden transition-all focus:border-blue-600 focus:bg-white focus:ring-1 focus:ring-blue-600"
+                  >
+                    <option value="WEBSITE">Website</option>
+                    <option value="PORTAL">Portal</option>
+                    <option value="DIRECT_CALL">Phone Call</option>
+                    <option value="REFERRAL">Referral</option>
+                    <option value="WALK_IN">Walk-in</option>
+                    <option value="OTHER">Other</option>
+                  </select>
+                  <UserCheck className="pointer-events-none absolute top-2.5 left-3 h-4 w-4 text-slate-400" />
+                  <ChevronDown className="pointer-events-none absolute top-2.5 right-3 h-4 w-4 text-slate-400" />
+                </div>
+              </div>
+            </div>
+
+            <hr className="my-4 border-slate-100" />
+
+            {/* Property Requirements Section */}
+            <div className="space-y-4">
+              <h3 className="text-xs font-bold tracking-wider text-slate-400 uppercase">
+                Property Requirements
+              </h3>
+
+              {/* Purpose Segmented Control matching add-lead.html */}
+              <div>
+                <label className="mb-1.5 block text-xs font-bold tracking-wider text-slate-700 uppercase">
+                  Purpose
+                </label>
+                <div className="flex rounded-xl border border-slate-200 bg-slate-100 p-1">
+                  <button
+                    type="button"
+                    onClick={() => setPurpose('BUY')}
+                    className={`flex-1 cursor-pointer rounded-lg px-3 py-1.5 text-center text-xs font-semibold transition-all ${
+                      purpose === 'BUY'
+                        ? 'border border-slate-200 bg-white font-bold text-blue-600 shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    Buy
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPurpose('RENT')}
+                    className={`flex-1 cursor-pointer rounded-lg px-3 py-1.5 text-center text-xs font-semibold transition-all ${
+                      purpose === 'RENT'
+                        ? 'border border-slate-200 bg-white font-bold text-blue-600 shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    Rent
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPurpose('INVESTMENT')}
+                    className={`flex-1 cursor-pointer rounded-lg px-3 py-1.5 text-center text-xs font-semibold transition-all ${
+                      purpose === 'INVESTMENT' || purpose === 'INVEST'
+                        ? 'border border-slate-200 bg-white font-bold text-blue-600 shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    Invest
+                  </button>
+                </div>
+              </div>
+
+              {/* Budget Range with Currency prefix */}
+              <div>
+                <label className="mb-1.5 block text-xs font-bold tracking-wider text-slate-700 uppercase">
+                  Budget Range (₹)
+                </label>
+                <div className="flex items-center gap-2">
+                  <div className="relative flex-1">
+                    <span className="absolute top-2 left-3 text-xs font-bold text-slate-400">
+                      ₹
+                    </span>
+                    <input
+                      type="number"
+                      value={budgetMin}
+                      onChange={(e) =>
+                        setBudgetMin(e.target.value === '' ? '' : Number(e.target.value))
+                      }
+                      placeholder="Min"
+                      step="100000"
+                      className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2 pr-3 pl-7 text-xs text-slate-900 outline-hidden transition-all focus:border-blue-600 focus:bg-white focus:ring-1 focus:ring-blue-600"
+                    />
+                  </div>
+                  <span className="text-xs font-bold text-slate-400">-</span>
+                  <div className="relative flex-1">
+                    <span className="absolute top-2 left-3 text-xs font-bold text-slate-400">
+                      ₹
+                    </span>
+                    <input
+                      type="number"
+                      value={budgetMax}
+                      onChange={(e) =>
+                        setBudgetMax(e.target.value === '' ? '' : Number(e.target.value))
+                      }
+                      placeholder="Max"
+                      step="100000"
+                      className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2 pr-3 pl-7 text-xs text-slate-900 outline-hidden transition-all focus:border-blue-600 focus:bg-white focus:ring-1 focus:ring-blue-600"
+                    />
+                  </div>
+                </div>
+                <div className="mt-1 flex justify-between text-[11px] text-slate-400">
+                  <span>
+                    Min: ₹{typeof budgetMin === 'number' ? (budgetMin / 100000).toFixed(0) : '0'}{' '}
+                    Lakhs
+                  </span>
+                  <span>
+                    Max: ₹{typeof budgetMax === 'number' ? (budgetMax / 100000).toFixed(0) : '0'}{' '}
+                    Lakhs
+                  </span>
+                </div>
+              </div>
+
+              {/* Location Tags matching add-lead.html */}
+              <div>
+                <label className="mb-1.5 block text-xs font-bold tracking-wider text-slate-700 uppercase">
+                  Preferred Location(s)
+                </label>
+                <div className="flex min-h-[42px] flex-wrap items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 p-2 transition-all focus-within:border-blue-600 focus-within:bg-white focus-within:ring-1 focus-within:ring-blue-600">
+                  {locationTags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="inline-flex items-center gap-1 rounded-md bg-slate-200 px-2.5 py-1 text-xs font-semibold text-slate-800"
+                    >
+                      {tag}
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveLocation(tag)}
+                        className="cursor-pointer transition-colors hover:text-rose-600"
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    </span>
+                  ))}
+                  <input
+                    type="text"
+                    value={locationInput}
+                    onChange={(e) => setLocationInput(e.target.value)}
+                    onKeyDown={handleAddLocation}
+                    placeholder="Add location (press Enter)..."
+                    className="min-w-[120px] flex-1 border-none bg-transparent p-0 text-xs text-slate-900 outline-hidden placeholder:text-slate-400 focus:ring-0"
+                  />
+                </div>
+              </div>
+
+              {/* Property Type Radio Cards matching add-lead.html */}
+              <div>
+                <label className="mb-1.5 block text-xs font-bold tracking-wider text-slate-700 uppercase">
+                  Property Type
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  {(['APARTMENT', 'VILLA', 'COMMERCIAL'] as PropertyType[]).map((type) => {
+                    const isSelected = propertyType === type;
+                    const label =
+                      type === 'APARTMENT'
+                        ? 'Apartment'
+                        : type === 'VILLA'
+                          ? 'Villa'
+                          : 'Commercial';
+
+                    return (
+                      <label
+                        key={type}
+                        onClick={() => setPropertyType(type)}
+                        className={`flex cursor-pointer items-center justify-center gap-2 rounded-xl border p-2.5 text-center text-xs font-semibold transition-colors ${
+                          isSelected
+                            ? 'border-blue-600 bg-blue-50/60 text-blue-700 shadow-xs'
+                            : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="property_type"
+                          checked={isSelected}
+                          onChange={() => setPropertyType(type)}
+                          className="sr-only"
+                        />
+                        <span>{label}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Configuration (BHK) Pills matching add-lead.html */}
+              <div>
+                <label className="mb-1.5 block text-xs font-bold tracking-wider text-slate-700 uppercase">
+                  Configuration
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {['1BHK', '2BHK', '3BHK', '4BHK+'].map((opt) => {
+                    const isSelected = bhk === opt;
+                    return (
+                      <button
+                        key={opt}
+                        type="button"
+                        onClick={() => setBhk(opt)}
+                        className={`cursor-pointer rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-colors ${
+                          isSelected
+                            ? 'border-blue-600 bg-blue-50/70 font-bold text-blue-700 shadow-xs'
+                            : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
+                        }`}
+                      >
+                        {opt}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            <hr className="my-4 border-slate-100" />
+
+            {/* Additional Details Section matching add-lead.html */}
+            <div className="space-y-4 pb-2">
+              <h3 className="text-xs font-bold tracking-wider text-slate-400 uppercase">
+                Additional Details
+              </h3>
+
+              <div>
+                <label className="mb-1 block text-xs font-bold tracking-wider text-slate-700 uppercase">
+                  Timeline / Urgency
+                </label>
+                <div className="relative">
+                  <select
+                    value={urgency}
+                    onChange={(e) => setUrgency(e.target.value as LeadUrgency)}
+                    className="w-full cursor-pointer appearance-none rounded-xl border border-slate-200 bg-slate-50 py-2 pr-8 pl-3.5 text-xs font-medium text-slate-800 outline-hidden transition-all focus:border-blue-600 focus:bg-white focus:ring-1 focus:ring-blue-600"
+                  >
+                    <option value="IMMEDIATE">Immediate (0-30 days)</option>
+                    <option value="WITHIN_1_MONTH">Within 1 month</option>
+                    <option value="WITHIN_3_MONTHS">Within 3 months</option>
+                    <option value="EXPLORING">Just browsing</option>
+                  </select>
+                  <ChevronDown className="pointer-events-none absolute top-2.5 right-3 h-4 w-4 text-slate-400" />
+                </div>
+              </div>
+
+              <div>
+                <label className="mb-1 block text-xs font-bold tracking-wider text-slate-700 uppercase">
+                  Assign To
+                </label>
+                <div className="relative">
+                  <select
+                    value={assignedAgentId}
+                    onChange={(e) => setAssignedAgentId(e.target.value)}
+                    className="w-full cursor-pointer appearance-none rounded-xl border border-slate-200 bg-slate-50 py-2 pr-8 pl-3.5 text-xs font-medium text-slate-800 outline-hidden transition-all focus:border-blue-600 focus:bg-white focus:ring-1 focus:ring-blue-600"
+                  >
+                    <option value="">Unassigned (Pool)</option>
+                    {agents.map((ag) => (
+                      <option key={ag.id} value={ag.id}>
+                        {ag.name} ({ag.role})
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="pointer-events-none absolute top-2.5 right-3 h-4 w-4 text-slate-400" />
+                </div>
+              </div>
+
+              <div>
+                <label className="mb-1 block text-xs font-bold tracking-wider text-slate-700 uppercase">
+                  Notes
+                </label>
+                <textarea
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  placeholder="Enter any specific requirements or conversation notes..."
+                  rows={3}
+                  className="w-full resize-none rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-900 outline-hidden transition-all placeholder:text-slate-400 focus:border-blue-600 focus:bg-white focus:ring-1 focus:ring-blue-600"
+                />
+              </div>
+            </div>
+          </form>
         </div>
-      </form>
-    </Drawer>
+
+        {/* Footer Actions & Live Match Preview matching add-lead.html */}
+        <div className="flex flex-col gap-2.5 border-t border-slate-200 bg-white p-4 shadow-[0_-4px_10px_rgba(30,41,59,0.02)]">
+          {/* Live Match Preview banner */}
+          <div className="flex items-center justify-between rounded-lg border border-emerald-200 bg-emerald-50/70 px-3 py-2">
+            <div className="flex items-center gap-2">
+              <Zap className="h-4 w-4 fill-emerald-600 text-emerald-600" />
+              <span className="text-xs font-semibold text-emerald-800">
+                Matches found: 14 properties
+              </span>
+            </div>
+            <span className="cursor-pointer text-xs font-bold text-emerald-700 hover:underline">
+              View
+            </span>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={onClose}
+              disabled={isSubmitting}
+              className="flex-1 cursor-pointer rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-50"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              form="lead-form"
+              disabled={isSubmitting}
+              className="flex-1 cursor-pointer rounded-xl bg-blue-600 px-4 py-2.5 text-xs font-bold text-white shadow-sm transition-colors hover:bg-blue-700 disabled:opacity-50"
+            >
+              {isSubmitting ? 'Saving...' : lead ? 'Update Lead' : 'Save Lead'}
+            </button>
+          </div>
+        </div>
+      </aside>
+    </div>
   );
 }

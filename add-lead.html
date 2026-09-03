@@ -1,0 +1,523 @@
+<!doctype html>
+
+<html class="light" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>EstateNexus - Add Lead</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              'primary-fixed': '#dbe1ff',
+              outline: '#737686',
+              'surface-dim': '#d9d9e5',
+              'on-secondary-container': '#54647a',
+              'surface-container-lowest': '#ffffff',
+              'on-error': '#ffffff',
+              'tertiary-container': '#bc4800',
+              tertiary: '#943700',
+              'secondary-fixed-dim': '#b7c8e1',
+              'surface-container-high': '#e7e7f3',
+              'on-secondary-fixed-variant': '#38485d',
+              'secondary-fixed': '#d3e4fe',
+              'error-container': '#ffdad6',
+              'on-tertiary-container': '#ffede6',
+              'surface-container': '#ededf9',
+              'inverse-on-surface': '#f0f0fb',
+              surface: '#faf8ff',
+              'on-surface': '#191b23',
+              'on-secondary-fixed': '#0b1c30',
+              'on-error-container': '#93000a',
+              'surface-container-low': '#f3f3fe',
+              'surface-container-highest': '#e1e2ed',
+              'on-primary-container': '#eeefff',
+              'secondary-container': '#d0e1fb',
+              'on-surface-variant': '#434655',
+              'surface-variant': '#e1e2ed',
+              'on-primary-fixed-variant': '#003ea8',
+              'on-primary-fixed': '#00174b',
+              primary: '#004ac6',
+              secondary: '#505f76',
+              'surface-bright': '#faf8ff',
+              'inverse-surface': '#2e3039',
+              'outline-variant': '#c3c6d7',
+              'surface-tint': '#0053db',
+              'on-background': '#191b23',
+              'primary-container': '#2563eb',
+              'on-secondary': '#ffffff',
+              'inverse-primary': '#b4c5ff',
+              'tertiary-fixed-dim': '#ffb596',
+              'primary-fixed-dim': '#b4c5ff',
+              error: '#ba1a1a',
+              'on-primary': '#ffffff',
+              'tertiary-fixed': '#ffdbcd',
+              'on-tertiary-fixed': '#360f00',
+              background: '#faf8ff',
+              'on-tertiary': '#ffffff',
+              'on-tertiary-fixed-variant': '#7d2d00',
+            },
+            borderRadius: {
+              DEFAULT: '0.25rem',
+              lg: '0.5rem',
+              xl: '0.75rem',
+              full: '9999px',
+            },
+            spacing: {
+              xs: '4px',
+              lg: '24px',
+              'margin-desktop': '32px',
+              'sidebar-collapsed': '72px',
+              base: '4px',
+              gutter: '24px',
+              'sidebar-width': '260px',
+              sm: '8px',
+              'margin-mobile': '16px',
+              md: '16px',
+              xl: '32px',
+            },
+            fontFamily: {
+              'headline-md': ['Inter'],
+              'display-lg-mobile': ['Inter'],
+              'label-caps': ['Inter'],
+              'body-md': ['Inter'],
+              'title-sm': ['Inter'],
+              'body-sm': ['Inter'],
+              'display-lg': ['Inter'],
+            },
+            fontSize: {
+              'headline-md': [
+                '24px',
+                { lineHeight: '32px', letterSpacing: '-0.01em', fontWeight: '600' },
+              ],
+              'display-lg-mobile': [
+                '28px',
+                { lineHeight: '34px', letterSpacing: '-0.02em', fontWeight: '700' },
+              ],
+              'label-caps': [
+                '12px',
+                { lineHeight: '16px', letterSpacing: '0.05em', fontWeight: '600' },
+              ],
+              'body-md': ['16px', { lineHeight: '24px', fontWeight: '400' }],
+              'title-sm': ['18px', { lineHeight: '28px', fontWeight: '600' }],
+              'body-sm': ['14px', { lineHeight: '20px', fontWeight: '400' }],
+              'display-lg': [
+                '36px',
+                { lineHeight: '44px', letterSpacing: '-0.02em', fontWeight: '700' },
+              ],
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      body {
+        font-family: 'Inter', sans-serif;
+        background-color: #f8fafc;
+      }
+      .material-symbols-outlined {
+        font-variation-settings:
+          'FILL' 0,
+          'wght' 400,
+          'GRAD' 0,
+          'opsz' 24;
+      }
+      .material-symbols-outlined.filled {
+        font-variation-settings:
+          'FILL' 1,
+          'wght' 400,
+          'GRAD' 0,
+          'opsz' 24;
+      }
+
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background-color: #e1e2ed;
+        border-radius: 10px;
+      }
+    </style>
+  </head>
+  <body class="bg-background text-on-background relative flex h-screen overflow-hidden">
+    <!-- Background Screen Context (Leads Management) -->
+    <div class="absolute inset-0 z-0">
+      <img
+        alt="Leads Management Background"
+        class="h-full w-full object-cover"
+        src="https://lh3.googleusercontent.com/aida-public/AB6AXuCp9RvTY59XvJTB54jrOiH9Q97sqYumnvcaiHTEB3kBAC2qw1yolAdrg3A-lHBxUJmS5gCPnA_GfS5PmwJPC5b0JrXGwya-tFfoXT5PYkQsLnjfOGA7UkYbunqBBl4c0CXHRC3sNorx-2esEjBxKqkqT2_kdM3V0jSq0nAubEriCos6Jh7A48uTLpWT6ynObUKQjJIl2ke_aBDFDo_cmFqKrvjgGIHq6cS8y5HkiC4F154glF3IkV7t"
+      />
+    </div>
+    <!-- Overlay / Backdrop -->
+    <div
+      class="bg-on-background/30 fixed inset-0 z-40 backdrop-blur-sm transition-opacity duration-300"
+    ></div>
+    <!-- Side Panel Drawer -->
+    <aside
+      class="bg-surface border-outline-variant fixed inset-y-0 right-0 z-50 flex w-full translate-x-0 transform flex-col border-l shadow-2xl transition-transform duration-300 ease-in-out md:w-[480px]"
+    >
+      <!-- Drawer Header -->
+      <header
+        class="px-lg py-md border-outline-variant bg-surface-container-lowest flex items-center justify-between border-b"
+      >
+        <div>
+          <h2 class="font-headline-md text-headline-md text-on-surface">Add New Lead</h2>
+          <p class="font-body-sm text-body-sm text-on-surface-variant mt-xs">
+            Quick entry form for new prospects
+          </p>
+        </div>
+        <button
+          class="hover:bg-surface-container-high text-on-surface-variant rounded-full p-2 transition-colors"
+        >
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </header>
+      <!-- Scrollable Form Area -->
+      <div class="custom-scrollbar p-lg bg-surface-container-lowest flex-1 overflow-y-auto">
+        <form class="space-y-md">
+          <!-- Contact Info Section -->
+          <div class="space-y-4">
+            <h3
+              class="font-label-caps text-label-caps text-on-surface-variant tracking-wider uppercase"
+            >
+              Contact Details
+            </h3>
+            <div>
+              <label class="font-label-caps text-label-caps text-on-surface mb-xs block"
+                >Full Name</label
+              >
+              <input
+                class="bg-surface border-outline-variant font-body-sm text-body-sm text-on-surface focus:ring-primary focus:border-primary w-full rounded-xl border px-3 py-2 transition-all outline-none focus:ring-1"
+                placeholder="e.g. John Doe"
+                type="text"
+              />
+            </div>
+            <div class="gap-md grid grid-cols-2">
+              <div>
+                <label class="font-label-caps text-label-caps text-on-surface mb-xs block"
+                  >Phone Number</label
+                >
+                <input
+                  class="bg-surface border-outline-variant font-body-sm text-body-sm text-on-surface focus:ring-primary focus:border-primary w-full rounded-xl border px-3 py-2 transition-all outline-none focus:ring-1"
+                  placeholder="+1 (555) 000-0000"
+                  type="tel"
+                />
+              </div>
+              <div>
+                <label class="font-label-caps text-label-caps text-on-surface mb-xs block"
+                  >Email <span class="text-on-surface-variant font-normal">(Optional)</span></label
+                >
+                <input
+                  class="bg-surface border-outline-variant font-body-sm text-body-sm text-on-surface focus:ring-primary focus:border-primary w-full rounded-xl border px-3 py-2 transition-all outline-none focus:ring-1"
+                  placeholder="john@example.com"
+                  type="email"
+                />
+              </div>
+            </div>
+            <div>
+              <label class="font-label-caps text-label-caps text-on-surface mb-xs block"
+                >Source</label
+              >
+              <div class="relative">
+                <select
+                  class="bg-surface border-outline-variant font-body-sm text-body-sm text-on-surface focus:ring-primary focus:border-primary w-full appearance-none rounded-xl border py-2 pr-3 pl-10 transition-all outline-none focus:ring-1"
+                >
+                  <option disabled="" selected="" value="">Select Source...</option>
+                  <option value="instagram">Instagram</option>
+                  <option value="whatsapp">WhatsApp</option>
+                  <option value="phone">Phone Call</option>
+                  <option value="website">Website</option>
+                  <option value="referral">Referral</option>
+                  <option value="walkin">Walk-in</option>
+                </select>
+                <span
+                  class="material-symbols-outlined text-on-surface-variant absolute top-2.5 left-3 text-[20px]"
+                  >how_to_reg</span
+                >
+                <span
+                  class="material-symbols-outlined text-on-surface-variant pointer-events-none absolute top-2.5 right-3 text-[20px]"
+                  >expand_more</span
+                >
+              </div>
+            </div>
+          </div>
+          <hr class="border-outline-variant my-md" />
+          <!-- Requirements Section -->
+          <div class="space-y-4">
+            <h3
+              class="font-label-caps text-label-caps text-on-surface-variant tracking-wider uppercase"
+            >
+              Property Requirements
+            </h3>
+            <!-- Purpose Segmented Control -->
+            <div>
+              <label class="font-label-caps text-label-caps text-on-surface mb-xs block"
+                >Purpose</label
+              >
+              <div class="bg-surface-container flex rounded-xl p-1">
+                <button
+                  class="bg-surface border-outline-variant font-body-sm text-body-sm text-primary flex-1 rounded-lg border px-3 py-1.5 text-center font-semibold shadow-sm"
+                  type="button"
+                >
+                  Buy
+                </button>
+                <button
+                  class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface flex-1 rounded-lg px-3 py-1.5 text-center transition-colors"
+                  type="button"
+                >
+                  Rent
+                </button>
+                <button
+                  class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface flex-1 rounded-lg px-3 py-1.5 text-center transition-colors"
+                  type="button"
+                >
+                  Invest
+                </button>
+              </div>
+            </div>
+            <!-- Budget Range -->
+            <div>
+              <label class="font-label-caps text-label-caps text-on-surface mb-xs block"
+                >Budget Range</label
+              >
+              <div class="flex items-center gap-2">
+                <div class="relative flex-1">
+                  <span class="font-body-sm text-on-surface-variant absolute top-2.5 left-3"
+                    >$</span
+                  >
+                  <input
+                    class="bg-surface border-outline-variant font-body-sm text-body-sm text-on-surface focus:ring-primary focus:border-primary w-full rounded-xl border py-2 pr-3 pl-8 transition-all outline-none focus:ring-1"
+                    placeholder="Min"
+                    type="number"
+                  />
+                </div>
+                <span class="text-on-surface-variant font-body-sm">-</span>
+                <div class="relative flex-1">
+                  <span class="font-body-sm text-on-surface-variant absolute top-2.5 left-3"
+                    >$</span
+                  >
+                  <input
+                    class="bg-surface border-outline-variant font-body-sm text-body-sm text-on-surface focus:ring-primary focus:border-primary w-full rounded-xl border py-2 pr-3 pl-8 transition-all outline-none focus:ring-1"
+                    placeholder="Max"
+                    type="number"
+                  />
+                </div>
+              </div>
+            </div>
+            <!-- Location Tags -->
+            <div>
+              <label class="font-label-caps text-label-caps text-on-surface mb-xs block"
+                >Preferred Location(s)</label
+              >
+              <div
+                class="bg-surface border-outline-variant focus-within:ring-primary focus-within:border-primary flex min-h-[42px] flex-wrap items-center gap-2 rounded-xl border p-2 transition-all focus-within:ring-1"
+              >
+                <span
+                  class="bg-surface-container-high font-body-sm text-body-sm text-on-surface inline-flex items-center gap-1 rounded-md px-2 py-1"
+                >
+                  Downtown
+                  <button class="hover:text-error transition-colors" type="button">
+                    <span class="material-symbols-outlined text-[16px]">close</span>
+                  </button>
+                </span>
+                <input
+                  class="font-body-sm text-body-sm text-on-surface min-w-[100px] flex-1 border-none bg-transparent p-0 outline-none focus:ring-0"
+                  placeholder="Add location..."
+                  type="text"
+                />
+              </div>
+            </div>
+            <!-- Property Type -->
+            <div>
+              <label class="font-label-caps text-label-caps text-on-surface mb-xs block"
+                >Property Type</label
+              >
+              <div class="grid grid-cols-3 gap-2">
+                <label
+                  class="border-primary bg-primary-fixed/20 flex cursor-pointer items-center gap-2 rounded-xl border p-2 transition-colors"
+                >
+                  <input
+                    checked=""
+                    class="text-primary focus:ring-primary"
+                    name="prop_type"
+                    type="radio"
+                  />
+                  <span class="font-body-sm text-body-sm text-on-surface">Apartment</span>
+                </label>
+                <label
+                  class="border-outline-variant bg-surface hover:bg-surface-container flex cursor-pointer items-center gap-2 rounded-xl border p-2 transition-colors"
+                >
+                  <input class="text-primary focus:ring-primary" name="prop_type" type="radio" />
+                  <span class="font-body-sm text-body-sm text-on-surface">Villa</span>
+                </label>
+                <label
+                  class="border-outline-variant bg-surface hover:bg-surface-container flex cursor-pointer items-center gap-2 rounded-xl border p-2 transition-colors"
+                >
+                  <input class="text-primary focus:ring-primary" name="prop_type" type="radio" />
+                  <span class="font-body-sm text-body-sm text-on-surface">Commercial</span>
+                </label>
+              </div>
+            </div>
+            <!-- Configuration -->
+            <div>
+              <label class="font-label-caps text-label-caps text-on-surface mb-xs block"
+                >Configuration</label
+              >
+              <div class="flex flex-wrap gap-2">
+                <label
+                  class="border-primary bg-primary-fixed/20 inline-flex cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1.5 transition-colors"
+                >
+                  <input
+                    checked=""
+                    class="text-primary focus:ring-primary h-3.5 w-3.5 rounded-sm"
+                    type="checkbox"
+                  />
+                  <span class="font-body-sm text-body-sm text-on-surface">1BHK</span>
+                </label>
+                <label
+                  class="border-primary bg-primary-fixed/20 inline-flex cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1.5 transition-colors"
+                >
+                  <input
+                    checked=""
+                    class="text-primary focus:ring-primary h-3.5 w-3.5 rounded-sm"
+                    type="checkbox"
+                  />
+                  <span class="font-body-sm text-body-sm text-on-surface">2BHK</span>
+                </label>
+                <label
+                  class="border-outline-variant bg-surface hover:bg-surface-container inline-flex cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1.5 transition-colors"
+                >
+                  <input
+                    class="text-primary focus:ring-primary h-3.5 w-3.5 rounded-sm"
+                    type="checkbox"
+                  />
+                  <span class="font-body-sm text-body-sm text-on-surface">3BHK</span>
+                </label>
+                <label
+                  class="border-outline-variant bg-surface hover:bg-surface-container inline-flex cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1.5 transition-colors"
+                >
+                  <input
+                    class="text-primary focus:ring-primary h-3.5 w-3.5 rounded-sm"
+                    type="checkbox"
+                  />
+                  <span class="font-body-sm text-body-sm text-on-surface">4BHK+</span>
+                </label>
+              </div>
+            </div>
+          </div>
+          <hr class="border-outline-variant my-md" />
+          <!-- Admin Section -->
+          <div class="space-y-4 pb-2">
+            <h3
+              class="font-label-caps text-label-caps text-on-surface-variant tracking-wider uppercase"
+            >
+              Additional Details
+            </h3>
+            <div>
+              <label class="font-label-caps text-label-caps text-on-surface mb-xs block"
+                >Timeline / Urgency</label
+              >
+              <div class="relative">
+                <select
+                  class="bg-surface border-outline-variant font-body-sm text-body-sm text-on-surface focus:ring-primary focus:border-primary w-full appearance-none rounded-xl border py-2 pr-10 pl-3 transition-all outline-none focus:ring-1"
+                >
+                  <option>Immediate (0-30 days)</option>
+                  <option>Within 3 months</option>
+                  <option>Within 6 months</option>
+                  <option>Just browsing</option>
+                </select>
+                <span
+                  class="material-symbols-outlined text-on-surface-variant pointer-events-none absolute top-2.5 right-3 text-[20px]"
+                  >expand_more</span
+                >
+              </div>
+            </div>
+            <div>
+              <label class="font-label-caps text-label-caps text-on-surface mb-xs block"
+                >Assign To</label
+              >
+              <div class="relative">
+                <select
+                  class="bg-surface border-outline-variant font-body-sm text-body-sm text-on-surface focus:ring-primary focus:border-primary w-full appearance-none rounded-xl border py-2 pr-10 pl-10 transition-all outline-none focus:ring-1"
+                >
+                  <option>Sarah Jenkins (You)</option>
+                  <option>Marcus Thorne</option>
+                  <option>Unassigned (Pool)</option>
+                </select>
+                <img
+                  class="border-outline-variant absolute top-2 left-3 h-6 w-6 rounded-full border object-cover"
+                  data-alt="A tiny, high-quality professional headshot of a smiling woman in business attire, modern corporate lighting, light background, circular crop."
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuD2wpKt40dgEVlcbbiqPz1DD3zbCIuw7XtRWZy_KTRGlzU8LHcLtxftUjeqr9Q9iFRcT2RNfM8dL6UrWTx95eK_gCeUdIXqibk-iXxfiblyW5kOQzQzBxsk3anZx21a0LBkGQP7Z1jH0hcwJpq080ufkRDh-OI1_aL_7vYEBh9nG8B3GS9D2H7eqVexdnEiXkJ02HQ76qMU7xGqAvonGuEVyJMTfyDTRGmP91MHJY3edCUuXY1GKnUz"
+                />
+                <span
+                  class="material-symbols-outlined text-on-surface-variant pointer-events-none absolute top-2.5 right-3 text-[20px]"
+                  >expand_more</span
+                >
+              </div>
+            </div>
+            <div>
+              <label class="font-label-caps text-label-caps text-on-surface mb-xs block"
+                >Notes</label
+              >
+              <textarea
+                class="bg-surface border-outline-variant font-body-sm text-body-sm text-on-surface focus:ring-primary focus:border-primary w-full resize-none rounded-xl border px-3 py-2 transition-all outline-none focus:ring-1"
+                placeholder="Enter any specific requirements or conversation notes..."
+                rows="3"
+              ></textarea>
+            </div>
+          </div>
+        </form>
+      </div>
+      <!-- Footer Actions & Live Match Preview -->
+      <div
+        class="border-outline-variant bg-surface-container-lowest p-md gap-sm flex flex-col border-t shadow-[0_-4px_10px_rgba(30,41,59,0.02)]"
+      >
+        <!-- Live Match Preview -->
+        <div
+          class="flex items-center justify-between rounded-lg border border-[#10b981]/20 bg-[#d1fae5]/30 px-3 py-2"
+        >
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-[18px] text-[#059669]">bolt</span>
+            <span class="font-body-sm text-body-sm font-medium text-[#065f46]"
+              >Matches found: 14 properties</span
+            >
+          </div>
+          <button class="font-label-caps text-label-caps text-[#059669] hover:underline">
+            View
+          </button>
+        </div>
+        <!-- Action Buttons -->
+        <div class="mt-xs flex items-center gap-3">
+          <button
+            class="bg-surface border-outline-variant font-title-sm text-body-sm text-on-surface hover:bg-surface-container flex-1 rounded-xl border px-4 py-2 font-medium transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            class="bg-primary-container font-title-sm text-body-sm text-on-primary hover:bg-primary flex-1 rounded-xl px-4 py-2 font-medium shadow-sm transition-colors"
+          >
+            Save Lead
+          </button>
+        </div>
+      </div>
+    </aside>
+  </body>
+</html>
