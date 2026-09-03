@@ -46,11 +46,11 @@ export function Sidebar({ className }: { className?: string }) {
       {/* Brand Header */}
       <div className="flex h-18 items-center gap-3.5 border-b border-slate-200 px-6">
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-600 text-sm font-bold text-white shadow-xs">
-          EN
+          IG
         </div>
         <div>
           <h1 className="text-lg leading-tight font-bold tracking-tight text-blue-700">
-            EstateNexus
+            Infragen
           </h1>
           <p className="text-[11px] font-semibold tracking-wider text-slate-400 uppercase">
             Professional Suite

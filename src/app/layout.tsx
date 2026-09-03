@@ -4,9 +4,9 @@ import { AuthProvider } from '@/context/AuthContext';
 import { AppLayout } from '@/components/layout/AppLayout';
 
 export const metadata: Metadata = {
-  title: 'Infragen Real Estate CRM • Matching Engine',
+  title: 'Infragen • Smart Real Estate CRM',
   description:
-    'Single-Tenant Real Estate CRM with Bi-directional Lead-Property Matching Engine and Real-time Alerts',
+    'Infragen — Intelligent lead-property matching CRM with automated follow-ups, real-time alerts, and pipeline management for real estate agencies.',
 };
 
 export default function RootLayout({

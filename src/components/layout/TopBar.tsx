@@ -18,7 +18,7 @@ export interface TopBarProps {
 export function TopBar({
   userName = 'Alex Mercer',
   userRole = 'AGENT',
-  userEmail = 'alex.mercer@estatenexus.com',
+  userEmail = 'alex.mercer@infragen.io',
   unreadCount = 1,
   onSearch,
   onLogout,

@@ -43,12 +43,12 @@ export default function SettingsPage() {
 
   // Profile & Business Details
   const [fullName, setFullName] = useState(user?.name || 'Administrator');
-  const [email] = useState(user?.email || 'admin@estatenexus.com');
+  const [email] = useState(user?.email || 'admin@infragen.io');
   const [phone, setPhone] = useState('');
   const [roleTitle, setRoleTitle] = useState(
     user?.role === 'ADMIN' ? 'Admin / Principal Broker' : 'Real Estate Agent'
   );
-  const [businessName, setBusinessName] = useState('Nexus Real Estate Advisors');
+  const [businessName, setBusinessName] = useState('Infragen Real Estate');
   const [primaryMarket, setPrimaryMarket] = useState('Metro Prime');
   const [reraNumber, setReraNumber] = useState('');
 

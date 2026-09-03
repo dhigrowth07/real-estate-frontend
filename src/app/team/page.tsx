@@ -303,7 +303,7 @@ export default function TeamPage() {
                       type="email"
                       value={inviteEmail}
                       onChange={(e) => setInviteEmail(e.target.value)}
-                      placeholder="alex@estatenexus.com"
+                      placeholder="alex@infragen.io"
                       className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2 pr-3 pl-9 text-xs text-slate-900 outline-hidden focus:border-blue-600 focus:bg-white"
                       required
                     />
