@@ -1,0 +1,841 @@
+<!doctype html>
+<html class="light" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>EstateNexus Dashboard</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              primary: '#004ac6',
+              'surface-container-low': '#f3f3fe',
+              'primary-fixed-dim': '#b4c5ff',
+              'on-secondary-fixed-variant': '#38485d',
+              'inverse-primary': '#b4c5ff',
+              'surface-variant': '#e1e2ed',
+              'on-tertiary': '#ffffff',
+              'on-secondary': '#ffffff',
+              tertiary: '#943700',
+              'surface-dim': '#d9d9e5',
+              'inverse-on-surface': '#f0f0fb',
+              'on-primary': '#ffffff',
+              'on-surface': '#191b23',
+              'tertiary-fixed': '#ffdbcd',
+              'on-tertiary-fixed': '#360f00',
+              surface: '#faf8ff',
+              outline: '#737686',
+              'surface-container-lowest': '#ffffff',
+              'surface-container-high': '#e7e7f3',
+              'on-error-container': '#93000a',
+              'on-secondary-container': '#54647a',
+              'error-container': '#ffdad6',
+              'inverse-surface': '#2e3039',
+              'outline-variant': '#c3c6d7',
+              'on-tertiary-fixed-variant': '#7d2d00',
+              'tertiary-container': '#bc4800',
+              'on-secondary-fixed': '#0b1c30',
+              'on-primary-fixed': '#00174b',
+              secondary: '#505f76',
+              error: '#ba1a1a',
+              'secondary-container': '#d0e1fb',
+              'on-primary-container': '#eeefff',
+              'primary-container': '#2563eb',
+              'on-primary-fixed-variant': '#003ea8',
+              'on-background': '#191b23',
+              'secondary-fixed-dim': '#b7c8e1',
+              'surface-container-highest': '#e1e2ed',
+              background: '#faf8ff',
+              'on-error': '#ffffff',
+              'secondary-fixed': '#d3e4fe',
+              'surface-tint': '#0053db',
+              'surface-bright': '#faf8ff',
+              'on-surface-variant': '#434655',
+              'on-tertiary-container': '#ffede6',
+              'primary-fixed': '#dbe1ff',
+              'tertiary-fixed-dim': '#ffb596',
+              'surface-container': '#ededf9',
+            },
+            borderRadius: {
+              DEFAULT: '0.25rem',
+              lg: '0.5rem',
+              xl: '0.75rem',
+              full: '9999px',
+            },
+            spacing: {
+              'margin-desktop': '32px',
+              base: '4px',
+              md: '16px',
+              'sidebar-collapsed': '72px',
+              sm: '8px',
+              xl: '32px',
+              lg: '24px',
+              gutter: '24px',
+              'margin-mobile': '16px',
+              xs: '4px',
+              'sidebar-width': '260px',
+            },
+            fontFamily: {
+              'label-caps': ['Inter'],
+              'title-sm': ['Inter'],
+              'body-md': ['Inter'],
+              'display-lg-mobile': ['Inter'],
+              'display-lg': ['Inter'],
+              'body-sm': ['Inter'],
+              'headline-md': ['Inter'],
+            },
+            fontSize: {
+              'label-caps': [
+                '12px',
+                { lineHeight: '16px', letterSpacing: '0.05em', fontWeight: '600' },
+              ],
+              'title-sm': ['18px', { lineHeight: '28px', fontWeight: '600' }],
+              'body-md': ['16px', { lineHeight: '24px', fontWeight: '400' }],
+              'display-lg-mobile': [
+                '28px',
+                { lineHeight: '34px', letterSpacing: '-0.02em', fontWeight: '700' },
+              ],
+              'display-lg': [
+                '36px',
+                { lineHeight: '44px', letterSpacing: '-0.02em', fontWeight: '700' },
+              ],
+              'body-sm': ['14px', { lineHeight: '20px', fontWeight: '400' }],
+              'headline-md': [
+                '24px',
+                { lineHeight: '32px', letterSpacing: '-0.01em', fontWeight: '600' },
+              ],
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      body {
+        font-family: 'Inter', sans-serif;
+        background-color: #f8fafc;
+      }
+      .material-symbols-outlined {
+        font-variation-settings:
+          'FILL' 0,
+          'wght' 400,
+          'GRAD' 0,
+          'opsz' 24;
+      }
+      .icon-fill {
+        font-variation-settings: 'FILL' 1;
+      }
+
+      .shadow-soft {
+        box-shadow: 0px 2px 4px rgba(30, 41, 59, 0.05);
+      }
+      .shadow-floating {
+        box-shadow: 0px 10px 20px rgba(30, 41, 59, 0.1);
+      }
+    </style>
+  </head>
+  <body class="text-on-surface bg-surface flex h-screen overflow-hidden">
+    <!-- SideNavBar -->
+    <aside
+      class="w-sidebar-width border-outline-variant bg-surface fixed top-0 left-0 z-40 hidden h-screen flex-col border-r md:flex"
+    >
+      <div class="p-lg gap-md border-outline-variant flex items-center border-b">
+        <div
+          class="bg-primary-container text-on-primary-container font-title-sm text-title-sm flex h-10 w-10 items-center justify-center rounded-full font-bold"
+        >
+          EN
+        </div>
+        <div>
+          <h1 class="font-headline-md text-headline-md text-primary font-bold">EstateNexus</h1>
+          <p class="font-label-caps text-label-caps text-on-surface-variant">Professional Suite</p>
+        </div>
+      </div>
+      <nav class="py-md flex-1 overflow-y-auto">
+        <ul class="gap-sm px-sm flex flex-col">
+          <!-- Dashboard - Active -->
+          <li class="">
+            <a
+              class="gap-md px-md py-sm text-primary border-primary bg-surface-container-low font-body-md text-body-md hover:bg-surface-container-high flex items-center rounded-lg border-l-4 transition-colors duration-200 ease-in-out"
+              href="#"
+            >
+              <span class="material-symbols-outlined icon-fill">dashboard</span>
+              Dashboard
+            </a>
+          </li>
+          <!-- Leads -->
+          <li class="">
+            <a
+              class="gap-md px-md py-sm text-on-surface-variant font-body-md text-body-md hover:bg-surface-container-high flex items-center rounded-lg transition-colors duration-200 ease-in-out"
+              href="#"
+            >
+              <span class="material-symbols-outlined">person_search</span>
+              Leads
+            </a>
+          </li>
+          <!-- Inventory -->
+          <li class="">
+            <a
+              class="gap-md px-md py-sm text-on-surface-variant font-body-md text-body-md hover:bg-surface-container-high flex items-center rounded-lg transition-colors duration-200 ease-in-out"
+              href="#"
+            >
+              <span class="material-symbols-outlined">domain</span>
+              Inventory
+            </a>
+          </li>
+          <!-- Matches -->
+          <li class="">
+            <a
+              class="gap-md px-md py-sm text-on-surface-variant font-body-md text-body-md hover:bg-surface-container-high flex items-center rounded-lg transition-colors duration-200 ease-in-out"
+              href="#"
+            >
+              <span class="material-symbols-outlined">notifications_active</span>
+              Matches
+            </a>
+          </li>
+          <!-- Pipeline -->
+          <li class="">
+            <a
+              class="gap-md px-md py-sm text-on-surface-variant font-body-md text-body-md hover:bg-surface-container-high flex items-center rounded-lg transition-colors duration-200 ease-in-out"
+              href="#"
+            >
+              <span class="material-symbols-outlined">view_kanban</span>
+              Pipeline
+            </a>
+          </li>
+          <!-- Team -->
+          <li class="">
+            <a
+              class="gap-md px-md py-sm text-on-surface-variant font-body-md text-body-md hover:bg-surface-container-high flex items-center rounded-lg transition-colors duration-200 ease-in-out"
+              href="#"
+            >
+              <span class="material-symbols-outlined">group</span>
+              Team
+            </a>
+          </li>
+          <!-- Settings -->
+          <li class="">
+            <a
+              class="gap-md px-md py-sm text-on-surface-variant font-body-md text-body-md hover:bg-surface-container-high flex items-center rounded-lg transition-colors duration-200 ease-in-out"
+              href="#"
+            >
+              <span class="material-symbols-outlined">settings</span>
+              Settings
+            </a>
+          </li>
+        </ul>
+      </nav>
+      <div class="p-md border-outline-variant border-t">
+        <div class="gap-sm flex items-center">
+          <img
+            alt="EstateNexus Logo"
+            class="shadow-soft h-10 w-10 rounded-full object-cover"
+            data-alt="A close up professional headshot of an ambitious real estate agent wearing a modern navy suit, bright white background, studio lighting, highly detailed."
+            src="https://lh3.googleusercontent.com/aida-public/AB6AXuAblFBKFZLH7E-G4hFRchiHkK7NUPAZhlKrYQLh1-G_9aASJr5S9oq2FZW_7P8HdbF9UTWD50bVMmCB6To3BG5NZo20mO160uspSuXg1i2PcT-P93SozeDgCtlOT7QTiFS8kZHT7g_WgehGDBG4-w3iQrzs7VPmWcQbpxvz7X42woD3CMJGMp_thCK_GSIIeJHd2yYZJvCiZwfchqr-iZe9VoBaqZV1BqYr9cp-wti0PTL8Sd4oFaCU"
+          />
+          <div class="flex flex-col">
+            <span class="font-body-sm text-body-sm font-bold">Alex Mercer</span>
+            <span class="font-label-caps text-label-caps text-on-surface-variant"
+              >Senior Agent</span
+            >
+          </div>
+        </div>
+      </div>
+    </aside>
+    <!-- Main Content Wrapper -->
+    <div class="md:ml-sidebar-width bg-surface flex h-screen flex-1 flex-col overflow-hidden">
+      <!-- TopAppBar -->
+      <header
+        class="bg-surface/80 border-outline-variant md:left-sidebar-width px-lg fixed top-0 right-0 left-0 z-30 flex h-16 items-center justify-between border-b shadow-sm backdrop-blur-md transition-all duration-200"
+      >
+        <div class="gap-sm flex items-center md:hidden">
+          <button class="p-sm hover:bg-surface-variant text-primary rounded-full">
+            <span class="material-symbols-outlined">menu</span>
+          </button>
+          <span class="font-headline-md text-headline-md text-primary font-bold">EstateNexus</span>
+        </div>
+        <div
+          class="bg-surface-container-low px-md py-sm border-outline-variant focus-within:border-primary-container focus-within:ring-primary-container hidden w-96 items-center rounded-full border transition-all focus-within:ring-1 md:flex"
+        >
+          <span class="material-symbols-outlined text-on-surface-variant mr-sm">search</span>
+          <input
+            class="font-body-sm text-body-sm text-on-surface placeholder-on-surface-variant w-full border-none bg-transparent focus:ring-0 focus:outline-none"
+            placeholder="Search leads, properties, or agents..."
+            type="text"
+          />
+        </div>
+        <div class="gap-md flex items-center">
+          <button
+            class="text-on-surface-variant hover:text-primary p-sm hover:bg-surface-container-low relative rounded-full transition-colors"
+          >
+            <span class="material-symbols-outlined">notifications</span>
+            <span class="bg-error absolute top-1 right-2 h-2 w-2 rounded-full"></span>
+          </button>
+          <button
+            class="text-on-surface-variant hover:text-primary p-sm hover:bg-surface-container-low hidden rounded-full transition-colors md:flex"
+          >
+            <span class="material-symbols-outlined">help_outline</span>
+          </button>
+          <img
+            alt="User profile"
+            class="shadow-soft h-8 w-8 rounded-full object-cover md:hidden"
+            data-alt="A professional headshot of a real estate agent in a modern setting, smiling confidently, high resolution."
+            src="https://lh3.googleusercontent.com/aida-public/AB6AXuAjdQw7PeZlIA6uIN1GZ4MJHZGK9thVmlhn0ykphvaxUiR4OX0v-ZjR8_CK2vT4SHOdZ-Kx6SFZJbHzAR6NYGGxaySvPTQVHblZqqZZBUwb1Ytw61jKLQbNJlguX1ffOy8g3mY7gSiNhPPBtS3cf7uVl2CvQ-ZhN5JrOoJq1tGjOn47bEmb_SP7pTQqNg0Z1CxV0Bcjx41gnTBDWpZfQU1YYDAmY5o7R_hMAQiUnMuzmYc6aAUx2_Mk"
+          />
+        </div>
+      </header>
+      <!-- Scrollable Canvas -->
+      <main class="pb-lg px-margin-mobile md:px-margin-desktop flex-1 overflow-y-auto pt-24">
+        <div class="space-y-lg mx-auto max-w-7xl">
+          <!-- Header -->
+          <div class="gap-sm flex flex-col items-start justify-between md:flex-row md:items-center">
+            <div>
+              <h2
+                class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-on-surface"
+              >
+                Overview
+              </h2>
+              <p class="font-body-md text-body-md text-on-surface-variant">
+                Here's what's happening with your portfolio today.
+              </p>
+            </div>
+            <button
+              class="bg-primary-container hover:bg-primary text-on-primary font-label-caps text-label-caps px-lg py-sm shadow-soft gap-sm flex items-center rounded-lg transition-colors"
+            >
+              <span class="material-symbols-outlined text-[18px]">add</span>
+              New Lead
+            </button>
+          </div>
+          <!-- Stat Cards Grid -->
+          <div class="gap-gutter grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
+            <!-- Card 1 -->
+            <div
+              class="bg-surface-container-lowest border-outline-variant p-md shadow-soft gap-sm flex flex-col rounded-xl border"
+            >
+              <div class="flex items-start justify-between">
+                <span class="font-label-caps text-label-caps text-on-surface-variant uppercase"
+                  >Total Active Leads</span
+                >
+                <span
+                  class="material-symbols-outlined text-primary p-xs bg-surface-container-low rounded-md"
+                  >group</span
+                >
+              </div>
+              <div class="gap-sm flex items-end">
+                <span class="font-display-lg-mobile text-display-lg-mobile text-on-surface"
+                  >342</span
+                >
+                <span
+                  class="font-body-sm text-body-sm px-sm py-xs mb-1 rounded-md bg-emerald-50 font-bold text-emerald-600"
+                  >+12%</span
+                >
+              </div>
+            </div>
+            <!-- Card 2 -->
+            <div
+              class="bg-surface-container-lowest border-outline-variant p-md shadow-soft gap-sm flex flex-col rounded-xl border"
+            >
+              <div class="flex items-start justify-between">
+                <span class="font-label-caps text-label-caps text-on-surface-variant uppercase"
+                  >Total Properties Listed</span
+                >
+                <span
+                  class="material-symbols-outlined text-primary p-xs bg-surface-container-low rounded-md"
+                  >domain</span
+                >
+              </div>
+              <div class="gap-sm flex items-end">
+                <span class="font-display-lg-mobile text-display-lg-mobile text-on-surface"
+                  >89</span
+                >
+                <span class="font-body-sm text-body-sm text-on-surface-variant mb-1">active</span>
+              </div>
+            </div>
+            <!-- Card 3 -->
+            <div
+              class="bg-surface-container-lowest border-outline-variant p-md shadow-soft gap-sm flex flex-col rounded-xl border"
+            >
+              <div class="flex items-start justify-between">
+                <span class="font-label-caps text-label-caps text-on-surface-variant uppercase"
+                  >Hot Matches Today</span
+                >
+                <span
+                  class="material-symbols-outlined p-xs rounded-md bg-emerald-50 text-emerald-600"
+                  >local_fire_department</span
+                >
+              </div>
+              <div class="gap-sm flex items-end">
+                <span class="font-display-lg-mobile text-display-lg-mobile text-on-surface"
+                  >14</span
+                >
+                <span
+                  class="font-body-sm text-body-sm px-sm py-xs mb-1 rounded-md bg-emerald-50 font-bold text-emerald-600"
+                  >Action Required</span
+                >
+              </div>
+            </div>
+            <!-- Card 4 -->
+            <div
+              class="bg-surface-container-lowest border-outline-variant p-md shadow-soft gap-sm flex flex-col rounded-xl border"
+            >
+              <div class="flex items-start justify-between">
+                <span class="font-label-caps text-label-caps text-on-surface-variant uppercase"
+                  >Deals Closed This Month</span
+                >
+                <span
+                  class="material-symbols-outlined text-primary p-xs bg-surface-container-low rounded-md"
+                  >workspace_premium</span
+                >
+              </div>
+              <div class="gap-sm flex items-end">
+                <span class="font-display-lg-mobile text-display-lg-mobile text-on-surface">8</span>
+                <span
+                  class="font-body-sm text-body-sm px-sm py-xs mb-1 rounded-md bg-amber-50 font-bold text-amber-600"
+                  >Target: 10</span
+                >
+              </div>
+            </div>
+          </div>
+          <!-- Bento Grid for main content -->
+          <div class="gap-gutter grid grid-cols-1 lg:grid-cols-3">
+            <!-- Hot Matches Section (Takes up 2 columns on lg) -->
+            <div
+              class="bg-surface-container-lowest border-outline-variant p-lg shadow-soft gap-md flex flex-col rounded-xl border lg:col-span-2"
+            >
+              <div class="border-outline-variant pb-sm flex items-center justify-between border-b">
+                <h3 class="font-title-sm text-title-sm text-on-surface gap-sm flex items-center">
+                  <span class="material-symbols-outlined text-emerald-600"
+                    >notifications_active</span
+                  >
+                  High Probability Matches
+                </h3>
+                <button class="font-label-caps text-label-caps text-primary hover:underline">
+                  View All
+                </button>
+              </div>
+              <div class="gap-md grid grid-cols-1 md:grid-cols-2">
+                <!-- Match 1 -->
+                <div
+                  class="border-outline-variant p-md hover:border-primary-container bg-surface rounded-lg border shadow-sm transition-colors"
+                >
+                  <div class="mb-md flex items-start justify-between">
+                    <div>
+                      <p class="font-label-caps text-label-caps text-on-surface-variant">Lead</p>
+                      <p class="font-body-md text-body-md font-bold">Sarah Johnson</p>
+                    </div>
+                    <div
+                      class="font-title-sm text-title-sm px-md py-xs rounded-full border border-emerald-500 bg-emerald-50 font-bold text-emerald-700"
+                    >
+                      92%
+                    </div>
+                  </div>
+                  <div class="mb-md">
+                    <p class="font-label-caps text-label-caps text-on-surface-variant">
+                      Property Match
+                    </p>
+                    <p class="font-body-sm text-body-sm truncate">Sunrise Apartments, 3BHK</p>
+                  </div>
+                  <button
+                    class="bg-surface-container-high hover:bg-primary-container hover:text-on-primary text-on-surface font-label-caps text-label-caps py-sm border-outline-variant hover:border-primary-container w-full rounded-md border text-center transition-colors"
+                  >
+                    View Match
+                  </button>
+                </div>
+                <!-- Match 2 -->
+                <div
+                  class="border-outline-variant p-md hover:border-primary-container bg-surface rounded-lg border shadow-sm transition-colors"
+                >
+                  <div class="mb-md flex items-start justify-between">
+                    <div>
+                      <p class="font-label-caps text-label-caps text-on-surface-variant">Lead</p>
+                      <p class="font-body-md text-body-md font-bold">David Chen</p>
+                    </div>
+                    <div
+                      class="font-title-sm text-title-sm px-md py-xs rounded-full border border-emerald-500 bg-emerald-50 font-bold text-emerald-700"
+                    >
+                      88%
+                    </div>
+                  </div>
+                  <div class="mb-md">
+                    <p class="font-label-caps text-label-caps text-on-surface-variant">
+                      Property Match
+                    </p>
+                    <p class="font-body-sm text-body-sm truncate">Oakwood Villa, Downtown</p>
+                  </div>
+                  <button
+                    class="bg-surface-container-high hover:bg-primary-container hover:text-on-primary text-on-surface font-label-caps text-label-caps py-sm border-outline-variant hover:border-primary-container w-full rounded-md border text-center transition-colors"
+                  >
+                    View Match
+                  </button>
+                </div>
+                <!-- Match 3 -->
+                <div
+                  class="border-outline-variant p-md hover:border-primary-container bg-surface rounded-lg border shadow-sm transition-colors"
+                >
+                  <div class="mb-md flex items-start justify-between">
+                    <div>
+                      <p class="font-label-caps text-label-caps text-on-surface-variant">Lead</p>
+                      <p class="font-body-md text-body-md font-bold">Elena Rodriguez</p>
+                    </div>
+                    <div
+                      class="font-title-sm text-title-sm px-md py-xs rounded-full border border-amber-500 bg-amber-50 font-bold text-amber-700"
+                    >
+                      76%
+                    </div>
+                  </div>
+                  <div class="mb-md">
+                    <p class="font-label-caps text-label-caps text-on-surface-variant">
+                      Property Match
+                    </p>
+                    <p class="font-body-sm text-body-sm truncate">Modern Loft, Westside</p>
+                  </div>
+                  <button
+                    class="bg-surface-container-high hover:bg-primary-container hover:text-on-primary text-on-surface font-label-caps text-label-caps py-sm border-outline-variant hover:border-primary-container w-full rounded-md border text-center transition-colors"
+                  >
+                    View Match
+                  </button>
+                </div>
+                <!-- Match 4 -->
+                <div
+                  class="border-outline-variant p-md hover:border-primary-container bg-surface hidden rounded-lg border shadow-sm transition-colors xl:block"
+                >
+                  <div class="mb-md flex items-start justify-between">
+                    <div>
+                      <p class="font-label-caps text-label-caps text-on-surface-variant">Lead</p>
+                      <p class="font-body-md text-body-md font-bold">Michael Chang</p>
+                    </div>
+                    <div
+                      class="font-title-sm text-title-sm px-md py-xs rounded-full border border-amber-500 bg-amber-50 font-bold text-amber-700"
+                    >
+                      65%
+                    </div>
+                  </div>
+                  <div class="mb-md">
+                    <p class="font-label-caps text-label-caps text-on-surface-variant">
+                      Property Match
+                    </p>
+                    <p class="font-body-sm text-body-sm truncate">Suburban Family Home, 4BHK</p>
+                  </div>
+                  <button
+                    class="bg-surface-container-high hover:bg-primary-container hover:text-on-primary text-on-surface font-label-caps text-label-caps py-sm border-outline-variant hover:border-primary-container w-full rounded-md border text-center transition-colors"
+                  >
+                    View Match
+                  </button>
+                </div>
+              </div>
+            </div>
+            <!-- Right Column (Widgets) -->
+            <div class="gap-gutter flex flex-col">
+              <!-- Aging Inventory Widget -->
+              <div
+                class="bg-surface-container-lowest border-outline-variant p-md shadow-soft gap-sm flex flex-col rounded-xl border"
+              >
+                <div
+                  class="border-outline-variant pb-xs flex items-center justify-between border-b"
+                >
+                  <h3 class="font-title-sm text-title-sm text-on-surface gap-sm flex items-center">
+                    <span class="material-symbols-outlined text-[20px] text-amber-600"
+                      >warning</span
+                    >
+                    Aging Inventory
+                  </h3>
+                </div>
+                <div class="gap-xs mt-sm flex flex-col">
+                  <div
+                    class="p-sm hover:bg-surface-container-low flex items-center justify-between rounded-md transition-colors"
+                  >
+                    <div class="flex flex-col">
+                      <span class="font-body-sm text-body-sm w-40 truncate font-bold"
+                        >124 Maple Street</span
+                      >
+                      <span class="font-label-caps text-label-caps text-error"
+                        >45 Days on Market</span
+                      >
+                    </div>
+                    <button
+                      class="material-symbols-outlined text-on-surface-variant hover:text-primary"
+                    >
+                      chevron_right
+                    </button>
+                  </div>
+                  <div
+                    class="p-sm hover:bg-surface-container-low flex items-center justify-between rounded-md transition-colors"
+                  >
+                    <div class="flex flex-col">
+                      <span class="font-body-sm text-body-sm w-40 truncate font-bold"
+                        >Apt 4B, Riverfront Tower</span
+                      >
+                      <span class="font-label-caps text-label-caps text-amber-600"
+                        >32 Days on Market</span
+                      >
+                    </div>
+                    <button
+                      class="material-symbols-outlined text-on-surface-variant hover:text-primary"
+                    >
+                      chevron_right
+                    </button>
+                  </div>
+                  <div
+                    class="p-sm hover:bg-surface-container-low flex items-center justify-between rounded-md transition-colors"
+                  >
+                    <div class="flex flex-col">
+                      <span class="font-body-sm text-body-sm w-40 truncate font-bold"
+                        >88 Pine Avenue</span
+                      >
+                      <span class="font-label-caps text-label-caps text-amber-600"
+                        >30 Days on Market</span
+                      >
+                    </div>
+                    <button
+                      class="material-symbols-outlined text-on-surface-variant hover:text-primary"
+                    >
+                      chevron_right
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <!-- Leads by Source -->
+              <div
+                class="bg-surface-container-lowest border-outline-variant p-md shadow-soft gap-sm flex flex-1 flex-col rounded-xl border"
+              >
+                <h3
+                  class="font-title-sm text-title-sm text-on-surface border-outline-variant pb-xs border-b"
+                >
+                  Lead Sources
+                </h3>
+                <div class="py-md relative flex flex-1 flex-col items-center justify-center">
+                  <!-- Fake Donut Chart -->
+                  <div
+                    class="border-surface-container-high relative flex h-32 w-32 items-center justify-center overflow-hidden rounded-full border-[12px]"
+                  >
+                    <div
+                      class="border-primary absolute top-0 right-0 h-full w-1/2 rounded-r-full border-r-[12px]"
+                      style="transform: rotate(30deg); transform-origin: left center"
+                    ></div>
+                    <div
+                      class="absolute right-0 bottom-0 h-1/2 w-1/2 rounded-br-full border-r-[12px] border-b-[12px] border-emerald-500"
+                    ></div>
+                    <div
+                      class="absolute bottom-0 left-0 h-1/2 w-1/2 rounded-bl-full border-b-[12px] border-l-[12px] border-amber-500"
+                    ></div>
+                    <div
+                      class="bg-surface-container-lowest z-10 flex h-20 w-20 flex-col items-center justify-center rounded-full"
+                    >
+                      <span
+                        class="font-display-lg-mobile text-display-lg-mobile text-on-surface font-bold"
+                        >342</span
+                      >
+                    </div>
+                  </div>
+                  <div class="mt-md mt-auto flex w-full justify-around">
+                    <div class="gap-xs font-label-caps text-label-caps flex items-center">
+                      <span class="bg-primary h-2 w-2 rounded-full"></span> Web
+                    </div>
+                    <div class="gap-xs font-label-caps text-label-caps flex items-center">
+                      <span class="h-2 w-2 rounded-full bg-emerald-500"></span> Social
+                    </div>
+                    <div class="gap-xs font-label-caps text-label-caps flex items-center">
+                      <span class="h-2 w-2 rounded-full bg-amber-500"></span> Direct
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Recent Leads Table -->
+          <div
+            class="bg-surface-container-lowest border-outline-variant shadow-soft overflow-hidden rounded-xl border"
+          >
+            <div
+              class="p-md border-outline-variant bg-surface-container-low/50 flex items-center justify-between border-b"
+            >
+              <h3 class="font-title-sm text-title-sm text-on-surface">Recent Leads</h3>
+              <button
+                class="font-label-caps text-label-caps text-primary gap-xs flex items-center hover:underline"
+              >
+                Filter <span class="material-symbols-outlined text-[16px]">filter_list</span>
+              </button>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full border-collapse text-left">
+                <thead>
+                  <tr class="border-outline-variant bg-surface-container-lowest border-b">
+                    <th
+                      class="p-md font-label-caps text-label-caps text-on-surface-variant font-medium"
+                    >
+                      Name
+                    </th>
+                    <th
+                      class="p-md font-label-caps text-label-caps text-on-surface-variant font-medium"
+                    >
+                      Source
+                    </th>
+                    <th
+                      class="p-md font-label-caps text-label-caps text-on-surface-variant font-medium"
+                    >
+                      Stage
+                    </th>
+                    <th
+                      class="p-md font-label-caps text-label-caps text-on-surface-variant font-medium"
+                    >
+                      Agent
+                    </th>
+                    <th
+                      class="p-md font-label-caps text-label-caps text-on-surface-variant font-medium"
+                    >
+                      Added
+                    </th>
+                  </tr>
+                </thead>
+                <tbody class="font-body-sm text-body-sm">
+                  <!-- Row 1 -->
+                  <tr
+                    class="border-outline-variant hover:bg-surface-container-low border-b transition-colors"
+                  >
+                    <td class="p-md font-bold">Marcus Chen</td>
+                    <td class="p-md">
+                      <div class="gap-xs text-on-surface-variant flex items-center">
+                        <span class="material-symbols-outlined text-[18px]">public</span> Website
+                      </div>
+                    </td>
+                    <td class="p-md">
+                      <span
+                        class="bg-primary/10 text-primary border-primary/20 px-sm py-xs font-label-caps text-label-caps rounded-full border"
+                        >New Lead</span
+                      >
+                    </td>
+                    <td class="p-md">
+                      <img
+                        alt="Agent Avatar"
+                        class="border-outline-variant h-6 w-6 rounded-full border object-cover"
+                        data-alt="Small circular headshot of a female real estate agent smiling."
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuBFIrK1MuR7Sw5uKKTXYPB2JjNOvwA_-VdJSh3Qbtd7NvowXLKi4JTjiMd2WxaBNwrhlsqgjUJEuu8Wie-mHwXXMfsToHnjQHIInfWK5sjU3x5FTuCLXxcOBI0jviJPf4u6VIVXVbk9gdROoG4ttfcbSz3-N9Y5TvIu-v6siyBF_jX4_yEPbYkuoSjD7EOhXKFsDmijAdpOM0WqA-iy17oxdKam0sYuxF1tEL9HzY486sn8TrcXlX1u"
+                      />
+                    </td>
+                    <td class="p-md text-on-surface-variant">2 hours ago</td>
+                  </tr>
+                  <!-- Row 2 -->
+                  <tr
+                    class="border-outline-variant hover:bg-surface-container-low border-b transition-colors"
+                  >
+                    <td class="p-md font-bold">Sophia Martinez</td>
+                    <td class="p-md">
+                      <div class="gap-xs text-on-surface-variant flex items-center">
+                        <span class="material-symbols-outlined text-[18px]">photo_camera</span>
+                        Instagram
+                      </div>
+                    </td>
+                    <td class="p-md">
+                      <span
+                        class="px-sm py-xs font-label-caps text-label-caps rounded-full border border-amber-200 bg-amber-50 text-amber-700"
+                        >Showing</span
+                      >
+                    </td>
+                    <td class="p-md">
+                      <img
+                        alt="Agent Avatar"
+                        class="border-outline-variant h-6 w-6 rounded-full border object-cover"
+                        data-alt="Small circular headshot of a male real estate agent smiling."
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuAUXOletQK7m8wtkSlcV9r2Ttdw3s-P7zioXWF1qPpz58J5fWEJCXKW2dWlDkuDG4ndXPTdfkIVNg_MrT5DCCUG4b34zkQ7m4NgUEy4ZNoBylWEDPB30N3UOS4ErF2NwLkEEHzfE4Zd1PWm3rpen1VrldSlzCjcPA0w9HmomkUk_LjTk155ZWiRyqRWy0BUDxyPpiRMLlYdfghIfG-CNkuj_QZ-v4mNybuW3gf8gEPQdKhQKPCPFIr6"
+                      />
+                    </td>
+                    <td class="p-md text-on-surface-variant">5 hours ago</td>
+                  </tr>
+                  <!-- Row 3 -->
+                  <tr
+                    class="border-outline-variant hover:bg-surface-container-low border-b transition-colors"
+                  >
+                    <td class="p-md font-bold">James Wilson</td>
+                    <td class="p-md">
+                      <div class="gap-xs text-on-surface-variant flex items-center">
+                        <span class="material-symbols-outlined text-[18px]">call</span> Phone
+                      </div>
+                    </td>
+                    <td class="p-md">
+                      <span
+                        class="px-sm py-xs font-label-caps text-label-caps rounded-full border border-emerald-200 bg-emerald-50 text-emerald-700"
+                        >Negotiation</span
+                      >
+                    </td>
+                    <td class="p-md">
+                      <img
+                        alt="Agent Avatar"
+                        class="border-outline-variant h-6 w-6 rounded-full border object-cover"
+                        data-alt="Small circular headshot of a female real estate agent smiling."
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuB9NtNMCAvMrQoa84gik-AXdIE5UDAslfJCJqY4iTR8NUnFpYwCTx3F_eCxxSg9G0iIu-0cJaMnYceNgdtAz7mjCx4cR0jtD8zJNmJ08dicEUSAVK4rc1J0xCFZCuYaMUyZdEnvB494dWiDoMUvwIkP52umV5g6aIA078JmhXIZzVNM3riF06IZ8CT1h7lKarxEG8b_kb48dp2hKtqkRQSzORHYREpXLE6YtLovzNHOkeUhIZq8DG3s"
+                      />
+                    </td>
+                    <td class="p-md text-on-surface-variant">1 day ago</td>
+                  </tr>
+                  <!-- Row 4 -->
+                  <tr
+                    class="border-outline-variant hover:bg-surface-container-low border-b transition-colors"
+                  >
+                    <td class="p-md font-bold">Olivia Taylor</td>
+                    <td class="p-md">
+                      <div class="gap-xs text-on-surface-variant flex items-center">
+                        <span class="material-symbols-outlined text-[18px]">chat</span> WhatsApp
+                      </div>
+                    </td>
+                    <td class="p-md">
+                      <span
+                        class="bg-primary/10 text-primary border-primary/20 px-sm py-xs font-label-caps text-label-caps rounded-full border"
+                        >New Lead</span
+                      >
+                    </td>
+                    <td class="p-md">
+                      <img
+                        alt="Agent Avatar"
+                        class="border-outline-variant h-6 w-6 rounded-full border object-cover"
+                        data-alt="Small circular headshot of a male real estate agent smiling."
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuBMuVx2qOdHaNFglYciIIz07dG62BprPaCFJxYcpBDZlLpSSWHo6ndfQixsr0sca634h8Ws-AssaeonCs5k41oMrVUGfsZBAd5vUx45FF0YSpGKps5ijGK2Q3LnZCg-LerE0--t2baibQ4KKm3pWXwFeXfz3Fvj-xyzKuu6AKbxvhjOP0cdJgXLo-E_WUlh5JOS2SFFrmRqsgX3laIMETNIQQHix22UEwr3C2HB_1JgbEQ6h6mlz8_E"
+                      />
+                    </td>
+                    <td class="p-md text-on-surface-variant">1 day ago</td>
+                  </tr>
+                  <!-- Row 5 -->
+                  <tr class="hover:bg-surface-container-low transition-colors">
+                    <td class="p-md font-bold">William Brown</td>
+                    <td class="p-md">
+                      <div class="gap-xs text-on-surface-variant flex items-center">
+                        <span class="material-symbols-outlined text-[18px]">public</span> Website
+                      </div>
+                    </td>
+                    <td class="p-md">
+                      <span
+                        class="px-sm py-xs font-label-caps text-label-caps rounded-full border border-amber-200 bg-amber-50 text-amber-700"
+                        >Showing</span
+                      >
+                    </td>
+                    <td class="p-md">
+                      <img
+                        alt="Agent Avatar"
+                        class="border-outline-variant h-6 w-6 rounded-full border object-cover"
+                        data-alt="Small circular headshot of a female real estate agent smiling."
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuBvoi9gYO0JLtoX_RK68gUFdXCfJUkg8Y755IV6jwHyEG-0iXMkm9NNIqOQXCuz3eNczgtUhwhL2GY80_66zGoaUegRpzI_mBRAtTJcyLlcRDJr099IuFoyIDtb7bSRde4elL-jFyk6WOXFiCRVe9dQ0uU99X1KRSB_5Ev6Q1N8-fVo77x6mirJlB4HI5NdpD-ieHFbVZrmhIwGkgU054MY945dzcZQbdDXDU-HjqaEwrMk0828JUX2"
+                      />
+                    </td>
+                    <td class="p-md text-on-surface-variant">2 days ago</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>
