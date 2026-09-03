@@ -1,0 +1,534 @@
+<!doctype html>
+
+<html class="light" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>EstateNexus - Add New Property</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              'tertiary-fixed': '#ffdbcd',
+              'tertiary-container': '#bc4800',
+              'error-container': '#ffdad6',
+              'on-primary-fixed': '#00174b',
+              'inverse-surface': '#2e3039',
+              'on-secondary-container': '#54647a',
+              'on-surface': '#191b23',
+              'surface-tint': '#0053db',
+              'secondary-fixed-dim': '#b7c8e1',
+              'surface-container-highest': '#e1e2ed',
+              'surface-container-high': '#e7e7f3',
+              'on-tertiary-fixed-variant': '#7d2d00',
+              'surface-variant': '#e1e2ed',
+              outline: '#737686',
+              'primary-fixed': '#dbe1ff',
+              error: '#ba1a1a',
+              'secondary-container': '#d0e1fb',
+              'on-secondary-fixed': '#0b1c30',
+              'outline-variant': '#c3c6d7',
+              tertiary: '#943700',
+              'tertiary-fixed-dim': '#ffb596',
+              'surface-bright': '#faf8ff',
+              'primary-container': '#2563eb',
+              'on-error': '#ffffff',
+              'on-tertiary-fixed': '#360f00',
+              'on-secondary-fixed-variant': '#38485d',
+              'on-tertiary-container': '#ffede6',
+              'surface-dim': '#d9d9e5',
+              'inverse-on-surface': '#f0f0fb',
+              'on-error-container': '#93000a',
+              'primary-fixed-dim': '#b4c5ff',
+              'on-background': '#191b23',
+              'on-primary': '#ffffff',
+              'surface-container-lowest': '#ffffff',
+              'surface-container-low': '#f3f3fe',
+              'on-secondary': '#ffffff',
+              secondary: '#505f76',
+              'on-surface-variant': '#434655',
+              'on-tertiary': '#ffffff',
+              background: '#faf8ff',
+              'on-primary-fixed-variant': '#003ea8',
+              'inverse-primary': '#b4c5ff',
+              'secondary-fixed': '#d3e4fe',
+              'on-primary-container': '#eeefff',
+              primary: '#004ac6',
+              'surface-container': '#ededf9',
+              surface: '#faf8ff',
+            },
+            borderRadius: {
+              DEFAULT: '0.25rem',
+              lg: '0.5rem',
+              xl: '0.75rem',
+              full: '9999px',
+            },
+            spacing: {
+              xs: '4px',
+              xl: '32px',
+              'margin-desktop': '32px',
+              sm: '8px',
+              'margin-mobile': '16px',
+              'sidebar-width': '260px',
+              gutter: '24px',
+              lg: '24px',
+              md: '16px',
+              'sidebar-collapsed': '72px',
+              base: '4px',
+            },
+            fontFamily: {
+              'label-caps': ['Inter'],
+              'title-sm': ['Inter'],
+              'body-sm': ['Inter'],
+              'headline-md': ['Inter'],
+              'display-lg-mobile': ['Inter'],
+              'display-lg': ['Inter'],
+              'body-md': ['Inter'],
+            },
+            fontSize: {
+              'label-caps': [
+                '12px',
+                {
+                  lineHeight: '16px',
+                  letterSpacing: '0.05em',
+                  fontWeight: '600',
+                },
+              ],
+              'title-sm': [
+                '18px',
+                {
+                  lineHeight: '28px',
+                  fontWeight: '600',
+                },
+              ],
+              'body-sm': [
+                '14px',
+                {
+                  lineHeight: '20px',
+                  fontWeight: '400',
+                },
+              ],
+              'headline-md': [
+                '24px',
+                {
+                  lineHeight: '32px',
+                  letterSpacing: '-0.01em',
+                  fontWeight: '600',
+                },
+              ],
+              'display-lg-mobile': [
+                '28px',
+                {
+                  lineHeight: '34px',
+                  letterSpacing: '-0.02em',
+                  fontWeight: '700',
+                },
+              ],
+              'display-lg': [
+                '36px',
+                {
+                  lineHeight: '44px',
+                  letterSpacing: '-0.02em',
+                  fontWeight: '700',
+                },
+              ],
+              'body-md': [
+                '16px',
+                {
+                  lineHeight: '24px',
+                  fontWeight: '400',
+                },
+              ],
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+  <body
+    class="bg-background text-on-background font-body-sm text-body-sm relative flex h-screen overflow-hidden"
+  >
+    <!-- Background Mock Canvas (Property Management Screen) -->
+    <div
+      class="pointer-events-none flex flex-1 flex-col opacity-30 transition-opacity duration-300"
+      id="main-content"
+    >
+      <!-- TopAppBar Placeholder -->
+      <header
+        class="border-outline-variant bg-surface px-lg z-30 flex h-16 items-center justify-between border-b"
+      >
+        <div class="font-headline-md text-headline-md text-primary font-bold">EstateNexus</div>
+        <div class="gap-md flex items-center">
+          <span class="material-symbols-outlined text-on-surface-variant">search</span>
+          <span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+        </div>
+      </header>
+      <!-- Sidebar + Content Placeholder -->
+      <div class="flex flex-1 overflow-hidden">
+        <aside
+          class="w-sidebar-width border-outline-variant bg-surface p-md gap-sm hidden flex-col border-r md:flex"
+        >
+          <div
+            class="p-sm text-primary border-primary bg-surface-container-low font-title-sm text-title-sm gap-sm flex items-center rounded-r border-l-4"
+          >
+            <span class="material-symbols-outlined">domain</span> Inventory
+          </div>
+        </aside>
+        <main class="p-gutter flex-1 overflow-y-auto">
+          <div
+            class="border-outline-variant text-on-surface-variant flex h-full items-center justify-center rounded-lg border border-dashed"
+          >
+            Property List Canvas Placeholder
+          </div>
+        </main>
+      </div>
+    </div>
+    <!-- Right Side Drawer / Modal Overlay -->
+    <div
+      class="bg-on-background/20 fixed inset-0 z-50 flex justify-end backdrop-blur-sm transition-opacity duration-300"
+      id="drawer-overlay"
+    >
+      <!-- Drawer Container -->
+      <div
+        class="bg-surface-container-lowest flex h-full w-full translate-x-0 transform flex-col shadow-2xl transition-transform duration-300 ease-in-out md:w-[600px]"
+        id="drawer"
+      >
+        <!-- Drawer Header -->
+        <header
+          class="px-gutter border-outline-variant bg-surface/80 sticky top-0 z-10 flex h-16 shrink-0 items-center justify-between border-b backdrop-blur-md"
+        >
+          <h2 class="font-headline-md text-headline-md text-on-surface">Add New Property</h2>
+          <button
+            aria-label="Close drawer"
+            class="hover:bg-surface-container-high text-on-surface-variant flex h-8 w-8 items-center justify-center rounded-full transition-colors"
+          >
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </header>
+        <!-- Drawer Scrollable Content -->
+        <div class="p-gutter space-y-xl custom-scrollbar flex-1 overflow-y-auto">
+          <!-- 1. Basic Details Section -->
+          <section class="space-y-md">
+            <div class="gap-sm border-outline-variant pb-xs flex items-center border-b">
+              <span class="material-symbols-outlined text-primary">info</span>
+              <h3 class="font-title-sm text-title-sm text-on-surface">Basic Details</h3>
+            </div>
+            <div class="space-y-sm">
+              <label class="font-label-caps text-label-caps text-on-surface-variant block"
+                >Property Title <span class="text-error">*</span></label
+              >
+              <input
+                class="rounded-DEFAULT border-outline-variant bg-surface text-on-surface placeholder:text-on-surface-variant focus:border-primary focus:ring-primary px-sm h-10 w-full shadow-sm transition-colors focus:ring-1"
+                placeholder="e.g. Skyline Luxury Apartments"
+                type="text"
+              />
+            </div>
+            <div class="gap-md grid grid-cols-1 sm:grid-cols-2">
+              <div class="space-y-sm">
+                <label class="font-label-caps text-label-caps text-on-surface-variant block"
+                  >Property Type <span class="text-error">*</span></label
+                >
+                <div class="relative">
+                  <select
+                    class="rounded-DEFAULT border-outline-variant bg-surface text-on-surface focus:border-primary focus:ring-primary px-sm h-10 w-full appearance-none pr-8 shadow-sm focus:ring-1"
+                  >
+                    <option disabled="" selected="" value="">Select Type</option>
+                    <option value="apartment">Apartment</option>
+                    <option value="villa">Villa</option>
+                    <option value="commercial">Commercial Space</option>
+                    <option value="plot">Plot/Land</option>
+                  </select>
+                </div>
+              </div>
+              <div class="space-y-sm">
+                <label class="font-label-caps text-label-caps text-on-surface-variant block"
+                  >Area (sqft) <span class="text-error">*</span></label
+                >
+                <input
+                  class="rounded-DEFAULT border-outline-variant bg-surface text-on-surface placeholder:text-on-surface-variant focus:border-primary focus:ring-primary px-sm h-10 w-full shadow-sm transition-colors focus:ring-1"
+                  placeholder="e.g. 1500"
+                  type="number"
+                />
+              </div>
+            </div>
+            <div class="space-y-sm">
+              <label class="font-label-caps text-label-caps text-on-surface-variant block"
+                >Configuration (BHK)</label
+              >
+              <div
+                class="p-xs bg-surface-container-high rounded-DEFAULT border-outline-variant flex max-w-fit border"
+              >
+                <button
+                  class="px-md py-xs bg-surface-container-lowest text-primary rounded-sm font-bold shadow-sm transition-all"
+                  type="button"
+                >
+                  1 BHK
+                </button>
+                <button
+                  class="px-md py-xs text-on-surface-variant hover:text-on-surface rounded-sm transition-all"
+                  type="button"
+                >
+                  2 BHK
+                </button>
+                <button
+                  class="px-md py-xs text-on-surface-variant hover:text-on-surface rounded-sm transition-all"
+                  type="button"
+                >
+                  3 BHK
+                </button>
+                <button
+                  class="px-md py-xs text-on-surface-variant hover:text-on-surface rounded-sm transition-all"
+                  type="button"
+                >
+                  4+ BHK
+                </button>
+              </div>
+            </div>
+          </section>
+          <!-- 2. Location Section -->
+          <section class="space-y-md">
+            <div class="gap-sm border-outline-variant pb-xs flex items-center border-b">
+              <span class="material-symbols-outlined text-primary">location_on</span>
+              <h3 class="font-title-sm text-title-sm text-on-surface">Location</h3>
+            </div>
+            <div class="space-y-sm">
+              <label class="font-label-caps text-label-caps text-on-surface-variant block"
+                >Full Address</label
+              >
+              <textarea
+                class="rounded-DEFAULT border-outline-variant bg-surface text-on-surface placeholder:text-on-surface-variant focus:border-primary focus:ring-primary p-sm w-full resize-none shadow-sm transition-colors focus:ring-1"
+                placeholder="Enter complete property address..."
+                rows="2"
+              ></textarea>
+            </div>
+            <div class="space-y-sm">
+              <label class="font-label-caps text-label-caps text-on-surface-variant block"
+                >Map Location</label
+              >
+              <div
+                class="rounded-DEFAULT border-outline-variant bg-surface-container-highest group relative h-48 cursor-pointer overflow-hidden border"
+              >
+                <img
+                  class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  data-alt="A clean, minimalist map interface in a high-performance B2B real estate application light mode. The map shows a precise, generic downtown grid with subtle blue routing lines and a distinct, sharp red location pin marking a property. The color palette utilizes soft whites, light grays, and precise primary blue accents, fostering a professional, data-driven environment for agents."
+                  data-location="New York"
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuC5en8nz8x6Z6JTtcfBtD0DYQyjrMfouCTKJGug0lggENqY-TvqUiH-qNoZ99UOQQyAaAZkcX9t3B1DJyciWlSJnc3HgDizwHP7_tc88D8hSQVgSQ-H_crmstuidkPugbIB38WzGx-3IqPJAF8Ixqln2UXSoaMRZBikeFXBjYOK8Xj1PKB6ll7hEp-R3MJB4LqPL7Tc2lbRgxFsDfvlofz74kaToccaWbEHgDj8f0P0gfiPXEhevSfI"
+                />
+                <div
+                  class="bg-on-background/10 absolute inset-0 flex items-center justify-center opacity-0 transition-opacity group-hover:opacity-100"
+                >
+                  <span
+                    class="bg-surface-container-lowest text-on-surface px-md py-xs font-label-caps text-label-caps gap-xs flex items-center rounded-full shadow-sm"
+                  >
+                    <span class="material-symbols-outlined text-[16px]">pin_drop</span> Adjust Pin
+                  </span>
+                </div>
+              </div>
+            </div>
+          </section>
+          <!-- 3. Pricing & Status -->
+          <section class="space-y-md">
+            <div class="gap-sm border-outline-variant pb-xs flex items-center border-b">
+              <span class="material-symbols-outlined text-primary">payments</span>
+              <h3 class="font-title-sm text-title-sm text-on-surface">Pricing &amp; Status</h3>
+            </div>
+            <div class="gap-md grid grid-cols-1 sm:grid-cols-2">
+              <div class="space-y-sm">
+                <label class="font-label-caps text-label-caps text-on-surface-variant block"
+                  >Asking Price ($) <span class="text-error">*</span></label
+                >
+                <div class="relative">
+                  <span
+                    class="left-sm text-on-surface-variant material-symbols-outlined absolute top-1/2 -translate-y-1/2 text-[18px]"
+                    >attach_money</span
+                  >
+                  <input
+                    class="rounded-DEFAULT border-outline-variant bg-surface text-on-surface placeholder:text-on-surface-variant focus:border-primary focus:ring-primary pr-sm h-10 w-full pl-10 shadow-sm transition-colors focus:ring-1"
+                    placeholder="e.g. 500,000"
+                    type="text"
+                  />
+                </div>
+              </div>
+              <div class="space-y-sm">
+                <label class="font-label-caps text-label-caps text-on-surface-variant block"
+                  >Possession Status</label
+                >
+                <select
+                  class="rounded-DEFAULT border-outline-variant bg-surface text-on-surface focus:border-primary focus:ring-primary px-sm h-10 w-full appearance-none shadow-sm focus:ring-1"
+                >
+                  <option value="ready">Ready to Move</option>
+                  <option value="under_construction">Under Construction</option>
+                </select>
+              </div>
+            </div>
+          </section>
+          <!-- 4. Amenities -->
+          <section class="space-y-md">
+            <div class="gap-sm border-outline-variant pb-xs flex items-center border-b">
+              <span class="material-symbols-outlined text-primary">chair</span>
+              <h3 class="font-title-sm text-title-sm text-on-surface">Amenities</h3>
+            </div>
+            <div class="gap-sm grid grid-cols-2 sm:grid-cols-3">
+              <!-- Checkbox Item -->
+              <label
+                class="gap-sm p-sm rounded-DEFAULT border-outline-variant hover:border-primary/50 hover:bg-surface-container-low flex cursor-pointer items-center border transition-colors"
+              >
+                <input
+                  checked=""
+                  class="border-outline text-primary focus:ring-primary rounded-sm"
+                  type="checkbox"
+                />
+                <span class="text-on-surface">Parking</span>
+              </label>
+              <label
+                class="gap-sm p-sm rounded-DEFAULT border-outline-variant hover:border-primary/50 hover:bg-surface-container-low flex cursor-pointer items-center border transition-colors"
+              >
+                <input
+                  checked=""
+                  class="border-outline text-primary focus:ring-primary rounded-sm"
+                  type="checkbox"
+                />
+                <span class="text-on-surface">Gated Community</span>
+              </label>
+              <label
+                class="gap-sm p-sm rounded-DEFAULT border-outline-variant hover:border-primary/50 hover:bg-surface-container-low flex cursor-pointer items-center border transition-colors"
+              >
+                <input
+                  class="border-outline text-primary focus:ring-primary rounded-sm"
+                  type="checkbox"
+                />
+                <span class="text-on-surface">Swimming Pool</span>
+              </label>
+              <label
+                class="gap-sm p-sm rounded-DEFAULT border-outline-variant hover:border-primary/50 hover:bg-surface-container-low flex cursor-pointer items-center border transition-colors"
+              >
+                <input
+                  class="border-outline text-primary focus:ring-primary rounded-sm"
+                  type="checkbox"
+                />
+                <span class="text-on-surface">Gymnasium</span>
+              </label>
+              <label
+                class="gap-sm p-sm rounded-DEFAULT border-outline-variant hover:border-primary/50 hover:bg-surface-container-low flex cursor-pointer items-center border transition-colors"
+              >
+                <input
+                  class="border-outline text-primary focus:ring-primary rounded-sm"
+                  type="checkbox"
+                />
+                <span class="text-on-surface">School Nearby</span>
+              </label>
+              <label
+                class="gap-sm p-sm rounded-DEFAULT border-outline-variant hover:border-primary/50 hover:bg-surface-container-low flex cursor-pointer items-center border transition-colors"
+              >
+                <input
+                  class="border-outline text-primary focus:ring-primary rounded-sm"
+                  type="checkbox"
+                />
+                <span class="text-on-surface">Park/Garden</span>
+              </label>
+            </div>
+          </section>
+          <!-- 5. Media -->
+          <section class="space-y-md">
+            <div class="gap-sm border-outline-variant pb-xs flex items-center border-b">
+              <span class="material-symbols-outlined text-primary">photo_library</span>
+              <h3 class="font-title-sm text-title-sm text-on-surface">Media</h3>
+            </div>
+            <div
+              class="border-outline-variant p-lg bg-surface-container-lowest hover:bg-surface-container-low group flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed transition-colors"
+            >
+              <span
+                class="material-symbols-outlined text-outline group-hover:text-primary mb-sm text-[32px] transition-colors"
+                >cloud_upload</span
+              >
+              <p class="text-on-surface font-title-sm text-title-sm">Drag &amp; drop images here</p>
+              <p class="text-on-surface-variant font-label-caps text-label-caps mt-xs">
+                or click to browse (Max 10MB each)
+              </p>
+            </div>
+            <!-- Thumbnails Preview -->
+            <div class="gap-sm py-xs flex overflow-x-auto">
+              <div
+                class="rounded-DEFAULT border-outline-variant group relative h-20 w-20 shrink-0 overflow-hidden border"
+              >
+                <img
+                  class="h-full w-full object-cover"
+                  data-alt="A small preview thumbnail of a modern, brightly lit empty living room with white walls and light oak wooden flooring in a high-end property context. Minimalist light-mode styling."
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuCIoQruwGSuM8FMR6Ofdm8ew-Wln6U6FCnn5hd-mqwgKZx7X15wX_tltT8qGu8eg_wuYQjq_jus_7c86h4w3kHmQl_mn2Px_Vl4_k06pkVBUWoO4RJeUABTkul6OivBKuS2syWud6eXK4cFGtLWTLx2KjHV-TNMUWy5B33yfHs24PFY7z5EryCVZN7QUL3pNCVz_k5bjiQ5wkrKQkZ0xFP3tHYh5guTawBM9N-y8RomU14TfgK6lvYh"
+                />
+                <button
+                  class="bg-on-background/50 text-surface-container-lowest absolute top-1 right-1 flex h-5 w-5 items-center justify-center rounded-full opacity-0 transition-opacity group-hover:opacity-100"
+                >
+                  <span class="material-symbols-outlined text-[12px]">close</span>
+                </button>
+              </div>
+              <div
+                class="rounded-DEFAULT border-outline-variant group relative h-20 w-20 shrink-0 overflow-hidden border"
+              >
+                <img
+                  class="h-full w-full object-cover"
+                  data-alt="A small preview thumbnail of a pristine, modern kitchen featuring white marble countertops and sleek, handleless grey cabinetry. Well lit, high-end property context."
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuDDswDpyAE7qVsxy6o3-nADwv1DoobojDQ_8L43_wSyFSrxg624qS-7-zyAXc_NO55zwTfL-t0S2Ewn0hpg5TIru5G987vY-wYgrSZ7zdu32o_D8SkqF2845ZPN1g3nrGT0FiGxg7jFmYi41-2W3DTHLe1aJCv1lL98jP711K_N7j881rbSoJndh8oacLJbOEnRK-wwcKhmPYXRlEPudMnaEfKWtUqCWKkIemePxlrhiJW7UBU-yWnS"
+                />
+                <button
+                  class="bg-on-background/50 text-surface-container-lowest absolute top-1 right-1 flex h-5 w-5 items-center justify-center rounded-full opacity-0 transition-opacity group-hover:opacity-100"
+                >
+                  <span class="material-symbols-outlined text-[12px]">close</span>
+                </button>
+              </div>
+            </div>
+          </section>
+        </div>
+        <!-- Drawer Footer Actions -->
+        <footer
+          class="p-gutter border-outline-variant bg-surface gap-md flex shrink-0 items-center justify-end border-t"
+        >
+          <button
+            class="px-lg py-sm rounded-DEFAULT border-outline-variant text-on-surface font-title-sm text-title-sm hover:bg-surface-container-highest border transition-colors"
+            type="button"
+          >
+            Cancel
+          </button>
+          <button
+            class="px-lg py-sm rounded-DEFAULT bg-primary-container text-on-primary font-title-sm text-title-sm hover:bg-primary gap-sm flex items-center shadow-sm transition-colors"
+            type="button"
+          >
+            <span class="material-symbols-outlined text-[18px]">save</span>
+            Save Property
+          </button>
+        </footer>
+      </div>
+    </div>
+    <style>
+      /* Custom scrollbar for webkit to match the clean aesthetic */
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background-color: theme('colors.outline-variant');
+        border-radius: theme('borderRadius.full');
+      }
+      .custom-scrollbar:hover::-webkit-scrollbar-thumb {
+        background-color: theme('colors.outline');
+      }
+    </style>
+  </body>
+</html>
