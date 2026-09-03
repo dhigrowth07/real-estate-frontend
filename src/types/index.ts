@@ -86,6 +86,7 @@ export interface Lead {
   assignedAgentId?: string;
   assignedAgent?: User;
   matches?: Match[];
+  interactions?: Interaction[];
   createdAt: string;
   updatedAt?: string;
   _count?: {

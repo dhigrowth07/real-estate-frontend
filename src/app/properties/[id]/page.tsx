@@ -43,7 +43,8 @@ const DEFAULT_GALLERY = [
 
 export default function PropertyDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
-  const propertyId = resolvedParams.id;
+  const propertyId =
+    typeof resolvedParams.id === 'string' ? decodeURIComponent(resolvedParams.id).trim() : '';
   const router = useRouter();
 
   const [property, setProperty] = useState<Property | null>(null);
@@ -55,18 +56,37 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
   const [isEditOpen, setIsEditOpen] = useState(false);
 
   const fetchPropertyDetails = useCallback(async () => {
+    if (!propertyId) {
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      const [propData, matchesData] = await Promise.all([
-        apiClient.get<Property>(API_ENDPOINTS.PROPERTIES.DETAIL(propertyId)),
-        apiClient.get<Match[]>(API_ENDPOINTS.PROPERTIES.MATCHES(propertyId)),
-      ]);
+      // 1. Fetch Property Details (which already includes relation matches)
+      const propData = await apiClient.get<Property>(API_ENDPOINTS.PROPERTIES.DETAIL(propertyId));
       setProperty(propData);
-      setMatches(Array.isArray(matchesData) ? matchesData : []);
+
       if (propData?.images && propData.images.length > 0) {
         setSelectedImage(propData.images[0]);
       }
+      if (propData?.matches && Array.isArray(propData.matches)) {
+        setMatches(propData.matches);
+      }
+
+      // 2. Safely fetch additional matches in background
+      try {
+        const matchesData = await apiClient.get<Match[]>(
+          API_ENDPOINTS.PROPERTIES.MATCHES(propertyId)
+        );
+        if (Array.isArray(matchesData) && matchesData.length > 0) {
+          setMatches(matchesData);
+        }
+      } catch {
+        // Handled via propData.matches
+      }
     } catch {
-      // Fallback
+      // Property not found
+      setProperty(null);
     } finally {
       setIsLoading(false);
     }
