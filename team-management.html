@@ -1,0 +1,484 @@
+<!doctype html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>EstateNexus - Team Management</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              'on-surface-variant': '#434655',
+              'on-secondary': '#ffffff',
+              'tertiary-fixed': '#ffdbcd',
+              'primary-fixed-dim': '#b4c5ff',
+              'on-primary-fixed-variant': '#003ea8',
+              primary: '#004ac6',
+              'outline-variant': '#c3c6d7',
+              'secondary-fixed-dim': '#b7c8e1',
+              'surface-container-highest': '#e1e2ed',
+              'on-secondary-fixed-variant': '#38485d',
+              'on-primary': '#ffffff',
+              'surface-container': '#ededf9',
+              secondary: '#505f76',
+              tertiary: '#943700',
+              'on-surface': '#191b23',
+              'on-secondary-container': '#54647a',
+              'on-error': '#ffffff',
+              surface: '#faf8ff',
+              'on-primary-container': '#eeefff',
+              'surface-dim': '#d9d9e5',
+              'on-error-container': '#93000a',
+              'secondary-container': '#d0e1fb',
+              'inverse-on-surface': '#f0f0fb',
+              'tertiary-container': '#bc4800',
+              'error-container': '#ffdad6',
+              background: '#faf8ff',
+              'primary-fixed': '#dbe1ff',
+              'surface-bright': '#faf8ff',
+              outline: '#737686',
+              'on-primary-fixed': '#00174b',
+              'tertiary-fixed-dim': '#ffb596',
+              'surface-variant': '#e1e2ed',
+              'on-tertiary-fixed-variant': '#7d2d00',
+              'surface-container-lowest': '#ffffff',
+              'on-tertiary-container': '#ffede6',
+              'surface-tint': '#0053db',
+              'on-tertiary-fixed': '#360f00',
+              'on-secondary-fixed': '#0b1c30',
+              'inverse-surface': '#2e3039',
+              'on-background': '#191b23',
+              error: '#ba1a1a',
+              'inverse-primary': '#b4c5ff',
+              'on-tertiary': '#ffffff',
+              'surface-container-high': '#e7e7f3',
+              'surface-container-low': '#f3f3fe',
+              'primary-container': '#2563eb',
+              'secondary-fixed': '#d3e4fe',
+            },
+            borderRadius: {
+              DEFAULT: '0.25rem',
+              lg: '0.5rem',
+              xl: '0.75rem',
+              full: '9999px',
+            },
+            spacing: {
+              'sidebar-width': '260px',
+              xs: '4px',
+              base: '4px',
+              'margin-desktop': '32px',
+              lg: '24px',
+              'margin-mobile': '16px',
+              sm: '8px',
+              'sidebar-collapsed': '72px',
+              md: '16px',
+              gutter: '24px',
+              xl: '32px',
+            },
+            fontFamily: {
+              'label-caps': ['Inter'],
+              'display-lg-mobile': ['Inter'],
+              'body-sm': ['Inter'],
+              'body-md': ['Inter'],
+              'display-lg': ['Inter'],
+              'title-sm': ['Inter'],
+              'headline-md': ['Inter'],
+            },
+            fontSize: {
+              'label-caps': [
+                '12px',
+                { lineHeight: '16px', letterSpacing: '0.05em', fontWeight: '600' },
+              ],
+              'display-lg-mobile': [
+                '28px',
+                { lineHeight: '34px', letterSpacing: '-0.02em', fontWeight: '700' },
+              ],
+              'body-sm': ['14px', { lineHeight: '20px', fontWeight: '400' }],
+              'body-md': ['16px', { lineHeight: '24px', fontWeight: '400' }],
+              'display-lg': [
+                '36px',
+                { lineHeight: '44px', letterSpacing: '-0.02em', fontWeight: '700' },
+              ],
+              'title-sm': ['18px', { lineHeight: '28px', fontWeight: '600' }],
+              'headline-md': [
+                '24px',
+                { lineHeight: '32px', letterSpacing: '-0.01em', fontWeight: '600' },
+              ],
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      .material-symbols-outlined {
+        font-variation-settings:
+          'FILL' 0,
+          'wght' 400,
+          'GRAD' 0,
+          'opsz' 24;
+      }
+      .material-symbols-outlined[data-weight='fill'] {
+        font-variation-settings:
+          'FILL' 1,
+          'wght' 400,
+          'GRAD' 0,
+          'opsz' 24;
+      }
+    </style>
+  </head>
+  <body
+    class="bg-background text-on-background font-body-md bg-surface flex h-screen overflow-hidden"
+  >
+    <!-- SideNavBar -->
+    <nav
+      aria-label="Sidebar Navigation"
+      class="py-lg w-sidebar-width border-outline-variant bg-surface-container-lowest fixed top-0 left-0 z-10 hidden h-full flex-col border-r md:flex"
+    >
+      <div class="px-lg mb-8">
+        <h1 class="font-headline-md text-headline-md text-primary font-bold">EstateNexus</h1>
+        <p class="font-label-caps text-label-caps text-on-surface-variant mt-1">Agency Portal</p>
+      </div>
+      <ul class="flex-1 space-y-2 overflow-y-auto px-4">
+        <li>
+          <a
+            class="text-on-surface-variant hover:bg-surface-container flex scale-95 items-center rounded-lg px-4 py-3 transition-colors transition-transform active:scale-100"
+            href="#"
+          >
+            <span class="material-symbols-outlined mr-3">dashboard</span>
+            <span class="font-label-caps text-label-caps">Dashboard</span>
+          </a>
+        </li>
+        <li>
+          <a
+            class="text-on-surface-variant hover:bg-surface-container flex scale-95 items-center rounded-lg px-4 py-3 transition-colors transition-transform active:scale-100"
+            href="#"
+          >
+            <span class="material-symbols-outlined mr-3">person_search</span>
+            <span class="font-label-caps text-label-caps">Leads</span>
+          </a>
+        </li>
+        <li>
+          <a
+            class="text-on-surface-variant hover:bg-surface-container flex scale-95 items-center rounded-lg px-4 py-3 transition-colors transition-transform active:scale-100"
+            href="#"
+          >
+            <span class="material-symbols-outlined mr-3">inventory_2</span>
+            <span class="font-label-caps text-label-caps">Inventory</span>
+          </a>
+        </li>
+        <li>
+          <a
+            class="text-on-surface-variant hover:bg-surface-container flex scale-95 items-center rounded-lg px-4 py-3 transition-colors transition-transform active:scale-100"
+            href="#"
+          >
+            <span class="material-symbols-outlined mr-3">handshake</span>
+            <span class="font-label-caps text-label-caps">Matches</span>
+          </a>
+        </li>
+        <li>
+          <a
+            class="text-on-surface-variant hover:bg-surface-container flex scale-95 items-center rounded-lg px-4 py-3 transition-colors transition-transform active:scale-100"
+            href="#"
+          >
+            <span class="material-symbols-outlined mr-3">analytics</span>
+            <span class="font-label-caps text-label-caps">Pipeline</span>
+          </a>
+        </li>
+        <li>
+          <a
+            class="text-primary border-primary bg-primary-fixed hover:bg-surface-container flex scale-95 items-center rounded-r-lg border-l-4 px-4 py-3 font-bold transition-colors transition-transform active:scale-100"
+            href="#"
+          >
+            <span class="material-symbols-outlined mr-3" data-weight="fill">group</span>
+            <span class="font-label-caps text-label-caps">Team</span>
+          </a>
+        </li>
+        <li>
+          <a
+            class="text-on-surface-variant hover:bg-surface-container flex scale-95 items-center rounded-lg px-4 py-3 transition-colors transition-transform active:scale-100"
+            href="#"
+          >
+            <span class="material-symbols-outlined mr-3">settings</span>
+            <span class="font-label-caps text-label-caps">Settings</span>
+          </a>
+        </li>
+      </ul>
+      <div class="px-lg mt-auto">
+        <button
+          class="bg-primary-container text-on-primary font-label-caps text-label-caps flex w-full items-center justify-center rounded-lg py-3 shadow-sm transition-opacity hover:opacity-90"
+        >
+          <span class="material-symbols-outlined mr-2 text-sm">add</span>
+          Add Listing
+        </button>
+      </div>
+    </nav>
+    <!-- Main Content Area -->
+    <main class="md:ml-sidebar-width ml-0 flex h-screen flex-1 flex-col overflow-hidden">
+      <!-- TopAppBar -->
+      <header
+        class="px-margin-desktop border-outline-variant bg-surface sticky top-0 z-10 flex h-16 items-center justify-between border-b shadow-sm"
+      >
+        <div class="flex flex-1 items-center">
+          <!-- Search bar on left -->
+          <div class="relative hidden w-64 md:block md:w-96">
+            <span
+              class="material-symbols-outlined text-on-surface-variant absolute top-1/2 left-3 -translate-y-1/2 transform"
+              >search</span
+            >
+            <input
+              class="bg-surface-container border-outline-variant font-body-sm text-body-sm focus:border-primary w-full rounded-full border py-2 pr-4 pl-10 transition-colors focus:outline-none"
+              placeholder="Search..."
+              type="text"
+            />
+          </div>
+        </div>
+        <div class="flex items-center space-x-4">
+          <button
+            class="text-on-surface-variant hover:bg-surface-variant rounded-full p-2 transition-colors"
+          >
+            <span class="material-symbols-outlined">notifications</span>
+          </button>
+          <button
+            class="text-on-surface-variant hover:bg-surface-variant hidden rounded-full p-2 transition-colors md:block"
+          >
+            <span class="material-symbols-outlined">help_outline</span>
+          </button>
+          <div
+            class="border-outline-variant h-8 w-8 cursor-pointer overflow-hidden rounded-full border"
+          >
+            <img
+              alt="User Profile"
+              class="h-full w-full object-cover"
+              data-alt="A small, professional circular avatar portrait of a modern business person in a light, bright corporate setting, highly detailed."
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuAGp9BE1IbncvCwsHmdbPYmWiy9kw6ucYztjN-gAVQHI8poYp1FnwZIlyt-8xLTHz8-k_OVhEaWdn4VTVnTsaxkw8ZO6-RGNh3Ub5_fW6nlPwQhoo3kB_WTMTJgI5lZ-Se2ASoHZlnKoSTPoojZ01e-bf3wZkHwFN8_I1T0Qi8ozQRoD1RAVbXmCjPV2L19NNEzm-_-75wbtss8nEpfGAt-Y3jahRKBufyksnwCcrmpv8GcazRjwlwn"
+            />
+          </div>
+        </div>
+      </header>
+      <!-- Canvas -->
+      <div class="p-margin-mobile md:p-margin-desktop flex-1 overflow-y-auto">
+        <!-- Page Header -->
+        <div class="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+          <div>
+            <h2
+              class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-on-surface"
+            >
+              Team
+            </h2>
+            <p class="font-body-md text-body-md text-on-surface-variant mt-1">
+              Manage agents, roles, and performance.
+            </p>
+          </div>
+          <button
+            class="bg-primary-container text-on-primary font-label-caps text-label-caps flex w-full items-center justify-center rounded-lg px-6 py-2.5 shadow-sm transition-opacity hover:opacity-90 sm:w-auto"
+          >
+            <span class="material-symbols-outlined mr-2 text-sm">person_add</span>
+            + Invite Agent
+          </button>
+        </div>
+        <!-- Team Table Card -->
+        <div
+          class="bg-surface-container-lowest border-outline-variant overflow-hidden rounded-xl border shadow-[0_2px_4px_rgba(30,41,59,0.05)]"
+        >
+          <div class="overflow-x-auto">
+            <table class="w-full border-collapse text-left">
+              <thead>
+                <tr class="border-outline-variant bg-surface border-b">
+                  <th
+                    class="font-label-caps text-label-caps text-on-surface-variant px-6 py-4 font-semibold"
+                  >
+                    Agent
+                  </th>
+                  <th
+                    class="font-label-caps text-label-caps text-on-surface-variant px-6 py-4 font-semibold"
+                  >
+                    Role
+                  </th>
+                  <th
+                    class="font-label-caps text-label-caps text-on-surface-variant px-6 py-4 text-right font-semibold"
+                  >
+                    Assigned Leads
+                  </th>
+                  <th
+                    class="font-label-caps text-label-caps text-on-surface-variant px-6 py-4 text-right font-semibold"
+                  >
+                    Properties
+                  </th>
+                  <th
+                    class="font-label-caps text-label-caps text-on-surface-variant px-6 py-4 text-right font-semibold"
+                  >
+                    Conversion
+                  </th>
+                  <th
+                    class="font-label-caps text-label-caps text-on-surface-variant px-6 py-4 font-semibold"
+                  ></th>
+                </tr>
+              </thead>
+              <tbody class="font-body-sm text-body-sm">
+                <!-- Agent Row 1 -->
+                <tr
+                  class="border-outline-variant hover:bg-surface-container/50 border-b transition-colors"
+                >
+                  <td class="px-6 py-4">
+                    <div class="flex items-center gap-3">
+                      <img
+                        alt="Sarah Jenkins"
+                        class="border-outline-variant h-10 w-10 rounded-full border object-cover"
+                        data-alt="A professional headshot of a confident female real estate agent in a bright modern office setting, soft natural lighting."
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuA_xesa1apq-uzZFMugShsOZTZpMSW1xk8fpd5_trAI7KOzic75mU768uodImMrqwO0RVFf_XHLxETNNkfyf4G_kcmvbm3HqaWuCA4p-p0u4EWzFWqYP06YnU0LcG8-8SzEUw8m0cq7DYIn_zM6dHcL-Lo_cjX2NPl6xpegxw6gQkd1rFWAlhbK2tbLcbxsn6qBAbrgAHiS0kcZk6AQuiDxcUIpVeLW781T7Ece8iXOTArRJO014Yus"
+                      />
+                      <div>
+                        <p class="text-on-surface font-semibold">Sarah Jenkins</p>
+                        <p class="text-on-surface-variant text-xs">sarah.j@estatenexus.com</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4">
+                    <select
+                      class="bg-surface border-outline-variant text-on-surface font-body-sm focus:ring-primary focus:border-primary rounded border px-2 py-1 outline-none focus:ring-1"
+                    >
+                      <option value="admin">Admin</option>
+                      <option selected="" value="agent">Agent</option>
+                    </select>
+                  </td>
+                  <td class="text-on-surface px-6 py-4 text-right font-medium">142</td>
+                  <td class="text-on-surface px-6 py-4 text-right font-medium">18</td>
+                  <td class="px-6 py-4 text-right">
+                    <span
+                      class="bg-secondary-fixed text-on-secondary-fixed-variant inline-flex items-center rounded-full px-2 py-1 text-xs font-semibold"
+                    >
+                      18.5%
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 text-right">
+                    <button class="text-on-surface-variant hover:text-primary transition-colors">
+                      <span class="material-symbols-outlined text-lg">more_vert</span>
+                    </button>
+                  </td>
+                </tr>
+                <!-- Agent Row 2 -->
+                <tr
+                  class="border-outline-variant hover:bg-surface-container/50 border-b transition-colors"
+                >
+                  <td class="px-6 py-4">
+                    <div class="flex items-center gap-3">
+                      <div
+                        class="bg-primary-fixed text-on-primary-fixed-variant border-outline-variant flex h-10 w-10 items-center justify-center rounded-full border font-bold"
+                      >
+                        MK
+                      </div>
+                      <div>
+                        <p class="text-on-surface font-semibold">Marcus Thorne</p>
+                        <p class="text-on-surface-variant text-xs">marcus.t@estatenexus.com</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4">
+                    <select
+                      class="bg-surface border-outline-variant text-on-surface font-body-sm focus:ring-primary focus:border-primary rounded border px-2 py-1 outline-none focus:ring-1"
+                    >
+                      <option selected="" value="admin">Admin</option>
+                      <option value="agent">Agent</option>
+                    </select>
+                  </td>
+                  <td class="text-on-surface px-6 py-4 text-right font-medium">89</td>
+                  <td class="text-on-surface px-6 py-4 text-right font-medium">42</td>
+                  <td class="px-6 py-4 text-right">
+                    <span
+                      class="bg-secondary-fixed text-on-secondary-fixed-variant inline-flex items-center rounded-full px-2 py-1 text-xs font-semibold"
+                    >
+                      22.1%
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 text-right">
+                    <button class="text-on-surface-variant hover:text-primary transition-colors">
+                      <span class="material-symbols-outlined text-lg">more_vert</span>
+                    </button>
+                  </td>
+                </tr>
+                <!-- Agent Row 3 -->
+                <tr
+                  class="border-outline-variant hover:bg-surface-container/50 border-b transition-colors"
+                >
+                  <td class="px-6 py-4">
+                    <div class="flex items-center gap-3">
+                      <img
+                        alt="David Chen"
+                        class="border-outline-variant h-10 w-10 rounded-full border object-cover"
+                        data-alt="A professional headshot of a younger male real estate agent smiling slightly, modern minimalist background, highly detailed corporate photography."
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuCPmTy5n1cRCRfhfGV_9LAI6IW5M6ZJOzBurLgXanjfJo69b0JiqqReAOASAjuswuvg594fcvmcS3QLemjDhkcp-2i_lPlzk4APetqRpMwe5Zk-WtsTbNtaP9s_dKWz0uvnv-BC7mNWNjVogluUOTr2JycSZucn3WVbMVHAR7rlUkuVxyAe0tiTzggczjjCMqHv9aFit4bFY6I-FIZQkvpB9q82cATqvPCRgzuIV0MIgB_gbRmrtjsA"
+                      />
+                      <div>
+                        <p class="text-on-surface font-semibold">David Chen</p>
+                        <p class="text-on-surface-variant text-xs">david.c@estatenexus.com</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4">
+                    <select
+                      class="bg-surface border-outline-variant text-on-surface font-body-sm focus:ring-primary focus:border-primary rounded border px-2 py-1 outline-none focus:ring-1"
+                    >
+                      <option value="admin">Admin</option>
+                      <option selected="" value="agent">Agent</option>
+                    </select>
+                  </td>
+                  <td class="text-on-surface px-6 py-4 text-right font-medium">215</td>
+                  <td class="text-on-surface px-6 py-4 text-right font-medium">12</td>
+                  <td class="px-6 py-4 text-right">
+                    <span
+                      class="bg-surface-variant text-on-surface-variant inline-flex items-center rounded-full px-2 py-1 text-xs font-semibold"
+                    >
+                      11.2%
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 text-right">
+                    <button class="text-on-surface-variant hover:text-primary transition-colors">
+                      <span class="material-symbols-outlined text-lg">more_vert</span>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <!-- Pagination -->
+          <div
+            class="border-outline-variant bg-surface flex items-center justify-between border-t px-6 py-4"
+          >
+            <p class="font-body-sm text-body-sm text-on-surface-variant">
+              Showing 1 to 3 of 12 agents
+            </p>
+            <div class="flex gap-2">
+              <button
+                class="border-outline-variant bg-surface hover:bg-surface-variant text-on-surface font-body-sm rounded border px-3 py-1 transition-colors disabled:opacity-50"
+                disabled=""
+              >
+                Previous
+              </button>
+              <button
+                class="border-outline-variant bg-surface hover:bg-surface-variant text-on-surface font-body-sm rounded border px-3 py-1 transition-colors"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>
