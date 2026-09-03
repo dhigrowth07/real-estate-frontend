@@ -21,43 +21,6 @@ interface AgentStats extends User {
   avatarUrl?: string;
 }
 
-const SAMPLE_TEAM_DATA: AgentStats[] = [
-  {
-    id: 'u-1',
-    name: 'Sarah Jenkins',
-    email: 'sarah.j@estatenexus.com',
-    role: 'AGENT',
-    createdAt: new Date().toISOString(),
-    assignedLeadsCount: 142,
-    propertiesCount: 18,
-    conversionRate: '18.5%',
-    avatarUrl:
-      'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=200&q=80',
-  },
-  {
-    id: 'u-2',
-    name: 'Marcus Thorne',
-    email: 'marcus.t@estatenexus.com',
-    role: 'ADMIN',
-    createdAt: new Date().toISOString(),
-    assignedLeadsCount: 89,
-    propertiesCount: 42,
-    conversionRate: '22.1%',
-  },
-  {
-    id: 'u-3',
-    name: 'David Chen',
-    email: 'david.c@estatenexus.com',
-    role: 'AGENT',
-    createdAt: new Date().toISOString(),
-    assignedLeadsCount: 215,
-    propertiesCount: 12,
-    conversionRate: '11.2%',
-    avatarUrl:
-      'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80',
-  },
-];
-
 export default function TeamPage() {
   const [agents, setAgents] = useState<AgentStats[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -75,19 +38,19 @@ export default function TeamPage() {
   const fetchAgents = useCallback(async () => {
     try {
       const data = await apiClient.get<User[]>(API_ENDPOINTS.USERS.LIST);
-      if (Array.isArray(data) && data.length > 0) {
-        const mapped: AgentStats[] = data.map((u, idx) => ({
+      if (Array.isArray(data)) {
+        const mapped: AgentStats[] = data.map((u) => ({
           ...u,
-          assignedLeadsCount: 100 + ((idx * 37) % 150),
-          propertiesCount: 10 + ((idx * 14) % 40),
-          conversionRate: `${(15 + ((idx * 3.7) % 12)).toFixed(1)}%`,
+          assignedLeadsCount: (u as { _count?: { leads?: number } })._count?.leads || 0,
+          propertiesCount: 0,
+          conversionRate: '—',
         }));
         setAgents(mapped);
       } else {
-        setAgents(SAMPLE_TEAM_DATA);
+        setAgents([]);
       }
     } catch {
-      setAgents(SAMPLE_TEAM_DATA);
+      setAgents([]);
     } finally {
       setIsLoading(false);
     }
@@ -232,18 +195,18 @@ export default function TeamPage() {
 
                       {/* Assigned Leads */}
                       <td className="px-6 py-4 text-right text-sm font-semibold text-slate-800">
-                        {agent.assignedLeadsCount || 142}
+                        {agent.assignedLeadsCount ?? 0}
                       </td>
 
                       {/* Properties */}
                       <td className="px-6 py-4 text-right text-sm font-semibold text-slate-800">
-                        {agent.propertiesCount || 18}
+                        {agent.propertiesCount ?? 0}
                       </td>
 
                       {/* Conversion Pill */}
                       <td className="px-6 py-4 text-right">
                         <span className="inline-flex items-center rounded-full border border-blue-100 bg-blue-50 px-2.5 py-1 text-xs font-bold text-blue-700">
-                          {agent.conversionRate || '18.5%'}
+                          {agent.conversionRate || '—'}
                         </span>
                       </td>
 
@@ -264,7 +227,7 @@ export default function TeamPage() {
         {/* Pagination Footer matching Screenshot */}
         <div className="flex items-center justify-between border-t border-slate-200 bg-white px-6 py-4">
           <p className="text-xs font-medium text-slate-500">
-            Showing 1 to {agents.length} of 12 agents
+            Showing {agents.length > 0 ? 1 : 0} to {agents.length} of {agents.length} agents
           </p>
           <div className="flex gap-2">
             <button

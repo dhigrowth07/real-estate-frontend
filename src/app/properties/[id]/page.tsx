@@ -157,47 +157,7 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
   const currentHeroImage = selectedImage || galleryImages[0];
 
   // Compatible leads sample fallback
-  const displayLeads =
-    matches.length > 0
-      ? matches
-      : [
-          {
-            id: 'm1',
-            leadId: 'l1',
-            propertyId: property.id,
-            score: 94,
-            status: 'NEW' as const,
-            createdAt: new Date().toISOString(),
-            lead: {
-              id: 'l1',
-              name: 'Sarah Chen',
-              phone: '+1 (555) 123-4567',
-              budgetMin: 4000000,
-              budgetMax: 4500000,
-              preferredLocations: ['Marina Bay'],
-              propertyType: 'PENTHOUSE' as const,
-              bhk: '4+ BHK',
-            },
-          },
-          {
-            id: 'm2',
-            leadId: 'l2',
-            propertyId: property.id,
-            score: 88,
-            status: 'NEW' as const,
-            createdAt: new Date().toISOString(),
-            lead: {
-              id: 'l2',
-              name: 'Marcus Rodriguez',
-              phone: '+1 (555) 234-5678',
-              budgetMin: 5000000,
-              budgetMax: 5500000,
-              preferredLocations: ['Marina'],
-              propertyType: 'APARTMENT' as const,
-              bhk: '3 BHK',
-            },
-          },
-        ];
+  const displayLeads = matches;
 
   return (
     <div className="mx-auto max-w-7xl space-y-6">
@@ -408,71 +368,82 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {displayLeads.map((item) => {
-            const lead = item.lead;
-            const initials = lead?.name
-              ? lead.name
-                  .split(' ')
-                  .map((n) => n[0])
-                  .join('')
-                  .toUpperCase()
-                  .slice(0, 2)
-              : 'SC';
+        {displayLeads.length === 0 ? (
+          <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-slate-200 bg-white p-8 text-center">
+            <Users className="mb-2 h-8 w-8 text-slate-300" />
+            <p className="text-xs font-bold text-slate-700">No Matching Leads Yet</p>
+            <p className="mt-0.5 text-[11px] text-slate-400">
+              Compatible leads scored by the matching engine will appear here automatically.
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {displayLeads.map((item) => {
+              const lead = item.lead;
+              const initials = lead?.name
+                ? lead.name
+                    .split(' ')
+                    .map((n) => n[0])
+                    .join('')
+                    .toUpperCase()
+                    .slice(0, 2)
+                : 'SC';
 
-            return (
-              <div
-                key={item.id}
-                className="flex flex-col justify-between rounded-xl border border-slate-200 bg-white p-4 shadow-xs"
-              >
-                <div>
-                  <div className="mb-3 flex items-start justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-xs font-bold text-blue-700">
-                        {initials}
+              return (
+                <div
+                  key={item.id}
+                  className="flex flex-col justify-between rounded-xl border border-slate-200 bg-white p-4 shadow-xs"
+                >
+                  <div>
+                    <div className="mb-3 flex items-start justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-xs font-bold text-blue-700">
+                          {initials}
+                        </div>
+                        <div>
+                          <h4 className="text-xs font-bold text-slate-900">
+                            {lead?.name || 'Sarah Chen'}
+                          </h4>
+                          <p className="text-[11px] text-slate-500">
+                            Looking for: {lead?.propertyType || 'Penthouse'},{' '}
+                            {lead?.bhk || '4+ BHK'}
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <h4 className="text-xs font-bold text-slate-900">
-                          {lead?.name || 'Sarah Chen'}
-                        </h4>
-                        <p className="text-[11px] text-slate-500">
-                          Looking for: {lead?.propertyType || 'Penthouse'}, {lead?.bhk || '4+ BHK'}
-                        </p>
+                      <div className="rounded-md border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[11px] font-bold text-emerald-800">
+                        {item.score}% Match
                       </div>
                     </div>
-                    <div className="rounded-md border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[11px] font-bold text-emerald-800">
-                      {item.score}% Match
-                    </div>
+                    <p className="mb-3 text-xs text-slate-600">
+                      <span className="font-semibold text-slate-900">Budget:</span>{' '}
+                      {lead?.budgetMin ? formatPrice(lead.budgetMin) : '₹40L'} -{' '}
+                      {lead?.budgetMax ? formatPrice(lead.budgetMax) : '₹50L'}
+                    </p>
                   </div>
-                  <p className="mb-3 text-xs text-slate-600">
-                    <span className="font-semibold text-slate-900">Budget:</span>{' '}
-                    {lead?.budgetMin ? formatPrice(lead.budgetMin) : '₹40L'} -{' '}
-                    {lead?.budgetMax ? formatPrice(lead.budgetMax) : '₹50L'}
-                  </p>
-                </div>
 
-                <div className="mt-1 flex gap-2 border-t border-slate-100 pt-3">
-                  <a
-                    href={`tel:${lead?.phone || '+15551234567'}`}
-                    className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-slate-200 py-2 text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-50"
-                  >
-                    <Phone className="h-3.5 w-3.5 text-slate-600" />
-                    <span>Call</span>
-                  </a>
-                  <a
-                    href={`https://wa.me/${(lead?.phone || '15551234567').replace(/[^0-9]/g, '')}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 py-2 text-xs font-semibold text-emerald-800 transition-colors hover:bg-emerald-100"
-                  >
-                    <MessageSquare className="h-3.5 w-3.5 text-emerald-600" />
-                    <span>WhatsApp</span>
-                  </a>
+                  <div className="mt-1 flex gap-2 border-t border-slate-100 pt-3">
+                    <a
+                      href={`tel:${lead?.phone || '+15551234567'}`}
+                      className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-slate-200 py-2 text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-50"
+                    >
+                      <Phone className="h-3.5 w-3.5 text-slate-600" />
+                      <span>Call</span>
+                    </a>
+                    <a
+                      href={`https://wa.me/${(lead?.phone || '15551234567').replace(/[^0-9]/g, '')}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 py-2 text-xs font-semibold text-emerald-800 transition-colors hover:bg-emerald-100"
+                    >
+                      <MessageSquare className="h-3.5 w-3.5 text-emerald-600" />
+                      <span>WhatsApp</span>
+                    </a>
+                  </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* Edit Property Drawer */}

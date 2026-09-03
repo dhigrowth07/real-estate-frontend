@@ -16,121 +16,6 @@ function formatPrice(amount: number): string {
   return `₹${amount.toLocaleString('en-IN')}`;
 }
 
-const SAMPLE_MATCHES: Match[] = [
-  {
-    id: 'm-1',
-    leadId: 'l-1',
-    propertyId: 'p-1',
-    score: 94,
-    status: 'NEW',
-    createdAt: new Date().toISOString(),
-    lead: {
-      id: 'l-1',
-      name: 'Sarah Jenkins',
-      phone: '+1 (555) 123-4567',
-      source: 'WEBSITE',
-      budgetMin: 5000000,
-      budgetMax: 7500000,
-      preferredLocations: ['Downtown'],
-      propertyType: 'APARTMENT',
-      bhk: '3BHK',
-      purpose: 'BUY',
-      urgency: 'IMMEDIATE',
-      stage: 'CONTACTED',
-      createdAt: new Date().toISOString(),
-    },
-    property: {
-      id: 'p-1',
-      title: 'Sunrise Apartments',
-      location: 'Downtown Core',
-      price: 6500000,
-      propertyType: 'APARTMENT',
-      bhk: '3BHK',
-      sqft: 1850,
-      possessionStatus: 'READY_TO_MOVE',
-      status: 'AVAILABLE',
-      images: [
-        'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80',
-      ],
-      createdAt: new Date().toISOString(),
-    },
-  },
-  {
-    id: 'm-2',
-    leadId: 'l-2',
-    propertyId: 'p-2',
-    score: 88,
-    status: 'NEW',
-    createdAt: new Date().toISOString(),
-    lead: {
-      id: 'l-2',
-      name: 'David Smith',
-      phone: '+1 (555) 234-5678',
-      source: 'PORTAL',
-      budgetMin: 10000000,
-      budgetMax: 15000000,
-      preferredLocations: ['Westside Suburbs'],
-      propertyType: 'VILLA',
-      bhk: '4BHK',
-      purpose: 'BUY',
-      urgency: 'WITHIN_1_MONTH',
-      stage: 'CONTACTED',
-      createdAt: new Date().toISOString(),
-    },
-    property: {
-      id: 'p-2',
-      title: 'Oakwood Villa',
-      location: 'Westside Suburbs',
-      price: 12500000,
-      propertyType: 'VILLA',
-      bhk: '4BHK',
-      sqft: 3200,
-      possessionStatus: 'READY_TO_MOVE',
-      status: 'AVAILABLE',
-      images: [
-        'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80',
-      ],
-      createdAt: new Date().toISOString(),
-    },
-  },
-  {
-    id: 'm-3',
-    leadId: 'l-3',
-    propertyId: 'p-3',
-    score: 76,
-    status: 'NOTIFIED',
-    createdAt: new Date().toISOString(),
-    lead: {
-      id: 'l-3',
-      name: 'Emily Davis',
-      phone: '+1 (555) 345-6789',
-      source: 'DIRECT_CALL',
-      budgetMin: 4000000,
-      budgetMax: 6000000,
-      preferredLocations: ['Innovation District'],
-      propertyType: 'COMMERCIAL',
-      purpose: 'RENT',
-      urgency: 'IMMEDIATE',
-      stage: 'SITE_VISIT_SCHEDULED',
-      createdAt: new Date().toISOString(),
-    },
-    property: {
-      id: 'p-3',
-      title: 'Nexus Tech Park Unit 4B',
-      location: 'Innovation District',
-      price: 4500000,
-      propertyType: 'COMMERCIAL',
-      sqft: 2500,
-      possessionStatus: 'READY_TO_MOVE',
-      status: 'AVAILABLE',
-      images: [
-        'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80',
-      ],
-      createdAt: new Date().toISOString(),
-    },
-  },
-];
-
 type TabType = 'ALL' | 'NEW' | 'HIGH' | 'MEDIUM' | 'DISMISSED';
 
 export default function MatchesAndAlertsPage() {
@@ -143,13 +28,9 @@ export default function MatchesAndAlertsPage() {
   const fetchMatches = useCallback(async () => {
     try {
       const data = await apiClient.get<Match[]>(API_ENDPOINTS.MATCHES.LIST);
-      if (Array.isArray(data) && data.length > 0) {
-        setMatches(data);
-      } else {
-        setMatches(SAMPLE_MATCHES);
-      }
+      setMatches(Array.isArray(data) ? data : []);
     } catch {
-      setMatches(SAMPLE_MATCHES);
+      setMatches([]);
     } finally {
       setIsLoading(false);
       setIsRefreshing(false);

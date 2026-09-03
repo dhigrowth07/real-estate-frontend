@@ -104,55 +104,6 @@ function getStageBadge(stage: string) {
   }
 }
 
-const STATIC_FALLBACK_LEADS: LeadDisplayItem[] = [
-  {
-    id: '1',
-    name: 'Marcus Chen',
-    source: 'WEBSITE',
-    stage: 'NEW',
-    agentName: 'Sarah Agent',
-    addedText: '2 hours ago',
-  },
-  {
-    id: '2',
-    name: 'Sophia Martinez',
-    source: 'PORTAL',
-    stage: 'SITE_VISIT_SCHEDULED',
-    agentName: 'David Agent',
-    addedText: '5 hours ago',
-  },
-  {
-    id: '3',
-    name: 'James Wilson',
-    source: 'DIRECT_CALL',
-    stage: 'NEGOTIATION',
-    agentName: 'Sarah Agent',
-    addedText: '1 day ago',
-  },
-  {
-    id: '4',
-    name: 'Olivia Taylor',
-    source: 'WHATSAPP',
-    stage: 'NEW',
-    agentName: 'David Agent',
-    addedText: '1 day ago',
-  },
-  {
-    id: '5',
-    name: 'William Brown',
-    source: 'WEBSITE',
-    stage: 'SITE_VISIT_SCHEDULED',
-    agentName: 'Alex Mercer',
-    addedText: '2 days ago',
-  },
-];
-
-const STATIC_AGING_ITEMS: AgingItem[] = [
-  { id: '1', title: '124 Maple Street', daysOnMarket: 45, isDanger: true },
-  { id: '2', title: 'Apt 4B, Riverfront Tower', daysOnMarket: 32, isDanger: false },
-  { id: '3', title: '88 Pine Avenue', daysOnMarket: 30, isDanger: false },
-];
-
 export default function DashboardPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [matches, setMatches] = useState<Match[]>([]);
@@ -190,7 +141,7 @@ export default function DashboardPage() {
   const totalLeadsCount =
     stats?.distributions?.leadsBySource?.reduce((acc, s) => acc + s.count, 0) ||
     stats?.kpis?.totalActiveLeads ||
-    342;
+    0;
 
   const agingWithDays: AgingItem[] =
     stats?.agingInventory && stats.agingInventory.length > 0
@@ -200,40 +151,10 @@ export default function DashboardPage() {
           daysOnMarket: 30 + index * 7,
           isDanger: index === 0,
         }))
-      : STATIC_AGING_ITEMS;
+      : [];
 
-  // Top 4 High-Probability Matches (live or default visual pairs)
-  const displayMatches =
-    matches && matches.length > 0
-      ? matches.slice(0, 4)
-      : [
-          {
-            id: 'sample-1',
-            score: 92,
-            leadName: 'Sarah Johnson',
-            propertyTitle: 'Sunrise Apartments, 3BHK',
-          },
-          {
-            id: 'sample-2',
-            score: 88,
-            leadName: 'David Chen',
-            propertyTitle: 'Oakwood Villa, Downtown',
-          },
-          {
-            id: 'sample-3',
-            score: 76,
-            leadName: 'Elena Rodriguez',
-            propertyTitle: 'Modern Loft, Westside',
-          },
-          {
-            id: 'sample-4',
-            score: 65,
-            leadName: 'Michael Chang',
-            propertyTitle: 'Suburban Family Home, 4BHK',
-          },
-        ];
+  const displayMatches = matches && matches.length > 0 ? matches.slice(0, 4) : [];
 
-  // Recent Leads (live or reference default)
   const displayLeads: LeadDisplayItem[] =
     stats?.recentLeads && stats.recentLeads.length > 0
       ? stats.recentLeads.map((l) => ({
@@ -241,10 +162,10 @@ export default function DashboardPage() {
           name: l.name,
           source: l.source,
           stage: l.stage,
-          agentName: l.assignedAgent?.name || 'Assigned',
+          agentName: l.assignedAgent?.name || 'Unassigned',
           addedText: formatDateDisplay(l.createdAt),
         }))
-      : STATIC_FALLBACK_LEADS;
+      : [];
 
   if (isLoading) {
     return (
@@ -304,10 +225,10 @@ export default function DashboardPage() {
           </div>
           <div className="mt-1 flex items-end gap-2">
             <span className="text-3xl font-bold text-slate-900">
-              {stats?.kpis?.totalActiveLeads ?? 342}
+              {stats?.kpis?.totalActiveLeads ?? 0}
             </span>
             <span className="mb-1 rounded-md bg-emerald-50 px-2 py-0.5 text-xs font-bold text-emerald-600">
-              +12%
+              Active
             </span>
           </div>
         </div>
@@ -324,7 +245,7 @@ export default function DashboardPage() {
           </div>
           <div className="mt-1 flex items-end gap-2">
             <span className="text-3xl font-bold text-slate-900">
-              {stats?.kpis?.totalProperties ?? 89}
+              {stats?.kpis?.totalProperties ?? 0}
             </span>
             <span className="mb-1 text-xs font-medium text-slate-500">active</span>
           </div>
@@ -342,7 +263,7 @@ export default function DashboardPage() {
           </div>
           <div className="mt-1 flex items-end gap-2">
             <span className="text-3xl font-bold text-slate-900">
-              {stats?.kpis?.hotMatchesToday ?? 14}
+              {stats?.kpis?.hotMatchesToday ?? 0}
             </span>
             <span className="mb-1 rounded-md bg-emerald-50 px-2 py-0.5 text-xs font-bold text-emerald-600">
               Action Required
@@ -362,10 +283,10 @@ export default function DashboardPage() {
           </div>
           <div className="mt-1 flex items-end gap-2">
             <span className="text-3xl font-bold text-slate-900">
-              {stats?.kpis?.dealsClosedThisMonth ?? 8}
+              {stats?.kpis?.dealsClosedThisMonth ?? 0}
             </span>
             <span className="mb-1 rounded-md bg-amber-50 px-2 py-0.5 text-xs font-bold text-amber-600">
-              Target: 10
+              Won
             </span>
           </div>
         </div>
@@ -388,98 +309,116 @@ export default function DashboardPage() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            {displayMatches.map((match) => {
-              const leadName =
-                'lead' in match && match.lead
-                  ? (match.lead as Lead).name
-                  : 'leadName' in match
-                    ? String(match.leadName)
-                    : 'Inquiry';
-              const propTitle =
-                'property' in match && match.property
-                  ? (match.property as Property).title
-                  : 'propertyTitle' in match
-                    ? String(match.propertyTitle)
-                    : 'Sunrise Apartments, 3BHK';
+          {displayMatches.length === 0 ? (
+            <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-slate-200 bg-slate-50/50 p-8 text-center">
+              <BellRing className="mb-2 h-8 w-8 text-slate-300" />
+              <p className="text-xs font-bold text-slate-700">No Hot Matches Available</p>
+              <p className="mt-0.5 text-[11px] text-slate-400">
+                New matches will automatically appear here once leads and properties are registered.
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              {displayMatches.map((match) => {
+                const leadName =
+                  'lead' in match && match.lead
+                    ? (match.lead as Lead).name
+                    : 'leadName' in match
+                      ? String(match.leadName)
+                      : 'Inquiry';
+                const propTitle =
+                  'property' in match && match.property
+                    ? (match.property as Property).title
+                    : 'propertyTitle' in match
+                      ? String(match.propertyTitle)
+                      : 'Listing';
 
-              return (
-                <div
-                  key={match.id}
-                  className="flex flex-col justify-between rounded-lg border border-slate-200 bg-slate-50/50 p-4 shadow-xs transition-colors hover:border-blue-500"
-                >
-                  <div>
-                    <div className="mb-3 flex items-start justify-between">
-                      <div>
+                return (
+                  <div
+                    key={match.id}
+                    className="flex flex-col justify-between rounded-lg border border-slate-200 bg-slate-50/50 p-4 shadow-xs transition-colors hover:border-blue-500"
+                  >
+                    <div>
+                      <div className="mb-3 flex items-start justify-between">
+                        <div>
+                          <p className="text-[11px] font-semibold tracking-wider text-slate-400 uppercase">
+                            Lead
+                          </p>
+                          <p className="mt-0.5 text-sm font-bold text-slate-900">{leadName}</p>
+                        </div>
+                        <div
+                          className={`rounded-full border px-3 py-0.5 text-sm font-bold ${
+                            match.score >= 80
+                              ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
+                              : 'border-amber-500 bg-amber-50 text-amber-700'
+                          }`}
+                        >
+                          {match.score}%
+                        </div>
+                      </div>
+
+                      <div className="mb-3">
                         <p className="text-[11px] font-semibold tracking-wider text-slate-400 uppercase">
-                          Lead
+                          Property Match
                         </p>
-                        <p className="mt-0.5 text-sm font-bold text-slate-900">{leadName}</p>
-                      </div>
-                      <div
-                        className={`rounded-full border px-3 py-0.5 text-sm font-bold ${
-                          match.score >= 80
-                            ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
-                            : 'border-amber-500 bg-amber-50 text-amber-700'
-                        }`}
-                      >
-                        {match.score}%
+                        <p className="mt-0.5 truncate text-xs font-medium text-slate-700">
+                          {propTitle}
+                        </p>
                       </div>
                     </div>
 
-                    <div className="mb-3">
-                      <p className="text-[11px] font-semibold tracking-wider text-slate-400 uppercase">
-                        Property Match
-                      </p>
-                      <p className="mt-0.5 truncate text-xs font-medium text-slate-700">
-                        {propTitle}
-                      </p>
-                    </div>
+                    <Link href="/matches">
+                      <button className="w-full cursor-pointer rounded-md border border-slate-200 bg-slate-100 py-2 text-center text-xs font-semibold text-slate-800 transition-colors hover:border-blue-600 hover:bg-blue-600 hover:text-white">
+                        View Match
+                      </button>
+                    </Link>
                   </div>
-
-                  <Link href="/matches">
-                    <button className="w-full cursor-pointer rounded-md border border-slate-200 bg-slate-100 py-2 text-center text-xs font-semibold text-slate-800 transition-colors hover:border-blue-600 hover:bg-blue-600 hover:text-white">
-                      View Match
-                    </button>
-                  </Link>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          )}
         </div>
 
-        {/* Right Column (Widgets) */}
+        {/* Right Column: Aging Inventory & Lead Sources */}
         <div className="flex flex-col gap-6">
           {/* Aging Inventory Widget */}
           <div className="flex flex-col gap-2 rounded-xl border border-slate-200 bg-white p-4 shadow-xs">
             <div className="flex items-center justify-between border-b border-slate-100 pb-2">
               <h3 className="flex items-center gap-1.5 text-base font-bold text-slate-900">
-                <AlertTriangle className="h-4 w-4 text-amber-600" />
+                <AlertTriangle className="h-4 w-4 text-amber-500" />
                 <span>Aging Inventory</span>
               </h3>
             </div>
 
-            <div className="mt-1 flex flex-col divide-y divide-slate-100">
-              {agingWithDays.map((prop) => (
-                <Link
-                  key={prop.id}
-                  href="/properties"
-                  className="flex items-center justify-between rounded-md px-1 py-2.5 transition-colors hover:bg-slate-50"
-                >
-                  <div className="flex min-w-0 flex-col pr-2">
-                    <span className="truncate text-xs font-bold text-slate-900">{prop.title}</span>
-                    <span
-                      className={`text-[11px] font-semibold ${
-                        prop.isDanger ? 'text-rose-600' : 'text-amber-600'
-                      }`}
-                    >
-                      {prop.daysOnMarket} Days on Market
-                    </span>
-                  </div>
-                  <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" />
-                </Link>
-              ))}
-            </div>
+            {agingWithDays.length === 0 ? (
+              <div className="p-4 text-center text-xs text-slate-400">
+                No aging inventory detected.
+              </div>
+            ) : (
+              <div className="mt-1 flex flex-col divide-y divide-slate-100">
+                {agingWithDays.map((prop) => (
+                  <Link
+                    key={prop.id}
+                    href="/properties"
+                    className="flex items-center justify-between rounded-md px-1 py-2.5 transition-colors hover:bg-slate-50"
+                  >
+                    <div className="flex min-w-0 flex-col pr-2">
+                      <span className="truncate text-xs font-bold text-slate-900">
+                        {prop.title}
+                      </span>
+                      <span
+                        className={`text-[11px] font-semibold ${
+                          prop.isDanger ? 'text-rose-600' : 'text-amber-600'
+                        }`}
+                      >
+                        {prop.daysOnMarket} Days on Market
+                      </span>
+                    </div>
+                    <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" />
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Leads by Source Widget */}
@@ -556,37 +495,46 @@ export default function DashboardPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 text-sm">
-              {displayLeads.map((lead) => (
-                <tr key={lead.id} className="transition-colors hover:bg-slate-50/70">
-                  <td className="p-4 font-bold text-slate-900">{lead.name}</td>
-                  <td className="p-4">
-                    <div className="flex items-center gap-1.5 text-xs font-medium text-slate-600">
-                      {getSourceIcon(lead.source)}
-                      <span className="capitalize">
-                        {lead.source?.toLowerCase().replace(/_/g, ' ') || 'Website'}
-                      </span>
-                    </div>
+              {displayLeads.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="p-8 text-center text-xs text-slate-400">
+                    No leads registered yet. Click &quot;+ New Lead&quot; above to add your first
+                    lead.
                   </td>
-                  <td className="p-4">{getStageBadge(lead.stage)}</td>
-                  <td className="p-4">
-                    <div className="flex items-center gap-2">
-                      <div className="flex h-6 w-6 items-center justify-center rounded-full border border-blue-200 bg-blue-100 text-[10px] font-bold text-blue-700">
-                        {lead.agentName
-                          ? lead.agentName
-                              .split(' ')
-                              .map((n) => n[0])
-                              .join('')
-                              .substring(0, 2)
-                          : 'AG'}
-                      </div>
-                      <span className="hidden text-xs font-medium text-slate-600 sm:inline">
-                        {lead.agentName}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="p-4 text-xs text-slate-400">{lead.addedText}</td>
                 </tr>
-              ))}
+              ) : (
+                displayLeads.map((lead) => (
+                  <tr key={lead.id} className="transition-colors hover:bg-slate-50/70">
+                    <td className="p-4 font-bold text-slate-900">{lead.name}</td>
+                    <td className="p-4">
+                      <div className="flex items-center gap-1.5 text-xs font-medium text-slate-600">
+                        {getSourceIcon(lead.source)}
+                        <span className="capitalize">
+                          {lead.source?.toLowerCase().replace(/_/g, ' ') || 'Website'}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="p-4">{getStageBadge(lead.stage)}</td>
+                    <td className="p-4">
+                      <div className="flex items-center gap-2">
+                        <div className="flex h-6 w-6 items-center justify-center rounded-full border border-blue-200 bg-blue-100 text-[10px] font-bold text-blue-700">
+                          {lead.agentName
+                            ? lead.agentName
+                                .split(' ')
+                                .map((n) => n[0])
+                                .join('')
+                                .substring(0, 2)
+                            : 'AG'}
+                        </div>
+                        <span className="hidden text-xs font-medium text-slate-600 sm:inline">
+                          {lead.agentName}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="p-4 text-xs text-slate-400">{lead.addedText}</td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

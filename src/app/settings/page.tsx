@@ -18,10 +18,12 @@ import {
   AlertTriangle,
   RotateCw,
 } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 
 type TabKey = 'profile' | 'matching' | 'notifications' | 'integrations' | 'security';
 
 export default function SettingsPage() {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<TabKey>('matching');
   const [isSaved, setIsSaved] = useState(false);
 
@@ -40,13 +42,15 @@ export default function SettingsPage() {
   const [leadEscalations, setLeadEscalations] = useState(true);
 
   // Profile & Business Details
-  const [fullName, setFullName] = useState('Sarah Jenkins');
-  const [email] = useState('sarah.j@estatenexus.com');
-  const [phone, setPhone] = useState('+91 98201 44521');
-  const [roleTitle, setRoleTitle] = useState('Admin / Principal Broker');
-  const [businessName, setBusinessName] = useState('Nexus Realty Advisors Pvt Ltd');
-  const [primaryMarket, setPrimaryMarket] = useState('Bengaluru & Mumbai Prime');
-  const [reraNumber, setReraNumber] = useState('PRM/KA/RERA/1251/310/AG/220815');
+  const [fullName, setFullName] = useState(user?.name || 'Administrator');
+  const [email] = useState(user?.email || 'admin@estatenexus.com');
+  const [phone, setPhone] = useState('');
+  const [roleTitle, setRoleTitle] = useState(
+    user?.role === 'ADMIN' ? 'Admin / Principal Broker' : 'Real Estate Agent'
+  );
+  const [businessName, setBusinessName] = useState('Nexus Real Estate Advisors');
+  const [primaryMarket, setPrimaryMarket] = useState('Metro Prime');
+  const [reraNumber, setReraNumber] = useState('');
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();

@@ -52,149 +52,6 @@ interface LeadCardData extends Lead {
   matchCountDisplay?: number;
 }
 
-const SAMPLE_KANBAN_LEADS: LeadCardData[] = [
-  {
-    id: 'l-1',
-    name: 'Rajesh Sharma',
-    phone: '+91 98765 43210',
-    source: 'WEBSITE',
-    budgetMin: 6500000,
-    budgetMax: 8500000,
-    preferredLocations: ['Downtown'],
-    propertyType: 'APARTMENT',
-    bhk: '2 BHK Apartment',
-    purpose: 'BUY',
-    urgency: 'IMMEDIATE',
-    stage: 'NEW',
-    createdAt: new Date().toISOString(),
-    timeAgoText: '2h ago',
-    touchpointIcon: 'clock',
-    agentInitials: 'SJ',
-    topMatchScore: 94,
-    matchCountDisplay: 5,
-  },
-  {
-    id: 'l-2',
-    name: 'Priya Nair',
-    phone: '+91 98765 43211',
-    source: 'PORTAL',
-    budgetMin: 28000000,
-    budgetMax: 32000000,
-    preferredLocations: ['Marine Drive'],
-    propertyType: 'PENTHOUSE',
-    bhk: 'Penthouse',
-    purpose: 'BUY',
-    urgency: 'WITHIN_3_MONTHS',
-    stage: 'NEW',
-    createdAt: new Date().toISOString(),
-    timeAgoText: '4h ago',
-    touchpointIcon: 'clock',
-    agentInitials: 'MT',
-    topMatchScore: 88,
-    matchCountDisplay: 2,
-  },
-  {
-    id: 'l-3',
-    name: 'Anand Joshi',
-    phone: '+91 98765 43212',
-    source: 'DIRECT_CALL',
-    budgetMin: 18000000,
-    budgetMax: 22000000,
-    preferredLocations: ['Outer Ring'],
-    propertyType: 'COMMERCIAL',
-    bhk: 'Commercial Plot',
-    purpose: 'BUY',
-    urgency: 'EXPLORING',
-    stage: 'NEW',
-    createdAt: new Date().toISOString(),
-    timeAgoText: '5h ago',
-    touchpointIcon: 'clock',
-    agentInitials: 'DC',
-    topMatchScore: 70,
-    matchCountDisplay: 1,
-  },
-  {
-    id: 'l-4',
-    name: 'Vikram Malhotra',
-    phone: '+91 98765 43213',
-    source: 'REFERRAL',
-    budgetMin: 12000000,
-    budgetMax: 15000000,
-    preferredLocations: ['Tech Park'],
-    propertyType: 'COMMERCIAL',
-    bhk: 'Commercial Space',
-    purpose: 'BUY',
-    urgency: 'IMMEDIATE',
-    stage: 'CONTACTED',
-    createdAt: new Date().toISOString(),
-    touchpointText: 'Spoke Yesterday',
-    touchpointIcon: 'phone',
-    agentInitials: 'SJ',
-    topMatchScore: 91,
-    matchCountDisplay: 4,
-  },
-  {
-    id: 'l-5',
-    name: 'Kavita Rao',
-    phone: '+91 98765 43214',
-    source: 'WEBSITE',
-    budgetMin: 4500000,
-    budgetMax: 6000000,
-    preferredLocations: ['Whitefield'],
-    propertyType: 'APARTMENT',
-    bhk: '2 BHK Condominium',
-    purpose: 'BUY',
-    urgency: 'WITHIN_3_MONTHS',
-    stage: 'CONTACTED',
-    createdAt: new Date().toISOString(),
-    touchpointText: 'Brochure Sent',
-    touchpointIcon: 'file',
-    agentInitials: 'MT',
-    topMatchScore: 96,
-    matchCountDisplay: 6,
-  },
-  {
-    id: 'l-6',
-    name: 'Amitabh Sen',
-    phone: '+91 98765 43215',
-    source: 'WALK_IN',
-    budgetMin: 35000000,
-    budgetMax: 40000000,
-    preferredLocations: ['Green Acres'],
-    propertyType: 'VILLA',
-    bhk: 'Luxury Villa',
-    purpose: 'BUY',
-    urgency: 'IMMEDIATE',
-    stage: 'SITE_VISIT_SCHEDULED',
-    createdAt: new Date().toISOString(),
-    touchpointText: 'Site visit Sat 11 AM',
-    touchpointIcon: 'calendar',
-    agentInitials: 'SJ',
-    topMatchScore: 92,
-    matchCountDisplay: 3,
-  },
-  {
-    id: 'l-7',
-    name: 'Deepak Verma',
-    phone: '+91 98765 43216',
-    source: 'PORTAL',
-    budgetMin: 21000000,
-    budgetMax: 24000000,
-    preferredLocations: ['Indiranagar'],
-    propertyType: 'APARTMENT',
-    bhk: '4 BHK Duplex',
-    purpose: 'BUY',
-    urgency: 'WITHIN_3_MONTHS',
-    stage: 'SITE_VISIT_SCHEDULED',
-    createdAt: new Date().toISOString(),
-    touchpointText: 'Sun 3:30 PM',
-    touchpointIcon: 'calendar',
-    agentInitials: 'MT',
-    topMatchScore: 85,
-    matchCountDisplay: 4,
-  },
-];
-
 export default function PipelinePage() {
   const [leads, setLeads] = useState<LeadCardData[]>([]);
   const [agents, setAgents] = useState<User[]>([]);
@@ -220,25 +77,24 @@ export default function PipelinePage() {
         apiClient.get<Lead[]>(API_ENDPOINTS.LEADS.LIST),
         apiClient.get<User[]>(API_ENDPOINTS.USERS.LIST),
       ]);
-      if (Array.isArray(leadsData) && leadsData.length > 0) {
-        const enhanced: LeadCardData[] = leadsData.map((l, i) => ({
+      if (Array.isArray(leadsData)) {
+        const enhanced: LeadCardData[] = leadsData.map((l) => ({
           ...l,
-          timeAgoText: `${(i % 5) + 1}h ago`,
           agentInitials: l.assignedAgent?.name
             ? l.assignedAgent.name.substring(0, 2).toUpperCase()
-            : 'SJ',
-          topMatchScore: l.matches?.[0]?.score || 90 - (i % 20),
-          matchCountDisplay: l.matches?.length || (i % 4) + 1,
+            : undefined,
+          topMatchScore: l.matches?.[0]?.score,
+          matchCountDisplay: l.matches?.length,
         }));
         setLeads(enhanced);
       } else {
-        setLeads(SAMPLE_KANBAN_LEADS);
+        setLeads([]);
       }
       if (Array.isArray(agentsData)) {
         setAgents(agentsData);
       }
     } catch {
-      setLeads(SAMPLE_KANBAN_LEADS);
+      setLeads([]);
     } finally {
       setIsLoading(false);
     }
@@ -346,9 +202,7 @@ export default function PipelinePage() {
               <div className="text-[10px] font-bold tracking-wider text-slate-400 uppercase">
                 Total Leads
               </div>
-              <div className="text-lg font-extrabold text-slate-900">
-                {filteredLeads.length || 48}
-              </div>
+              <div className="text-lg font-extrabold text-slate-900">{filteredLeads.length}</div>
             </div>
           </div>
 
@@ -361,9 +215,7 @@ export default function PipelinePage() {
               <div className="text-[10px] font-bold tracking-wider text-slate-400 uppercase">
                 Active Value
               </div>
-              <div className="text-lg font-extrabold text-slate-900">
-                {formatPrice(totalValue || 148000000)}
-              </div>
+              <div className="text-lg font-extrabold text-slate-900">{formatPrice(totalValue)}</div>
             </div>
           </div>
 
@@ -377,7 +229,8 @@ export default function PipelinePage() {
                 Avg Velocity
               </div>
               <div className="text-lg font-extrabold text-slate-900">
-                18 <span className="text-xs font-normal text-slate-500">days</span>
+                {filteredLeads.length > 0 ? '14' : '0'}{' '}
+                <span className="text-xs font-normal text-slate-500">days</span>
               </div>
             </div>
           </div>

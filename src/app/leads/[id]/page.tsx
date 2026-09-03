@@ -41,36 +41,6 @@ function formatPrice(amount: number): string {
   return `₹${amount.toLocaleString('en-IN')}`;
 }
 
-const SAMPLE_MATCHED_PROPERTIES = [
-  {
-    id: 'p-1',
-    title: 'Sunrise Apartments, 3BHK',
-    location: 'Downtown Core',
-    price: 650000,
-    score: 92,
-    image:
-      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80',
-  },
-  {
-    id: 'p-2',
-    title: 'The Foundry Lofts, 2BHK',
-    location: 'Historic Arts District',
-    price: 715000,
-    score: 88,
-    image:
-      'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=800&q=80',
-  },
-  {
-    id: 'p-3',
-    title: 'Azure Riverside, 2BHK',
-    location: 'West End Walk',
-    price: 520000,
-    score: 75,
-    image:
-      'https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?auto=format&fit=crop&w=800&q=80',
-  },
-];
-
 export default function LeadDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   const leadId =
@@ -131,22 +101,7 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
         // Fallback to lead.interactions
       }
     } catch {
-      // Fallback dummy for demonstration if newly created
-      setLead({
-        id: leadId,
-        name: 'Sarah Jenkins',
-        phone: '+1 (555) 123-4567',
-        source: 'WEBSITE',
-        budgetMin: 500000,
-        budgetMax: 750000,
-        preferredLocations: ['Downtown'],
-        propertyType: 'APARTMENT',
-        bhk: '2BHK, 3BHK',
-        purpose: 'BUY',
-        urgency: 'IMMEDIATE',
-        stage: 'REQUIREMENT_GATHERED',
-        createdAt: new Date().toISOString(),
-      });
+      setLead(null);
     } finally {
       setIsLoading(false);
     }
@@ -174,24 +129,6 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
       setInteractions((prev) => [created, ...prev]);
       setNewNote('');
     } catch {
-      // Optimistic local add
-      const localInteraction: Interaction = {
-        id: `int-${Date.now()}`,
-        leadId,
-        channel,
-        type: interactionType,
-        notes: newNote,
-        timestamp: new Date().toISOString(),
-        agentId: 'current-user',
-        agent: {
-          id: 'current-user',
-          name: 'Mike Ross',
-          email: 'mike@estatenexus.com',
-          role: 'AGENT',
-          createdAt: new Date().toISOString(),
-        },
-      };
-      setInteractions((prev) => [localInteraction, ...prev]);
       setNewNote('');
     } finally {
       setIsLogging(false);
@@ -239,20 +176,17 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
   }
 
   const isHighUrgency = lead.urgency === 'IMMEDIATE';
-  const displayMatches =
-    matches.length > 0
-      ? matches.map((m) => ({
-          id: m.property?.id || m.id,
-          title: m.property?.title || 'Sunrise Apartments, 3BHK',
-          location: m.property?.location || 'Downtown Core',
-          price: m.property?.price || 650000,
-          score: m.score,
-          image:
-            m.property?.images && m.property.images.length > 0
-              ? m.property.images[0]
-              : SAMPLE_MATCHED_PROPERTIES[0].image,
-        }))
-      : SAMPLE_MATCHED_PROPERTIES;
+  const displayMatches = matches.map((m) => ({
+    id: m.property?.id || m.id,
+    title: m.property?.title || 'Listing',
+    location: m.property?.location || 'City',
+    price: m.property?.price || 0,
+    score: m.score,
+    image:
+      m.property?.images && m.property.images.length > 0
+        ? m.property.images[0]
+        : 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80',
+  }));
 
   return (
     <div className="mx-auto max-w-[1600px] space-y-6 pb-16">
@@ -408,18 +342,25 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
             </div>
           </div>
 
-          {/* Notes Card matching Screenshot */}
+          {/* Notes Card */}
           <div className="space-y-3 rounded-2xl border border-slate-200 bg-white p-5 shadow-2xs">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <h3 className="text-sm font-bold text-slate-900">Notes</h3>
-              <button className="cursor-pointer p-0.5 text-slate-400 hover:text-slate-700">
+              <button
+                onClick={() => setActiveTab('activity')}
+                className="cursor-pointer p-0.5 text-slate-400 hover:text-slate-700"
+                title="Add Note"
+              >
                 <Plus className="h-4 w-4" />
               </button>
             </div>
-            <p className="border-l-2 border-blue-400 pl-3 text-xs leading-relaxed text-slate-600 italic">
-              &ldquo;Looking for something with good natural light and proximity to the metro
-              station. Highly motivated buyer.&rdquo;
-            </p>
+            {interactions.find((i) => i.channel === 'NOTE' || i.notes) ? (
+              <p className="border-l-2 border-blue-400 pl-3 text-xs leading-relaxed text-slate-600 italic">
+                &ldquo;{interactions.find((i) => i.channel === 'NOTE' || i.notes)?.notes}&rdquo;
+              </p>
+            ) : (
+              <p className="text-xs text-slate-400 italic">No notes added yet.</p>
+            )}
           </div>
         </div>
 
@@ -464,119 +405,126 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
             </button>
           </div>
 
-          {/* TAB 1: Matched Properties Cards Grid matching Screenshot */}
+          {/* TAB 1: Matched Properties Cards Grid */}
           {activeTab === 'matches' && (
             <div className="space-y-6">
-              <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
-                {displayMatches.map((prop, idx) => {
-                  const isHigh = prop.score >= 80;
+              {displayMatches.length === 0 ? (
+                <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-white p-8 text-center">
+                  <Building2 className="mb-2 h-8 w-8 text-slate-300" />
+                  <p className="text-xs font-bold text-slate-700">No Matched Properties Yet</p>
+                  <p className="mt-0.5 text-[11px] text-slate-400">
+                    Properties matching this lead&apos;s budget and criteria will automatically
+                    appear here.
+                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+                  {displayMatches.map((prop, idx) => {
+                    const isHigh = prop.score >= 80;
 
-                  return (
-                    <div
-                      key={prop.id || idx}
-                      className="flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xs transition-all hover:shadow-md"
-                    >
-                      {/* Property Image with Top-Left Score Badge */}
-                      <div className="relative h-44 w-full overflow-hidden bg-slate-100">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={prop.image}
-                          alt={prop.title}
-                          className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
-                        />
-                        <div
-                          className={`absolute top-3 left-3 flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-bold shadow-xs backdrop-blur-md ${
-                            isHigh
-                              ? 'bg-blue-600/90 text-white'
-                              : 'border border-slate-200 bg-white/90 text-slate-800'
-                          }`}
-                        >
-                          <CheckCircle className="h-3 w-3" />
-                          <span>{prop.score}% Match</span>
-                        </div>
-                      </div>
-
-                      {/* Content */}
-                      <div className="flex flex-1 flex-col justify-between space-y-3 p-4">
-                        <div>
-                          <div className="text-lg font-black text-slate-900">
-                            {formatPrice(prop.price)}
-                          </div>
-                          <h4 className="mt-0.5 truncate text-xs font-bold text-slate-800">
-                            {prop.title}
-                          </h4>
-                          <p className="mt-1 flex items-center gap-1 text-[11px] font-medium text-slate-500">
-                            <MapPin className="h-3 w-3 shrink-0 text-slate-400" />
-                            <span className="truncate">{prop.location}</span>
-                          </p>
-                        </div>
-
-                        {/* Action Buttons Row */}
-                        <div className="flex items-center gap-2 pt-1">
-                          <Link
-                            href={`/properties/${prop.id}`}
-                            className={`flex-1 cursor-pointer rounded-xl py-2 text-center text-xs font-bold shadow-2xs transition-colors ${
+                    return (
+                      <div
+                        key={prop.id || idx}
+                        className="flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xs transition-all hover:shadow-md"
+                      >
+                        {/* Property Image with Top-Left Score Badge */}
+                        <div className="relative h-44 w-full overflow-hidden bg-slate-100">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={prop.image}
+                            alt={prop.title}
+                            className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
+                          />
+                          <div
+                            className={`absolute top-3 left-3 flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-bold shadow-xs backdrop-blur-md ${
                               isHigh
-                                ? 'bg-blue-600 text-white hover:bg-blue-700'
-                                : 'border border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
+                                ? 'bg-blue-600/90 text-white'
+                                : 'border border-slate-200 bg-white/90 text-slate-800'
                             }`}
                           >
-                            View Details
-                          </Link>
-                          <button
-                            className="cursor-pointer rounded-xl border border-slate-200 p-2 text-slate-500 transition-colors hover:bg-slate-50"
-                            title="Share Listing"
-                          >
-                            <Share2 className="h-3.5 w-3.5" />
-                          </button>
+                            <CheckCircle className="h-3 w-3" />
+                            <span>{prop.score}% Match</span>
+                          </div>
+                        </div>
+
+                        {/* Content */}
+                        <div className="flex flex-1 flex-col justify-between space-y-3 p-4">
+                          <div>
+                            <div className="text-lg font-black text-slate-900">
+                              {formatPrice(prop.price)}
+                            </div>
+                            <h4 className="mt-0.5 truncate text-xs font-bold text-slate-800">
+                              {prop.title}
+                            </h4>
+                            <p className="mt-1 flex items-center gap-1 text-[11px] font-medium text-slate-500">
+                              <MapPin className="h-3 w-3 shrink-0 text-slate-400" />
+                              <span className="truncate">{prop.location}</span>
+                            </p>
+                          </div>
+
+                          {/* Action Buttons Row */}
+                          <div className="flex items-center gap-2 pt-1">
+                            <Link
+                              href={`/properties/${prop.id}`}
+                              className={`flex-1 cursor-pointer rounded-xl py-2 text-center text-xs font-bold shadow-2xs transition-colors ${
+                                isHigh
+                                  ? 'bg-blue-600 text-white hover:bg-blue-700'
+                                  : 'border border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
+                              }`}
+                            >
+                              View Details
+                            </Link>
+                            <button
+                              className="cursor-pointer rounded-xl border border-slate-200 p-2 text-slate-500 transition-colors hover:bg-slate-50"
+                              title="Share Listing"
+                            >
+                              <Share2 className="h-3.5 w-3.5" />
+                            </button>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  );
-                })}
-              </div>
+                    );
+                  })}
+                </div>
+              )}
 
-              {/* Recent Activity Section matching Screenshot */}
+              {/* Recent Activity Section */}
               <div className="space-y-5 rounded-2xl border border-slate-200 bg-white p-6 shadow-2xs">
                 <h3 className="text-sm font-bold text-slate-900">Recent Activity</h3>
 
-                <div className="space-y-4">
-                  {/* Activity 1 */}
-                  <div className="flex items-start gap-3">
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-100 text-blue-700">
-                      <Clock className="h-4 w-4" />
-                    </div>
-                    <div>
-                      <h4 className="text-xs font-bold text-slate-900">
-                        Status changed to Qualified
-                      </h4>
-                      <p className="mt-0.5 text-[11px] text-slate-400">
-                        2 hours ago • System Admin
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Activity 2 */}
-                  <div className="flex items-start gap-3">
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-600">
-                      <Phone className="h-4 w-4" />
-                    </div>
-                    <div className="flex-1 space-y-2">
-                      <div>
-                        <h4 className="text-xs font-bold text-slate-900">Phone call completed</h4>
-                        <p className="mt-0.5 text-[11px] text-slate-400">
-                          Yesterday • Agent: Mike Ross
-                        </p>
+                {interactions.length === 0 ? (
+                  <p className="py-4 text-center text-xs text-slate-400">
+                    No activity logs recorded yet.
+                  </p>
+                ) : (
+                  <div className="space-y-4">
+                    {interactions.slice(0, 4).map((int) => (
+                      <div key={int.id} className="flex items-start gap-3">
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-100 text-blue-700">
+                          {int.channel === 'CALL' ? (
+                            <Phone className="h-4 w-4" />
+                          ) : (
+                            <Clock className="h-4 w-4" />
+                          )}
+                        </div>
+                        <div className="flex-1 space-y-1">
+                          <h4 className="text-xs font-bold text-slate-900">
+                            {int.channel} • {int.type?.replace(/_/g, ' ')}
+                          </h4>
+                          <p className="text-[11px] text-slate-400">
+                            {new Date(int.timestamp).toLocaleDateString()} • Agent:{' '}
+                            {int.agent?.name || 'Agent'}
+                          </p>
+                          {int.notes && (
+                            <div className="rounded-xl border border-slate-100 bg-slate-50/80 p-3 text-xs leading-relaxed font-medium text-slate-600">
+                              {int.notes}
+                            </div>
+                          )}
+                        </div>
                       </div>
-
-                      {/* Quote Box matching Screenshot */}
-                      <div className="rounded-xl border border-slate-100 bg-slate-50/80 p-3 text-xs leading-relaxed font-medium text-slate-600">
-                        Discussed budget flexibility. Client is willing to go up to $780k for a
-                        premium view.
-                      </div>
-                    </div>
+                    ))}
                   </div>
-                </div>
+                )}
               </div>
             </div>
           )}

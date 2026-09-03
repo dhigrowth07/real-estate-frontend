@@ -27,56 +27,6 @@ function formatPrice(amount: number): string {
   return `₹${amount.toLocaleString('en-IN')}`;
 }
 
-const SAMPLE_PROPERTIES: Property[] = [
-  {
-    id: 'sample-1',
-    title: 'Serene Heights Apartment',
-    location: 'Downtown Core',
-    price: 8500000,
-    propertyType: 'APARTMENT',
-    bhk: '3BHK',
-    sqft: 1850,
-    possessionStatus: 'READY_TO_MOVE',
-    status: 'AVAILABLE',
-    images: [
-      'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80',
-    ],
-    createdAt: new Date().toISOString(),
-    _count: { matches: 12 },
-  },
-  {
-    id: 'sample-2',
-    title: 'Oakwood Villa',
-    location: 'Westside Suburbs',
-    price: 12500000,
-    propertyType: 'VILLA',
-    bhk: '4BHK',
-    sqft: 3200,
-    possessionStatus: 'READY_TO_MOVE',
-    status: 'SOLD',
-    images: [
-      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80',
-    ],
-    createdAt: new Date().toISOString(),
-    _count: { matches: 5 },
-  },
-  {
-    id: 'sample-3',
-    title: 'Nexus Tech Park Unit 4B',
-    location: 'Innovation District',
-    price: 4500000,
-    propertyType: 'COMMERCIAL',
-    sqft: 2500,
-    possessionStatus: 'READY_TO_MOVE',
-    status: 'UNDER_OFFER',
-    images: [
-      'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80',
-    ],
-    createdAt: new Date().toISOString(),
-    _count: { matches: 28 },
-  },
-];
-
 function getStatusPill(status: PropertyStatus) {
   switch (status) {
     case 'AVAILABLE':
@@ -133,13 +83,9 @@ export default function PropertiesPage() {
       if (bhkFilter) params.bhk = bhkFilter;
 
       const data = await apiClient.get<Property[]>(API_ENDPOINTS.PROPERTIES.LIST, params);
-      if (Array.isArray(data) && data.length > 0) {
-        setProperties(data);
-      } else {
-        setProperties(SAMPLE_PROPERTIES);
-      }
+      setProperties(Array.isArray(data) ? data : []);
     } catch {
-      setProperties(SAMPLE_PROPERTIES);
+      setProperties([]);
     } finally {
       setIsLoading(false);
       setIsRefreshing(false);
@@ -338,13 +284,12 @@ export default function PropertiesPage() {
       ) : viewMode === 'grid' ? (
         /* Bento Card Grid matching Screenshot */
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {displayedProperties.map((prop, idx) => {
-            const matchCount =
-              prop.matches?.length || prop._count?.matches || (idx === 0 ? 12 : idx === 1 ? 5 : 28);
+          {displayedProperties.map((prop) => {
+            const matchCount = prop.matches?.length || prop._count?.matches || 0;
             const imageUrl =
               prop.images && prop.images.length > 0
                 ? prop.images[0]
-                : SAMPLE_PROPERTIES[idx % SAMPLE_PROPERTIES.length].images![0];
+                : 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80';
 
             return (
               <div
@@ -362,7 +307,7 @@ export default function PropertiesPage() {
                   {/* Top-Right Matching Leads Overlay Badge */}
                   <div className="absolute top-2.5 right-2.5 flex items-center gap-1.5 rounded-md border border-slate-200/80 bg-white/95 px-2.5 py-1 text-xs font-bold text-blue-700 shadow-xs backdrop-blur-xs">
                     <Users className="h-3.5 w-3.5 text-blue-600" />
-                    <span>{matchCount} matching leads</span>
+                    <span>{matchCount} Matches</span>
                   </div>
                   {/* Bottom-Left Status Badge */}
                   <div className="absolute bottom-2.5 left-2.5">{getStatusPill(prop.status)}</div>
@@ -447,7 +392,7 @@ export default function PropertiesPage() {
                     <td className="px-4 py-3.5">{getStatusPill(prop.status)}</td>
                     <td className="px-4 py-3.5 text-center">
                       <span className="inline-flex items-center justify-center rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-bold text-blue-700">
-                        {prop.matches?.length || prop._count?.matches || 12}
+                        {prop.matches?.length || prop._count?.matches || 0}
                       </span>
                     </td>
                     <td className="px-4 py-3.5 text-right">
