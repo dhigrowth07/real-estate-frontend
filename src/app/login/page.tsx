@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Building, Lock, Mail, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { Lock, Mail, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { useAuth } from '@/hooks/useAuth';
@@ -49,16 +49,14 @@ export default function LoginPage() {
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         {/* Brand Logo & Header */}
         <div className="flex justify-center">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-600 text-white text-xl font-black shadow-lg shadow-blue-500/30">
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-600 text-xl font-black text-white shadow-lg shadow-blue-500/30">
             IG
           </div>
         </div>
         <h2 className="mt-4 text-center text-2xl font-black tracking-tight text-slate-900 sm:text-3xl">
           Infragen
         </h2>
-        <p className="mt-1 text-center text-sm text-slate-500">
-          Sign in to your workspace
-        </p>
+        <p className="mt-1 text-center text-sm text-slate-500">Sign in to your workspace</p>
       </div>
 
       <div className="mt-8 px-4 sm:mx-auto sm:w-full sm:max-w-md sm:px-0">

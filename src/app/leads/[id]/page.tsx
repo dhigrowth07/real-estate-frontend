@@ -27,6 +27,7 @@ import {
 import { LeadFormDrawer } from '@/components/leads/LeadFormDrawer';
 import { apiClient, API_ENDPOINTS } from '@/lib/api-client';
 import { Lead, Match, Interaction, InteractionChannel, InteractionType } from '@/types';
+import { getImageUrl } from '@/lib/utils';
 
 function formatPrice(amount: number): string {
   if (amount >= 10000000) {
@@ -431,7 +432,7 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
                         <div className="relative h-44 w-full overflow-hidden bg-slate-100">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
-                            src={prop.image}
+                            src={getImageUrl(prop.image)}
                             alt={prop.title}
                             className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
                           />

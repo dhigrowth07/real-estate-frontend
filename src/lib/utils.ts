@@ -26,3 +26,20 @@ export function formatDate(dateString: string): string {
     year: 'numeric',
   }).format(new Date(dateString));
 }
+
+export function getImageUrl(pathOrUrl?: string): string {
+  if (!pathOrUrl) {
+    return 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80';
+  }
+  if (
+    pathOrUrl.startsWith('http://') ||
+    pathOrUrl.startsWith('https://') ||
+    pathOrUrl.startsWith('data:') ||
+    pathOrUrl.startsWith('blob:')
+  ) {
+    return pathOrUrl;
+  }
+  const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
+  const origin = apiBase.replace(/\/api\/v1\/?$/, '');
+  return `${origin}${pathOrUrl.startsWith('/') ? '' : '/'}${pathOrUrl}`;
+}

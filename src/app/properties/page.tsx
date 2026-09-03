@@ -16,6 +16,7 @@ import {
 import { PropertyFormDrawer } from '@/components/properties/PropertyFormDrawer';
 import { apiClient, API_ENDPOINTS } from '@/lib/api-client';
 import { Property, PropertyStatus } from '@/types';
+import { getImageUrl } from '@/lib/utils';
 
 function formatPrice(amount: number): string {
   if (amount >= 10000000) {
@@ -286,10 +287,7 @@ export default function PropertiesPage() {
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {displayedProperties.map((prop) => {
             const matchCount = prop.matches?.length || prop._count?.matches || 0;
-            const imageUrl =
-              prop.images && prop.images.length > 0
-                ? prop.images[0]
-                : 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80';
+            const imageUrl = getImageUrl(prop.images?.[0]);
 
             return (
               <div

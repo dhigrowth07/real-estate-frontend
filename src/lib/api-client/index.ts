@@ -50,10 +50,14 @@ class ApiClient {
     const url = this.buildUrl(endpoint, params);
 
     const token = this.getToken();
+    const isFormData = typeof FormData !== 'undefined' && restOptions.body instanceof FormData;
     const defaultHeaders: Record<string, string> = {
-      'Content-Type': 'application/json',
       Accept: 'application/json',
     };
+
+    if (!isFormData) {
+      defaultHeaders['Content-Type'] = 'application/json';
+    }
 
     if (token) {
       defaultHeaders['Authorization'] = `Bearer ${token}`;
@@ -130,6 +134,14 @@ class ApiClient {
 
   public delete<T>(endpoint: string, options?: RequestInit): Promise<T> {
     return this.request<T>(endpoint, { method: 'DELETE', ...options });
+  }
+
+  public upload<T>(endpoint: string, formData: FormData, options?: RequestInit): Promise<T> {
+    return this.request<T>(endpoint, {
+      method: 'POST',
+      body: formData,
+      ...options,
+    });
   }
 }
 

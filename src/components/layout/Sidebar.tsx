@@ -49,9 +49,7 @@ export function Sidebar({ className }: { className?: string }) {
           IG
         </div>
         <div>
-          <h1 className="text-lg leading-tight font-bold tracking-tight text-blue-700">
-            Infragen
-          </h1>
+          <h1 className="text-lg leading-tight font-bold tracking-tight text-blue-700">Infragen</h1>
           <p className="text-[11px] font-semibold tracking-wider text-slate-400 uppercase">
             Professional Suite
           </p>

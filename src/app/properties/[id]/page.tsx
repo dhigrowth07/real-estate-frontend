@@ -22,6 +22,7 @@ import {
 import { PropertyFormDrawer } from '@/components/properties/PropertyFormDrawer';
 import { apiClient, API_ENDPOINTS } from '@/lib/api-client';
 import { Property, Match, PropertyStatus } from '@/types';
+import { getImageUrl } from '@/lib/utils';
 
 function formatPrice(amount: number): string {
   if (amount >= 10000000) {
@@ -151,10 +152,11 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
     );
   }
 
-  const galleryImages =
-    property.images && property.images.length > 0 ? property.images : DEFAULT_GALLERY;
+  const galleryImages = (
+    property.images && property.images.length > 0 ? property.images : DEFAULT_GALLERY
+  ).map((img) => getImageUrl(img));
 
-  const currentHeroImage = selectedImage || galleryImages[0];
+  const currentHeroImage = selectedImage ? getImageUrl(selectedImage) : galleryImages[0];
 
   // Compatible leads sample fallback
   const displayLeads = matches;

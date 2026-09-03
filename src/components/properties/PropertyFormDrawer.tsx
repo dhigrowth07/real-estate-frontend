@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   X,
   Info,
@@ -11,9 +11,11 @@ import {
   UploadCloud,
   Save,
   MapPinCheck,
+  Loader2,
 } from 'lucide-react';
 import { apiClient, API_ENDPOINTS } from '@/lib/api-client';
 import { Property, PropertyType, PossessionStatus, PropertyStatus } from '@/types';
+import { getImageUrl } from '@/lib/utils';
 
 export interface PropertyFormDrawerProps {
   isOpen: boolean;
@@ -48,14 +50,15 @@ export function PropertyFormDrawer({
   const [possessionStatus, setPossessionStatus] = useState<PossessionStatus>('READY_TO_MOVE');
   const [status, setStatus] = useState<PropertyStatus>('AVAILABLE');
   const [amenities, setAmenities] = useState<string[]>(['Parking', 'Gated Community']);
-  const [images, setImages] = useState<string[]>([
-    'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=800&q=80',
-  ]);
+  const [images, setImages] = useState<string[]>([]);
   const [imageUrlInput, setImageUrlInput] = useState('');
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Sync state with open/property props
   useEffect(() => {
@@ -75,14 +78,7 @@ export function PropertyFormDrawer({
             ? property.amenities
             : ['Parking', 'Gated Community']
         );
-        setImages(
-          property.images && property.images.length > 0
-            ? property.images
-            : [
-                'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80',
-                'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=800&q=80',
-              ]
-        );
+        setImages(property.images && property.images.length > 0 ? property.images : []);
       } else {
         setTitle('');
         setLocation('');
@@ -93,10 +89,7 @@ export function PropertyFormDrawer({
         setPossessionStatus('READY_TO_MOVE');
         setStatus('AVAILABLE');
         setAmenities(['Parking', 'Gated Community']);
-        setImages([
-          'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80',
-          'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=800&q=80',
-        ]);
+        setImages([]);
       }
       setImageUrlInput('');
       setError(null);
@@ -124,6 +117,51 @@ export function PropertyFormDrawer({
       setAmenities(amenities.filter((a) => a !== amenity));
     } else {
       setAmenities([...amenities, amenity]);
+    }
+  };
+
+  const handleFileUpload = async (files: FileList | File[]) => {
+    if (!files || files.length === 0) return;
+
+    setError(null);
+    const validFiles: File[] = [];
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      if (!file.type.startsWith('image/')) {
+        setError(`"${file.name}" is not a valid image file.`);
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        setError(`"${file.name}" exceeds the 5MB size limit.`);
+        return;
+      }
+      validFiles.push(file);
+    }
+
+    if (validFiles.length === 0) return;
+
+    try {
+      setIsUploading(true);
+      const formData = new FormData();
+      validFiles.forEach((file) => {
+        formData.append('files', file);
+      });
+
+      const response = await apiClient.upload<{ files?: Array<{ url: string }>; urls?: string[] }>(
+        API_ENDPOINTS.PROPERTIES.UPLOAD_IMAGES,
+        formData
+      );
+
+      const newUrls = response.urls || response.files?.map((f) => f.url) || [];
+      if (newUrls.length > 0) {
+        setImages((prev) => [...prev, ...newUrls]);
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to upload images. Please try again.';
+      setError(msg);
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -426,61 +464,135 @@ export function PropertyFormDrawer({
 
             {/* 5. Media Section */}
             <section className="space-y-4 pb-2">
-              <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
-                <ImageIcon className="h-4 w-4 text-blue-600" />
-                <h3 className="text-sm font-bold text-slate-900">Media</h3>
+              <div className="flex items-center justify-between border-b border-slate-200 pb-2">
+                <div className="flex items-center gap-2">
+                  <ImageIcon className="h-4 w-4 text-blue-600" />
+                  <h3 className="text-sm font-bold text-slate-900">Media & Photos</h3>
+                </div>
+                {images.length > 0 && (
+                  <span className="text-xs font-semibold text-slate-500">
+                    {images.length} {images.length === 1 ? 'photo' : 'photos'} added
+                  </span>
+                )}
               </div>
 
-              {/* Add Image Link Row */}
-              <div className="flex gap-2">
-                <input
-                  type="url"
-                  value={imageUrlInput}
-                  onChange={(e) => setImageUrlInput(e.target.value)}
-                  placeholder="Paste property image URL..."
-                  className="flex-1 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-900 outline-hidden placeholder:text-slate-400 focus:border-blue-600"
-                />
-                <button
-                  type="button"
-                  onClick={handleAddImage}
-                  className="cursor-pointer rounded-lg bg-slate-100 px-3.5 py-2 text-xs font-bold text-slate-800 transition-colors hover:bg-slate-200"
-                >
-                  Add
-                </button>
+              {/* Hidden File Input */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                multiple
+                accept="image/png,image/jpeg,image/jpg,image/webp"
+                className="hidden"
+                onChange={(e) => {
+                  if (e.target.files && e.target.files.length > 0) {
+                    void handleFileUpload(e.target.files);
+                    e.target.value = '';
+                  }
+                }}
+              />
+
+              {/* Interactive Drag & Drop Box */}
+              <div
+                onClick={() => !isUploading && fileInputRef.current?.click()}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setIsDragging(true);
+                }}
+                onDragLeave={() => setIsDragging(false)}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  setIsDragging(false);
+                  if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                    void handleFileUpload(e.dataTransfer.files);
+                  }
+                }}
+                className={`group flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed p-6 transition-all ${
+                  isDragging
+                    ? 'scale-[0.99] border-blue-600 bg-blue-50/70'
+                    : isUploading
+                      ? 'cursor-not-allowed border-slate-200 bg-slate-50 opacity-80'
+                      : 'border-slate-200 bg-white hover:border-blue-500 hover:bg-slate-50/80'
+                }`}
+              >
+                {isUploading ? (
+                  <div className="flex flex-col items-center justify-center py-2">
+                    <Loader2 className="mb-2 h-8 w-8 animate-spin text-blue-600" />
+                    <p className="text-xs font-bold text-slate-800">Uploading photos...</p>
+                    <p className="mt-0.5 text-[11px] text-slate-400">
+                      Please wait while files are processed
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    <UploadCloud className="mb-2 h-8 w-8 text-slate-400 transition-colors group-hover:text-blue-600" />
+                    <p className="text-xs font-bold text-slate-800">
+                      Drag & drop images here, or{' '}
+                      <span className="text-blue-600 underline">browse</span>
+                    </p>
+                    <p className="mt-0.5 text-[11px] text-slate-400">
+                      PNG, JPG, WEBP up to 5MB each (Max 10 photos)
+                    </p>
+                  </>
+                )}
               </div>
 
-              {/* Drag/Drop Box */}
-              <div className="group flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-200 bg-white p-6 transition-colors hover:bg-slate-50">
-                <UploadCloud className="mb-2 h-8 w-8 text-slate-400 transition-colors group-hover:text-blue-600" />
-                <p className="text-xs font-bold text-slate-800">Drag & drop images here</p>
-                <p className="mt-0.5 text-[11px] text-slate-400">
-                  or click to browse (Max 10MB each)
-                </p>
+              {/* Add Image URL Row */}
+              <div className="space-y-1.5 pt-1">
+                <label className="block text-[11px] font-semibold text-slate-500">
+                  Or add image by URL
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="url"
+                    value={imageUrlInput}
+                    onChange={(e) => setImageUrlInput(e.target.value)}
+                    placeholder="https://example.com/property-image.jpg"
+                    className="flex-1 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-900 outline-hidden placeholder:text-slate-400 focus:border-blue-600"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddImage}
+                    className="cursor-pointer rounded-lg bg-slate-100 px-3.5 py-2 text-xs font-bold text-slate-800 transition-colors hover:bg-slate-200"
+                  >
+                    Add URL
+                  </button>
+                </div>
               </div>
 
               {/* Thumbnails Preview */}
               {images.length > 0 && (
-                <div className="flex gap-2.5 overflow-x-auto py-1">
-                  {images.map((img, idx) => (
-                    <div
-                      key={idx}
-                      className="group relative h-20 w-20 shrink-0 overflow-hidden rounded-lg border border-slate-200"
-                    >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={img}
-                        alt={`Preview ${idx + 1}`}
-                        className="h-full w-full object-cover"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveImage(img)}
-                        className="absolute top-1 right-1 flex h-5 w-5 cursor-pointer items-center justify-center rounded-full bg-slate-900/60 text-white opacity-0 transition-opacity group-hover:opacity-100"
+                <div className="space-y-2 pt-1">
+                  <p className="text-[11px] font-bold tracking-wider text-slate-500 uppercase">
+                    Attached Photos ({images.length})
+                  </p>
+                  <div className="flex flex-wrap gap-2.5 overflow-x-auto py-1">
+                    {images.map((img, idx) => (
+                      <div
+                        key={idx}
+                        className="group relative h-20 w-20 shrink-0 overflow-hidden rounded-lg border border-slate-200 shadow-2xs"
                       >
-                        <X className="h-3 w-3" />
-                      </button>
-                    </div>
-                  ))}
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={getImageUrl(img)}
+                          alt={`Preview ${idx + 1}`}
+                          className="h-full w-full object-cover"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveImage(img)}
+                          title="Remove photo"
+                          className="absolute top-1 right-1 flex h-5 w-5 cursor-pointer items-center justify-center rounded-full bg-slate-900/75 text-white transition-opacity hover:bg-rose-600"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                        {idx === 0 && (
+                          <div className="absolute inset-x-0 bottom-0 bg-blue-600/90 py-0.5 text-center text-[9px] font-bold text-white">
+                            Cover
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
             </section>
