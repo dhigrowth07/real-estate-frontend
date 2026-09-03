@@ -12,6 +12,7 @@ import {
   Save,
   MapPinCheck,
   Loader2,
+  Phone,
 } from 'lucide-react';
 import { apiClient, API_ENDPOINTS } from '@/lib/api-client';
 import { Property, PropertyType, PossessionStatus, PropertyStatus } from '@/types';
@@ -50,6 +51,7 @@ export function PropertyFormDrawer({
   const [possessionStatus, setPossessionStatus] = useState<PossessionStatus>('READY_TO_MOVE');
   const [status, setStatus] = useState<PropertyStatus>('AVAILABLE');
   const [amenities, setAmenities] = useState<string[]>(['Parking', 'Gated Community']);
+  const [ownerContact, setOwnerContact] = useState('');
   const [images, setImages] = useState<string[]>([]);
   const [imageUrlInput, setImageUrlInput] = useState('');
 
@@ -78,6 +80,7 @@ export function PropertyFormDrawer({
             ? property.amenities
             : ['Parking', 'Gated Community']
         );
+        setOwnerContact(property.ownerContact || '');
         setImages(property.images && property.images.length > 0 ? property.images : []);
       } else {
         setTitle('');
@@ -89,6 +92,7 @@ export function PropertyFormDrawer({
         setPossessionStatus('READY_TO_MOVE');
         setStatus('AVAILABLE');
         setAmenities(['Parking', 'Gated Community']);
+        setOwnerContact('');
         setImages([]);
       }
       setImageUrlInput('');
@@ -181,21 +185,22 @@ export function PropertyFormDrawer({
     e.preventDefault();
     setError(null);
 
-    if (!title || !location || price === '') {
+    if (!title.trim() || !location.trim() || price === '') {
       setError('Property Title, Address, and Price are required.');
       return;
     }
 
     const payload = {
-      title,
-      location,
+      title: title.trim(),
+      location: location.trim(),
       price: Number(price),
       propertyType,
-      bhk,
+      bhk: bhk || undefined,
       sqft: sqft ? Number(sqft) : undefined,
       possessionStatus,
       status,
       amenities,
+      ownerContact: ownerContact.trim() || undefined,
       images,
     };
 
@@ -289,9 +294,9 @@ export function PropertyFormDrawer({
                   >
                     <option value="APARTMENT">Apartment</option>
                     <option value="VILLA">Villa</option>
+                    <option value="INDEPENDENT_HOUSE">Independent House</option>
                     <option value="COMMERCIAL">Commercial Space</option>
                     <option value="PLOT">Plot/Land</option>
-                    <option value="PENTHOUSE">Penthouse</option>
                   </select>
                 </div>
 
@@ -462,7 +467,31 @@ export function PropertyFormDrawer({
               </div>
             </section>
 
-            {/* 5. Media Section */}
+            {/* 5. Owner / Seller Contact Section */}
+            <section className="space-y-4">
+              <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
+                <Phone className="h-4 w-4 text-blue-600" />
+                <h3 className="text-sm font-bold text-slate-900">Owner / Seller Contact</h3>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="block text-xs font-semibold tracking-wider text-slate-500 uppercase">
+                  Owner Phone / Email
+                </label>
+                <input
+                  type="text"
+                  value={ownerContact}
+                  onChange={(e) => setOwnerContact(e.target.value)}
+                  placeholder="e.g. +91 98765 43210 or owner@example.com"
+                  className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-xs text-slate-900 shadow-2xs outline-hidden transition-colors placeholder:text-slate-400 focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
+                />
+                <p className="text-[11px] text-slate-400">
+                  Primary contact for site visits and negotiations (optional)
+                </p>
+              </div>
+            </section>
+
+            {/* 6. Media Section */}
             <section className="space-y-4 pb-2">
               <div className="flex items-center justify-between border-b border-slate-200 pb-2">
                 <div className="flex items-center gap-2">
