@@ -1,9 +1,10 @@
 export const API_ENDPOINTS = {
   AUTH: {
     LOGIN: '/auth/login',
-    REGISTER: '/auth/register',
+    SIGNUP: '/auth/signup',
+    ACCEPT_INVITE: '/auth/accept-invite',
     ME: '/auth/me',
-    LOGOUT: '/auth/logout',
+    INVITES: '/auth/invites',
   },
   LEADS: {
     LIST: '/leads',
@@ -20,19 +21,32 @@ export const API_ENDPOINTS = {
     CREATE: '/properties',
     UPDATE: (id: string) => `/properties/${id}`,
     DELETE: (id: string) => `/properties/${id}`,
+    UPLOAD_IMAGES: '/properties/upload-images',
     MATCHES: (id: string) => `/properties/${id}/matches`,
   },
   MATCHES: {
     LIST: '/matches',
     DETAIL: (id: string) => `/matches/${id}`,
     UPDATE_STATUS: (id: string) => `/matches/${id}/status`,
-    RECALCULATE: '/matches/recalculate',
+    CONFIG: '/matches/config',
+    RECALCULATE_LEAD: (leadId: string) => `/matches/recalculate/lead/${leadId}`,
+    RECALCULATE_PROPERTY: (propertyId: string) => `/matches/recalculate/property/${propertyId}`,
   },
-  USERS: {
-    LIST: '/users',
-    DETAIL: (id: string) => `/users/${id}`,
+  NOTIFICATIONS: {
+    LIST: '/notifications',
+    UNREAD_COUNT: '/notifications/unread-count',
+    MARK_READ: (id: string) => `/notifications/${id}/read`,
+    MARK_ALL_READ: '/notifications/read-all',
+    DISMISS: (id: string) => `/notifications/${id}`,
   },
   DASHBOARD: {
+    OVERVIEW: '/dashboard',
     STATS: '/dashboard/stats',
+    RECENT_LEADS: '/dashboard/recent-leads',
+    AGING_INVENTORY: '/dashboard/aging-inventory',
+  },
+  SETTINGS: {
+    GET: '/settings',
+    UPDATE: '/settings',
   },
 } as const;

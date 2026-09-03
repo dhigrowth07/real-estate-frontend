@@ -70,24 +70,30 @@ class ApiClient {
     });
 
     if (!response.ok) {
-      let errorData;
+      let errorData: { message?: string | string[] } = {};
       try {
         errorData = await response.json();
       } catch {
         errorData = { message: response.statusText };
       }
-      throw new ApiError(
-        response.status,
-        errorData.message || `Request failed with status ${response.status}`,
-        errorData
-      );
+
+      const errorMessage = Array.isArray(errorData?.message)
+        ? errorData.message.join(', ')
+        : errorData?.message || `Request failed with status ${response.status}`;
+
+      throw new ApiError(response.status, errorMessage, errorData);
     }
 
     if (response.status === 204) {
       return {} as T;
     }
 
-    return response.json();
+    const json = await response.json();
+    // Unwrap standard NestJS TransformInterceptor { success: true, data: T }
+    if (json && typeof json === 'object' && 'data' in json && 'success' in json) {
+      return json.data as T;
+    }
+    return json as T;
   }
 
   public get<T>(
