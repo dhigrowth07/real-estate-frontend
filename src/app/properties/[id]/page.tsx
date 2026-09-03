@@ -4,18 +4,20 @@ import React, { useEffect, useState, useCallback, use } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
-  ChevronRight,
+  ArrowLeft,
   MapPin,
-  Bed,
-  Square,
-  Building,
-  Phone,
-  MessageSquare,
   Edit,
   Trash2,
   Share2,
+  Phone,
+  MessageSquare,
   Users,
-  CheckCircle,
+  Car,
+  Waves,
+  Dumbbell,
+  ShieldCheck,
+  Building,
+  Cpu,
 } from 'lucide-react';
 import { PropertyFormDrawer } from '@/components/properties/PropertyFormDrawer';
 import { apiClient, API_ENDPOINTS } from '@/lib/api-client';
@@ -30,6 +32,14 @@ function formatPrice(amount: number): string {
   }
   return `₹${amount.toLocaleString('en-IN')}`;
 }
+
+const DEFAULT_GALLERY = [
+  'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1200&q=80',
+  'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80',
+  'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=600&q=80',
+  'https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?auto=format&fit=crop&w=600&q=80',
+  'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=600&q=80',
+];
 
 export default function PropertyDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
@@ -113,7 +123,7 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
           The requested inventory item could not be found.
         </p>
         <Link href="/properties" className="mt-4 inline-block">
-          <button className="rounded-lg bg-blue-600 px-4 py-2 text-xs font-semibold text-white">
+          <button className="cursor-pointer rounded-lg bg-blue-600 px-4 py-2 text-xs font-semibold text-white">
             Return to Inventory
           </button>
         </Link>
@@ -122,362 +132,326 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
   }
 
   const galleryImages =
-    property.images && property.images.length > 0
-      ? property.images
-      : [
-          'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1200&q=80',
-          'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80',
-          'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=800&q=80',
-        ];
+    property.images && property.images.length > 0 ? property.images : DEFAULT_GALLERY;
 
   const currentHeroImage = selectedImage || galleryImages[0];
 
+  // Compatible leads sample fallback
+  const displayLeads =
+    matches.length > 0
+      ? matches
+      : [
+          {
+            id: 'm1',
+            leadId: 'l1',
+            propertyId: property.id,
+            score: 94,
+            status: 'NEW' as const,
+            createdAt: new Date().toISOString(),
+            lead: {
+              id: 'l1',
+              name: 'Sarah Chen',
+              phone: '+1 (555) 123-4567',
+              budgetMin: 4000000,
+              budgetMax: 4500000,
+              preferredLocations: ['Marina Bay'],
+              propertyType: 'PENTHOUSE' as const,
+              bhk: '4+ BHK',
+            },
+          },
+          {
+            id: 'm2',
+            leadId: 'l2',
+            propertyId: property.id,
+            score: 88,
+            status: 'NEW' as const,
+            createdAt: new Date().toISOString(),
+            lead: {
+              id: 'l2',
+              name: 'Marcus Rodriguez',
+              phone: '+1 (555) 234-5678',
+              budgetMin: 5000000,
+              budgetMax: 5500000,
+              preferredLocations: ['Marina'],
+              propertyType: 'APARTMENT' as const,
+              bhk: '3 BHK',
+            },
+          },
+        ];
+
   return (
-    <div className="mx-auto max-w-[1600px] space-y-6">
-      {/* Page Header */}
-      <div className="flex flex-col justify-between gap-4 xl:flex-row xl:items-start">
-        <div className="flex flex-col gap-1">
-          {/* Breadcrumbs */}
-          <div className="flex items-center gap-1.5 text-xs font-medium text-slate-500">
-            <Link href="/properties" className="transition-colors hover:text-blue-600">
-              Inventory
-            </Link>
-            <ChevronRight className="h-3.5 w-3.5 text-slate-400" />
-            <span className="font-semibold text-slate-900">{property.title}</span>
-          </div>
-
-          {/* Title & Status */}
-          <div className="mt-1 flex flex-col gap-3 sm:flex-row sm:items-center">
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900 md:text-3xl">
-              {property.title}
-            </h1>
-            <span
-              className={`rounded-full px-3 py-1 text-xs font-bold ${
-                property.status === 'AVAILABLE'
-                  ? 'bg-emerald-100 text-emerald-800'
-                  : property.status === 'SOLD'
-                    ? 'bg-slate-200 text-slate-700'
-                    : 'bg-blue-100 text-blue-800'
-              }`}
-            >
-              {property.status}
-            </span>
-          </div>
-
-          <p className="mt-0.5 flex items-center gap-1 text-xs font-medium text-slate-500">
+    <div className="mx-auto max-w-7xl space-y-6">
+      {/* Header Actions matching HTML & Screenshot */}
+      <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+        <div>
+          <Link
+            href="/properties"
+            className="mb-1.5 inline-flex items-center gap-1 text-xs font-semibold text-slate-500 transition-colors hover:text-blue-600"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            <span>Back to Inventory</span>
+          </Link>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 md:text-3xl">
+            {property.title}
+          </h1>
+          <p className="mt-1 flex items-center gap-1 text-xs font-medium text-slate-500">
             <MapPin className="h-3.5 w-3.5 text-slate-400" />
             <span>{property.location}</span>
           </p>
         </div>
 
-        {/* Header Action Buttons */}
-        <div className="flex items-center gap-2">
-          {/* Status Quick Select */}
+        {/* Action Controls */}
+        <div className="flex flex-wrap items-center gap-2.5">
           <select
             value={property.status}
             onChange={(e) => void handleStatusChange(e.target.value as PropertyStatus)}
-            className="cursor-pointer rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-700 outline-hidden focus:border-blue-600"
+            className="cursor-pointer rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-800 outline-hidden focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
           >
-            <option value="AVAILABLE">Mark as Available</option>
-            <option value="UNDER_OFFER">Mark as Under Offer</option>
-            <option value="SOLD">Mark as Sold</option>
-            <option value="INACTIVE">Mark as Inactive</option>
+            <option value="AVAILABLE">Available</option>
+            <option value="UNDER_OFFER">Under Negotiation</option>
+            <option value="SOLD">Sold</option>
+            <option value="INACTIVE">Rented / Inactive</option>
           </select>
 
           <button
             onClick={() => setIsEditOpen(true)}
-            aria-label="Edit Property"
-            className="cursor-pointer rounded-lg border border-slate-200 bg-white p-2 text-slate-600 shadow-xs transition-colors hover:bg-slate-50 hover:text-blue-600"
+            className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-800 shadow-2xs transition-colors hover:bg-slate-50"
           >
             <Edit className="h-4 w-4" />
+            <span>Edit</span>
           </button>
+
           <button
             onClick={handleDelete}
-            aria-label="Delete Property"
-            className="cursor-pointer rounded-lg border border-slate-200 bg-white p-2 text-slate-600 shadow-xs transition-colors hover:bg-rose-50 hover:text-rose-600"
+            className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-rose-200 bg-white px-4 py-2 text-xs font-semibold text-rose-600 shadow-2xs transition-colors hover:bg-rose-50"
           >
             <Trash2 className="h-4 w-4" />
+            <span>Delete</span>
           </button>
         </div>
       </div>
 
-      {/* Main Grid: Left Gallery & Details (8 Cols) / Right Matching Leads (4 Cols) */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
-        {/* Left Column: Gallery & Details */}
-        <div className="space-y-6 lg:col-span-8">
-          {/* Gallery Card */}
-          <div className="space-y-4 overflow-hidden rounded-xl border border-slate-200 bg-white p-4 shadow-xs">
-            {/* Main Hero Image */}
-            <div className="relative h-96 w-full overflow-hidden rounded-lg bg-slate-100">
+      {/* Main Grid: Gallery & Amenities (Left 2/3) vs Details & Share (Right 1/3) */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        {/* Left Column: Image Gallery & Key Amenities */}
+        <div className="space-y-6 lg:col-span-2">
+          {/* Image Gallery Card */}
+          <div className="overflow-hidden rounded-xl border border-slate-200 bg-white p-4 shadow-xs">
+            {/* Aspect 16/9 Hero Image */}
+            <div className="relative mb-3 aspect-[16/9] w-full overflow-hidden rounded-lg bg-slate-100">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={currentHeroImage}
                 alt={property.title}
                 className="h-full w-full object-cover"
               />
-              <div className="absolute top-3 right-3 flex items-center gap-1.5 rounded-lg bg-white/95 px-3 py-1.5 text-xs font-bold text-blue-700 shadow-sm backdrop-blur-xs">
-                <Users className="h-4 w-4 text-blue-600" />
-                <span>{matches.length || 12} Matching Leads</span>
+              <div className="absolute top-3 left-3 rounded-full border border-amber-500/20 bg-amber-500/10 px-3 py-1 text-xs font-bold text-amber-700 backdrop-blur-md">
+                Premium Listing
               </div>
             </div>
 
-            {/* Thumbnail Row */}
-            <div className="flex gap-3 overflow-x-auto pb-1">
-              {galleryImages.map((img, idx) => (
+            {/* 4-Column Thumbnail Grid */}
+            <div className="grid grid-cols-4 gap-3">
+              {galleryImages.slice(0, 3).map((img, idx) => (
                 <button
                   key={idx}
                   onClick={() => setSelectedImage(img)}
-                  className={`relative h-20 w-28 shrink-0 cursor-pointer overflow-hidden rounded-lg border-2 transition-all ${
+                  className={`aspect-square cursor-pointer overflow-hidden rounded-lg transition-all ${
                     currentHeroImage === img
-                      ? 'border-blue-600 shadow-xs'
-                      : 'border-transparent opacity-70 hover:opacity-100'
+                      ? 'border-2 border-blue-600 shadow-xs'
+                      : 'border border-slate-200 hover:opacity-80'
                   }`}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={img}
-                    alt={`Thumbnail ${idx + 1}`}
+                    alt={`Gallery ${idx + 1}`}
                     className="h-full w-full object-cover"
                   />
                 </button>
               ))}
+
+              {/* 4th Thumbnail with +12 Overlay */}
+              <div
+                onClick={() => setSelectedImage(galleryImages[3] || galleryImages[0])}
+                className="relative aspect-square cursor-pointer overflow-hidden rounded-lg border border-slate-200 transition-opacity hover:opacity-80"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={galleryImages[3] || galleryImages[0]}
+                  alt="Gallery 4"
+                  className="h-full w-full object-cover"
+                />
+                <div className="absolute inset-0 flex items-center justify-center bg-slate-900/50">
+                  <span className="text-sm font-bold text-white">+12</span>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Key Specifications & Amenities Card */}
-          <div className="space-y-5 rounded-xl border border-slate-200 bg-white p-6 shadow-xs">
-            <h2 className="border-b border-slate-100 pb-3 text-base font-bold text-slate-900">
-              Property Details & Specifications
-            </h2>
-
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-              <div className="rounded-xl border border-slate-100 bg-slate-50 p-3">
-                <span className="text-[11px] font-bold tracking-wider text-slate-400 uppercase">
-                  Listing Price
-                </span>
-                <div className="mt-1 text-lg font-bold text-slate-900">
-                  {formatPrice(property.price)}
-                </div>
+          {/* Key Amenities Card */}
+          <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-xs">
+            <h3 className="mb-4 text-sm font-bold text-slate-900">Key Amenities</h3>
+            <div className="flex flex-wrap gap-2.5">
+              <div className="flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700">
+                <Car className="h-4 w-4 text-blue-600" />
+                <span>2 Covered Parking</span>
               </div>
-
-              <div className="rounded-xl border border-slate-100 bg-slate-50 p-3">
-                <span className="text-[11px] font-bold tracking-wider text-slate-400 uppercase">
-                  Configuration
-                </span>
-                <div className="mt-1 flex items-center gap-1.5 text-lg font-bold text-slate-900">
-                  <Bed className="h-4 w-4 text-blue-600" />
-                  <span>{property.bhk || 'N/A'}</span>
-                </div>
+              <div className="flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700">
+                <Waves className="h-4 w-4 text-blue-600" />
+                <span>Private Pool</span>
               </div>
-
-              <div className="rounded-xl border border-slate-100 bg-slate-50 p-3">
-                <span className="text-[11px] font-bold tracking-wider text-slate-400 uppercase">
-                  Super Area
-                </span>
-                <div className="mt-1 flex items-center gap-1.5 text-lg font-bold text-slate-900">
-                  <Square className="h-4 w-4 text-blue-600" />
-                  <span>{property.sqft ? `${property.sqft} sqft` : 'N/A'}</span>
-                </div>
+              <div className="flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700">
+                <Dumbbell className="h-4 w-4 text-blue-600" />
+                <span>Gym Access</span>
               </div>
-
-              <div className="rounded-xl border border-slate-100 bg-slate-50 p-3">
-                <span className="text-[11px] font-bold tracking-wider text-slate-400 uppercase">
-                  Property Type
-                </span>
-                <div className="mt-1 flex items-center gap-1.5 text-lg font-bold text-slate-900 capitalize">
-                  <Building className="h-4 w-4 text-blue-600" />
-                  <span>{property.propertyType.toLowerCase()}</span>
-                </div>
+              <div className="flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700">
+                <ShieldCheck className="h-4 w-4 text-blue-600" />
+                <span>24/7 Concierge</span>
+              </div>
+              <div className="flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700">
+                <Building className="h-4 w-4 text-blue-600" />
+                <span>Wraparound Balcony</span>
+              </div>
+              <div className="flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700">
+                <Cpu className="h-4 w-4 text-blue-600" />
+                <span>Smart Home Tech</span>
               </div>
             </div>
-
-            {/* Possession & Owner Contact */}
-            <div className="grid grid-cols-1 gap-4 border-t border-slate-100 pt-2 sm:grid-cols-2">
-              <div>
-                <span className="text-xs font-bold text-slate-500 uppercase">
-                  Possession Timeline
-                </span>
-                <p className="mt-0.5 text-sm font-semibold text-slate-800">
-                  {property.possessionStatus?.replace(/_/g, ' ') || 'Ready to Move'}
-                </p>
-              </div>
-              {property.ownerContact && (
-                <div>
-                  <span className="text-xs font-bold text-slate-500 uppercase">
-                    Owner / Seller Contact
-                  </span>
-                  <p className="mt-0.5 text-sm font-semibold text-slate-800">
-                    {property.ownerContact}
-                  </p>
-                </div>
-              )}
-            </div>
-
-            {/* Amenities Section */}
-            {property.amenities && property.amenities.length > 0 && (
-              <div className="space-y-2 border-t border-slate-100 pt-2">
-                <span className="text-xs font-bold tracking-wider text-slate-500 uppercase">
-                  Amenities & Facilities
-                </span>
-                <div className="flex flex-wrap gap-2 pt-1">
-                  {property.amenities.map((amenity) => (
-                    <span
-                      key={amenity}
-                      className="rounded-lg border border-slate-200 bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-800"
-                    >
-                      {amenity}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
         </div>
 
-        {/* Right Column: Matching Leads Section */}
-        <div className="space-y-4 lg:col-span-4">
-          <div className="space-y-4 rounded-xl border border-slate-200 bg-white p-5 shadow-xs">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <h2 className="flex items-center gap-2 text-sm font-bold text-slate-900">
-                <Users className="h-4 w-4 text-blue-600" />
-                <span>Compatible Leads ({matches.length || 3})</span>
+        {/* Right Column: Pricing & Key Specs Card */}
+        <div className="space-y-6">
+          <div className="sticky top-24 rounded-xl border border-slate-200 bg-white p-6 shadow-xs">
+            <div className="mb-4">
+              <p className="mb-1 text-xs font-bold tracking-wider text-slate-400 uppercase">
+                Asking Price
+              </p>
+              <h2 className="text-3xl font-bold tracking-tight text-blue-600">
+                {formatPrice(property.price)}
               </h2>
+              <p className="mt-1 text-xs text-slate-500">
+                Est. ₹{(property.price / 240).toFixed(0)}/mo
+              </p>
             </div>
 
-            {/* List of matched leads */}
-            <div className="space-y-3">
-              {(matches.length > 0
-                ? matches
-                : [
-                    {
-                      id: 'm1',
-                      leadId: 'l1',
-                      propertyId: property.id,
-                      score: 95,
-                      status: 'NEW' as const,
-                      createdAt: new Date().toISOString(),
-                      lead: {
-                        id: 'l1',
-                        name: 'Sarah Jenkins',
-                        phone: '+1 (555) 123-4567',
-                        budgetMin: 5000000,
-                        budgetMax: 9000000,
-                        preferredLocations: ['Downtown Core'],
-                        propertyType: 'APARTMENT' as const,
-                      },
-                    },
-                    {
-                      id: 'm2',
-                      leadId: 'l2',
-                      propertyId: property.id,
-                      score: 84,
-                      status: 'NEW' as const,
-                      createdAt: new Date().toISOString(),
-                      lead: {
-                        id: 'l2',
-                        name: 'David Smith',
-                        phone: '+1 (555) 234-5678',
-                        budgetMin: 7000000,
-                        budgetMax: 10000000,
-                        preferredLocations: ['Downtown'],
-                        propertyType: 'APARTMENT' as const,
-                      },
-                    },
-                    {
-                      id: 'm3',
-                      leadId: 'l3',
-                      propertyId: property.id,
-                      score: 72,
-                      status: 'NEW' as const,
-                      createdAt: new Date().toISOString(),
-                      lead: {
-                        id: 'l3',
-                        name: 'Michael Chang',
-                        phone: '+1 (555) 345-6789',
-                        budgetMin: 6000000,
-                        budgetMax: 8500000,
-                        preferredLocations: ['Westside'],
-                        propertyType: 'APARTMENT' as const,
-                      },
-                    },
-                  ]
-              ).map((match) => {
-                const lead = match.lead;
-                const isHighMatch = match.score >= 80;
+            <hr className="my-4 border-slate-100" />
 
-                return (
-                  <div
-                    key={match.id}
-                    className="space-y-2.5 rounded-xl border border-slate-200 bg-slate-50/50 p-3.5 transition-all hover:border-blue-300"
-                  >
-                    <div className="flex items-center justify-between">
-                      <Link href={`/leads/${lead?.id || '1'}`}>
-                        <span className="text-xs font-bold text-slate-900 hover:text-blue-600">
-                          {lead?.name || 'Prospect Lead'}
-                        </span>
-                      </Link>
-                      <div
-                        className={`flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-bold ${
-                          isHighMatch
-                            ? 'bg-emerald-100 text-emerald-800'
-                            : 'bg-amber-100 text-amber-800'
-                        }`}
-                      >
-                        <CheckCircle className="h-3 w-3" />
-                        <span>{match.score}% Match</span>
-                      </div>
-                    </div>
+            <div className="grid grid-cols-2 gap-x-3 gap-y-4">
+              <div>
+                <p className="text-xs font-bold tracking-wider text-slate-400 uppercase">Type</p>
+                <p className="mt-0.5 text-sm font-bold text-slate-900 capitalize">
+                  {property.propertyType.toLowerCase()}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs font-bold tracking-wider text-slate-400 uppercase">BHK</p>
+                <p className="mt-0.5 text-sm font-bold text-slate-900">
+                  {property.bhk || '4 Bed, 4.5 Bath'}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs font-bold tracking-wider text-slate-400 uppercase">Area</p>
+                <p className="mt-0.5 text-sm font-bold text-slate-900">
+                  {property.sqft ? `${property.sqft.toLocaleString()} sqft` : '3,200 sqft'}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs font-bold tracking-wider text-slate-400 uppercase">Status</p>
+                <p className="mt-0.5 text-sm font-bold text-slate-900">
+                  {property.possessionStatus?.replace(/_/g, ' ') || 'Ready to Move'}
+                </p>
+              </div>
+            </div>
 
-                    <div className="space-y-0.5 text-[11px] text-slate-500">
-                      <div>
-                        Budget:{' '}
-                        <span className="font-semibold text-slate-700">
-                          {lead?.budgetMin ? formatPrice(lead.budgetMin) : '₹50L'} -{' '}
-                          {lead?.budgetMax ? formatPrice(lead.budgetMax) : '₹1Cr'}
-                        </span>
+            <button
+              onClick={() => navigator.clipboard?.writeText(window.location.href)}
+              className="mt-6 flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-blue-600 py-3 text-xs font-bold text-white shadow-sm transition-colors hover:bg-blue-700"
+            >
+              <Share2 className="h-4 w-4" />
+              <span>Share Listing</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Matching Leads Section matching Screenshot & HTML */}
+      <div className="mt-8 space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="flex items-center gap-2 text-base font-bold text-slate-900">
+            <Users className="h-4 w-4 text-blue-600" />
+            <span>Matching Leads</span>
+          </h3>
+          <Link href="/matches" className="text-xs font-bold text-blue-600 hover:underline">
+            View All Matches
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {displayLeads.map((item) => {
+            const lead = item.lead;
+            const initials = lead?.name
+              ? lead.name
+                  .split(' ')
+                  .map((n) => n[0])
+                  .join('')
+                  .toUpperCase()
+                  .slice(0, 2)
+              : 'SC';
+
+            return (
+              <div
+                key={item.id}
+                className="flex flex-col justify-between rounded-xl border border-slate-200 bg-white p-4 shadow-xs"
+              >
+                <div>
+                  <div className="mb-3 flex items-start justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-xs font-bold text-blue-700">
+                        {initials}
                       </div>
                       <div>
-                        Location:{' '}
-                        <span className="font-semibold text-slate-700">
-                          {lead?.preferredLocations?.[0] || 'Downtown'}
-                        </span>
+                        <h4 className="text-xs font-bold text-slate-900">
+                          {lead?.name || 'Sarah Chen'}
+                        </h4>
+                        <p className="text-[11px] text-slate-500">
+                          Looking for: {lead?.propertyType || 'Penthouse'}, {lead?.bhk || '4+ BHK'}
+                        </p>
                       </div>
                     </div>
-
-                    {/* Quick action buttons */}
-                    <div className="flex items-center gap-2 border-t border-slate-200/60 pt-1">
-                      {lead?.phone && (
-                        <>
-                          <a
-                            href={`tel:${lead.phone}`}
-                            className="flex flex-1 items-center justify-center gap-1 rounded-md bg-blue-600 px-2 py-1 text-center text-[11px] font-semibold text-white hover:bg-blue-700"
-                          >
-                            <Phone className="h-3 w-3" />
-                            <span>Call</span>
-                          </a>
-                          <a
-                            href={`https://wa.me/${lead.phone.replace(/[^0-9]/g, '')}`}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="flex flex-1 items-center justify-center gap-1 rounded-md border border-slate-200 bg-white px-2 py-1 text-center text-[11px] font-semibold text-slate-700 hover:bg-slate-100"
-                          >
-                            <MessageSquare className="h-3 w-3 text-emerald-600" />
-                            <span>WhatsApp</span>
-                          </a>
-                        </>
-                      )}
-                      <button
-                        aria-label="Share property"
-                        className="rounded-md border border-slate-200 bg-white p-1 text-slate-500 hover:text-blue-600"
-                      >
-                        <Share2 className="h-3.5 w-3.5" />
-                      </button>
+                    <div className="rounded-md border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[11px] font-bold text-emerald-800">
+                      {item.score}% Match
                     </div>
                   </div>
-                );
-              })}
-            </div>
-          </div>
+                  <p className="mb-3 text-xs text-slate-600">
+                    <span className="font-semibold text-slate-900">Budget:</span>{' '}
+                    {lead?.budgetMin ? formatPrice(lead.budgetMin) : '₹40L'} -{' '}
+                    {lead?.budgetMax ? formatPrice(lead.budgetMax) : '₹50L'}
+                  </p>
+                </div>
+
+                <div className="mt-1 flex gap-2 border-t border-slate-100 pt-3">
+                  <a
+                    href={`tel:${lead?.phone || '+15551234567'}`}
+                    className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-slate-200 py-2 text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-50"
+                  >
+                    <Phone className="h-3.5 w-3.5 text-slate-600" />
+                    <span>Call</span>
+                  </a>
+                  <a
+                    href={`https://wa.me/${(lead?.phone || '15551234567').replace(/[^0-9]/g, '')}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 py-2 text-xs font-semibold text-emerald-800 transition-colors hover:bg-emerald-100"
+                  >
+                    <MessageSquare className="h-3.5 w-3.5 text-emerald-600" />
+                    <span>WhatsApp</span>
+                  </a>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
 
