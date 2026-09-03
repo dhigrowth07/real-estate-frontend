@@ -1,0 +1,492 @@
+<!doctype html>
+
+<html class="light" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>EstateNexus - Inventory</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              'tertiary-fixed': '#ffdbcd',
+              'tertiary-container': '#bc4800',
+              'error-container': '#ffdad6',
+              'on-primary-fixed': '#00174b',
+              'inverse-surface': '#2e3039',
+              'on-secondary-container': '#54647a',
+              'on-surface': '#191b23',
+              'surface-tint': '#0053db',
+              'secondary-fixed-dim': '#b7c8e1',
+              'surface-container-highest': '#e1e2ed',
+              'surface-container-high': '#e7e7f3',
+              'on-tertiary-fixed-variant': '#7d2d00',
+              'surface-variant': '#e1e2ed',
+              outline: '#737686',
+              'primary-fixed': '#dbe1ff',
+              error: '#ba1a1a',
+              'secondary-container': '#d0e1fb',
+              'on-secondary-fixed': '#0b1c30',
+              'outline-variant': '#c3c6d7',
+              tertiary: '#943700',
+              'tertiary-fixed-dim': '#ffb596',
+              'surface-bright': '#faf8ff',
+              'primary-container': '#2563eb',
+              'on-error': '#ffffff',
+              'on-tertiary-fixed': '#360f00',
+              'on-secondary-fixed-variant': '#38485d',
+              'on-tertiary-container': '#ffede6',
+              'surface-dim': '#d9d9e5',
+              'inverse-on-surface': '#f0f0fb',
+              'on-error-container': '#93000a',
+              'primary-fixed-dim': '#b4c5ff',
+              'on-background': '#191b23',
+              'on-primary': '#ffffff',
+              'surface-container-lowest': '#ffffff',
+              'surface-container-low': '#f3f3fe',
+              'on-secondary': '#ffffff',
+              secondary: '#505f76',
+              'on-surface-variant': '#434655',
+              'on-tertiary': '#ffffff',
+              background: '#faf8ff',
+              'on-primary-fixed-variant': '#003ea8',
+              'inverse-primary': '#b4c5ff',
+              'secondary-fixed': '#d3e4fe',
+              'on-primary-container': '#eeefff',
+              primary: '#004ac6',
+              'surface-container': '#ededf9',
+              surface: '#faf8ff',
+            },
+            borderRadius: {
+              DEFAULT: '0.25rem',
+              lg: '0.5rem',
+              xl: '0.75rem',
+              full: '9999px',
+            },
+            spacing: {
+              xs: '4px',
+              xl: '32px',
+              'margin-desktop': '32px',
+              sm: '8px',
+              'margin-mobile': '16px',
+              'sidebar-width': '260px',
+              gutter: '24px',
+              lg: '24px',
+              md: '16px',
+              'sidebar-collapsed': '72px',
+              base: '4px',
+            },
+            fontFamily: {
+              'label-caps': ['Inter'],
+              'title-sm': ['Inter'],
+              'body-sm': ['Inter'],
+              'headline-md': ['Inter'],
+              'display-lg-mobile': ['Inter'],
+              'display-lg': ['Inter'],
+              'body-md': ['Inter'],
+            },
+            fontSize: {
+              'label-caps': [
+                '12px',
+                { lineHeight: '16px', letterSpacing: '0.05em', fontWeight: '600' },
+              ],
+              'title-sm': ['18px', { lineHeight: '28px', fontWeight: '600' }],
+              'body-sm': ['14px', { lineHeight: '20px', fontWeight: '400' }],
+              'headline-md': [
+                '24px',
+                { lineHeight: '32px', letterSpacing: '-0.01em', fontWeight: '600' },
+              ],
+              'display-lg-mobile': [
+                '28px',
+                { lineHeight: '34px', letterSpacing: '-0.02em', fontWeight: '700' },
+              ],
+              'display-lg': [
+                '36px',
+                { lineHeight: '44px', letterSpacing: '-0.02em', fontWeight: '700' },
+              ],
+              'body-md': ['16px', { lineHeight: '24px', fontWeight: '400' }],
+            },
+          },
+        },
+      };
+    </script>
+    <style type="text/tailwindcss">
+      @layer utilities {
+        .soft-shadow {
+          box-shadow: 0 2px 4px rgba(30, 41, 59, 0.05);
+        }
+      }
+    </style>
+  </head>
+  <body class="bg-background text-on-background font-body-sm flex min-h-screen overflow-x-hidden">
+    <!-- SideNavBar -->
+    <nav
+      class="bg-surface dark:bg-inverse-surface w-sidebar-width border-outline-variant fixed top-0 left-0 z-40 hidden h-screen flex-col border-r md:flex"
+    >
+      <div class="p-lg flex h-full flex-col">
+        <div class="mb-xl">
+          <h1
+            class="font-headline-md text-headline-md text-primary dark:text-primary-fixed-dim font-bold"
+          >
+            EstateNexus
+          </h1>
+          <p class="font-label-caps text-label-caps text-on-surface-variant mt-xs uppercase">
+            Professional Suite
+          </p>
+        </div>
+        <div class="space-y-sm flex flex-1 flex-col">
+          <a
+            class="gap-md px-md py-sm text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-secondary-fixed-dim/20 font-body-sm text-body-sm flex items-center rounded-lg transition-colors duration-200 ease-in-out"
+            href="#"
+          >
+            <span class="material-symbols-outlined" data-weight="line">dashboard</span>
+            Dashboard
+          </a>
+          <a
+            class="gap-md px-md py-sm text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-secondary-fixed-dim/20 font-body-sm text-body-sm flex items-center rounded-lg transition-colors duration-200 ease-in-out"
+            href="#"
+          >
+            <span class="material-symbols-outlined" data-weight="line">person_search</span>
+            Leads
+          </a>
+          <!-- Active Item: Inventory -->
+          <a
+            class="gap-md px-md py-sm text-primary dark:text-primary-fixed-dim border-primary dark:border-primary-fixed-dim bg-surface-container-low dark:bg-secondary-fixed-dim/10 font-body-sm text-body-sm flex items-center rounded-lg border-l-4 font-bold transition-colors duration-200 ease-in-out"
+            href="#"
+          >
+            <span class="material-symbols-outlined" data-weight="line">domain</span>
+            Inventory
+          </a>
+          <a
+            class="gap-md px-md py-sm text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-secondary-fixed-dim/20 font-body-sm text-body-sm flex items-center rounded-lg transition-colors duration-200 ease-in-out"
+            href="#"
+          >
+            <span class="material-symbols-outlined" data-weight="line">notifications_active</span>
+            Matches
+          </a>
+          <a
+            class="gap-md px-md py-sm text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-secondary-fixed-dim/20 font-body-sm text-body-sm flex items-center rounded-lg transition-colors duration-200 ease-in-out"
+            href="#"
+          >
+            <span class="material-symbols-outlined" data-weight="line">view_kanban</span>
+            Pipeline
+          </a>
+          <a
+            class="gap-md px-md py-sm text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-secondary-fixed-dim/20 font-body-sm text-body-sm flex items-center rounded-lg transition-colors duration-200 ease-in-out"
+            href="#"
+          >
+            <span class="material-symbols-outlined" data-weight="line">group</span>
+            Team
+          </a>
+          <a
+            class="gap-md px-md py-sm text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-secondary-fixed-dim/20 font-body-sm text-body-sm mt-auto flex items-center rounded-lg transition-colors duration-200 ease-in-out"
+            href="#"
+          >
+            <span class="material-symbols-outlined" data-weight="line">settings</span>
+            Settings
+          </a>
+        </div>
+      </div>
+    </nav>
+    <!-- Main Content Area -->
+    <main class="relative flex min-h-screen flex-1 flex-col md:ml-[260px]">
+      <!-- TopAppBar -->
+      <header
+        class="bg-surface/80 dark:bg-inverse-surface/80 border-outline-variant dark:border-outline docked full-width left-sidebar-width px-lg fixed top-0 right-0 z-30 flex h-16 w-full items-center justify-between border-b shadow-sm backdrop-blur-md transition-all duration-200 md:w-[calc(100%-260px)] dark:shadow-none"
+      >
+        <div class="gap-lg flex flex-1 items-center">
+          <button class="text-on-surface-variant md:hidden">
+            <span class="material-symbols-outlined">menu</span>
+          </button>
+          <div class="relative hidden w-full max-w-md sm:block">
+            <span
+              class="material-symbols-outlined left-sm text-outline absolute top-1/2 -translate-y-1/2 transform"
+              >search</span
+            >
+            <input
+              class="pl-xl pr-sm border-outline-variant bg-surface-container-lowest text-body-sm focus:border-primary focus:ring-primary w-full rounded-lg border py-2 transition-colors outline-none focus:ring-1"
+              placeholder="Search properties..."
+              type="text"
+            />
+          </div>
+        </div>
+        <div class="gap-md ml-auto flex items-center">
+          <button
+            class="text-on-surface-variant hover:text-primary p-xs rounded-full transition-colors"
+          >
+            <span class="material-symbols-outlined">notifications</span>
+          </button>
+          <button
+            class="text-on-surface-variant hover:text-primary p-xs rounded-full transition-colors"
+          >
+            <span class="material-symbols-outlined">help_outline</span>
+          </button>
+          <div
+            class="bg-surface-variant border-outline-variant h-8 w-8 cursor-pointer overflow-hidden rounded-full border"
+          >
+            <img
+              alt="User profile"
+              class="h-full w-full object-cover"
+              data-alt="A professional headshot of a real estate agent in a modern, well-lit office environment. Crisp focus, light corporate aesthetic."
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuB1Nz_jo479eKPMdFlFxnBdGB4H1lQLFzAR4wNkDrclBezii0sVcYQgNrEuTbrJ4p6gA2hXJLFoG_t1XaZjV8OVuhi8SMeGThNAHA15JnLLbO6QDc-RnA7mXoLPupCl5AqlRcZEzJ1-7Cx-lbdO3yVhYHcFeCy0d7LseKR_2x1B42SdTvj64MBUjaMD7iYtCqRpntDGS5GMcElUVpX6lYPLg7LGQ9i3IA8NhCTQSDRVMwL9uOAHA8tZ"
+            />
+          </div>
+        </div>
+      </header>
+      <!-- Page Content -->
+      <div class="p-margin-mobile md:p-margin-desktop mt-16 flex-1">
+        <!-- Filter & Action Bar -->
+        <div
+          class="bg-surface-container-lowest border-outline-variant p-lg mb-gutter soft-shadow rounded-xl border"
+        >
+          <div class="gap-md flex flex-col items-start justify-between lg:flex-row lg:items-center">
+            <div class="gap-sm flex w-full flex-wrap items-center lg:w-auto">
+              <span class="font-label-caps text-label-caps text-on-surface-variant mr-xs uppercase"
+                >Filters:</span
+              >
+              <select
+                class="border-outline-variant px-sm text-body-sm bg-surface-container-lowest focus:border-primary rounded-lg border py-1.5 outline-none"
+              >
+                <option value="">Location</option>
+                <option value="downtown">Downtown</option>
+                <option value="suburbs">Suburbs</option>
+              </select>
+              <select
+                class="border-outline-variant px-sm text-body-sm bg-surface-container-lowest focus:border-primary rounded-lg border py-1.5 outline-none"
+              >
+                <option value="">Price Range</option>
+                <option value="0-500k">Under $500k</option>
+                <option value="500k-1m">$500k - $1M</option>
+                <option value="1m+">$1M+</option>
+              </select>
+              <select
+                class="border-outline-variant px-sm text-body-sm bg-surface-container-lowest focus:border-primary rounded-lg border py-1.5 outline-none"
+              >
+                <option value="">Type</option>
+                <option value="apartment">Apartment</option>
+                <option value="villa">Villa</option>
+                <option value="commercial">Commercial</option>
+              </select>
+              <select
+                class="border-outline-variant px-sm text-body-sm bg-surface-container-lowest focus:border-primary rounded-lg border py-1.5 outline-none"
+              >
+                <option value="">Status</option>
+                <option value="available">Available</option>
+                <option value="sold">Sold</option>
+                <option value="rented">Rented</option>
+              </select>
+              <select
+                class="border-outline-variant px-sm text-body-sm bg-surface-container-lowest focus:border-primary rounded-lg border py-1.5 outline-none"
+              >
+                <option value="">BHK</option>
+                <option value="1">1 BHK</option>
+                <option value="2">2 BHK</option>
+                <option value="3">3+ BHK</option>
+              </select>
+            </div>
+            <div
+              class="gap-sm border-outline-variant pt-md mt-sm flex w-full items-center justify-between border-t lg:mt-0 lg:w-auto lg:justify-end lg:border-t-0 lg:pt-0"
+            >
+              <div
+                class="gap-xs border-outline-variant p-xs bg-surface-container-lowest flex items-center rounded-lg border"
+              >
+                <button
+                  class="p-xs bg-surface-variant text-on-surface hover:bg-surface-container-high rounded transition-colors"
+                >
+                  <span class="material-symbols-outlined text-sm">grid_view</span>
+                </button>
+                <button
+                  class="p-xs text-on-surface-variant hover:bg-surface-container-high rounded transition-colors"
+                >
+                  <span class="material-symbols-outlined text-sm">table_rows</span>
+                </button>
+              </div>
+              <select
+                class="border-outline-variant px-sm text-body-sm bg-surface-container-lowest focus:border-primary hidden rounded-lg border py-1.5 outline-none sm:block"
+              >
+                <option value="newest">Sort: Newest</option>
+                <option value="price_asc">Price: Low to High</option>
+                <option value="price_desc">Price: High to Low</option>
+                <option value="matches">Match Count</option>
+              </select>
+              <button
+                class="bg-primary-container text-on-primary px-lg font-title-sm text-title-sm gap-xs hover:bg-primary ml-auto flex items-center rounded-lg py-2 transition-colors lg:ml-0"
+              >
+                <span class="material-symbols-outlined text-sm">add</span>
+                Add Property
+              </button>
+            </div>
+          </div>
+        </div>
+        <!-- Property Grid (Bento/Card Style) -->
+        <div class="gap-gutter grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+          <!-- Card 1 -->
+          <div
+            class="bg-surface-container-lowest border-outline-variant soft-shadow group hover:border-primary-fixed-dim flex flex-col overflow-hidden rounded-xl border transition-colors"
+          >
+            <div class="relative h-48 overflow-hidden">
+              <img
+                alt="Serene Heights Apartment"
+                class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                data-alt="A luxurious modern apartment building exterior taken during golden hour. Warm sunlight reflecting off glass facades, clear blue sky, high-end real estate photography."
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAUpSIvpcEVgGBw1AF8m7glK_1e2DcwqvxdIsYljEZheJH4qMXAI_97Ys-Zp6s7DtI0N4Z5mCSRU8bINTOoy9AXnthtXK2nh2lZgh-LvqMJo--yct0DOOTGZk9nzjHreyXIK1lyaK1bUOMmm8R2nbDO2hs1B7Qt2VmyV7ixrZRjF4OuPeG9U1tEt7_nTZuXe_q2HEbU58iKADMagQOtZ9heZO4plA9lZzj-YZ_frBclJexOqVfdNhsO"
+              />
+              <div
+                class="top-sm right-sm bg-surface-container-lowest/90 text-primary-container px-sm py-xs font-label-caps text-label-caps gap-xs absolute flex items-center rounded shadow-sm backdrop-blur"
+              >
+                <span class="material-symbols-outlined text-[14px]">group</span>
+                12 matching leads
+              </div>
+              <div
+                class="bottom-sm left-sm px-sm py-xs font-label-caps text-label-caps absolute rounded border border-[#10b981]/20 bg-[#10b981]/10 text-[#10b981] backdrop-blur-sm"
+              >
+                Available
+              </div>
+            </div>
+            <div class="p-md flex flex-1 flex-col">
+              <h3 class="font-title-sm text-title-sm text-on-surface mb-xs truncate">
+                Serene Heights Apartment
+              </h3>
+              <p
+                class="font-body-sm text-body-sm text-on-surface-variant gap-xs mb-md flex items-center"
+              >
+                <span class="material-symbols-outlined text-[16px]">location_on</span>
+                Downtown Core
+              </p>
+              <div class="mt-auto">
+                <div class="text-display-lg-mobile font-display-lg-mobile text-on-surface mb-sm">
+                  $850,000
+                </div>
+                <div class="gap-md border-outline-variant pt-sm flex border-t">
+                  <div class="gap-xs text-on-surface-variant flex items-center">
+                    <span class="material-symbols-outlined text-[16px]">bed</span>
+                    <span class="font-body-sm text-body-sm">3 BHK</span>
+                  </div>
+                  <div class="gap-xs text-on-surface-variant flex items-center">
+                    <span class="material-symbols-outlined text-[16px]">square_foot</span>
+                    <span class="font-body-sm text-body-sm">1,850 sqft</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Card 2 -->
+          <div
+            class="bg-surface-container-lowest border-outline-variant soft-shadow group hover:border-primary-fixed-dim flex flex-col overflow-hidden rounded-xl border transition-colors"
+          >
+            <div class="relative h-48 overflow-hidden">
+              <img
+                alt="Oakwood Villa"
+                class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                data-alt="A spacious suburban villa with a well-manicured lawn and a modern architectural design. Shot on a sunny day, bright and welcoming atmosphere, professional real estate imagery."
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCJN5TPboMaP1jOEsQEtmDeg9CCsZ6Ejrb7L94S007TjgjKQvxyfrXm7MSMVZ1TCwwVhqyNRvrtGsFqGSRcuVJJtKAEaL1uAYldOqaiUOFLKAVYEqKJKM3dN-N7HprqldUD4fohCWGAdOaqtOBqPPKEX9Q_fvDc3S4tgLgWDfeMhhcQmh-HaF45gi_160MmPdqULfiJNgFNVh4ghoK0JlA0YK5GT1lAwjWIpdLdJQ8lKTfpt_yJnhfB"
+              />
+              <div
+                class="top-sm right-sm bg-surface-container-lowest/90 text-primary-container px-sm py-xs font-label-caps text-label-caps gap-xs absolute flex items-center rounded shadow-sm backdrop-blur"
+              >
+                <span class="material-symbols-outlined text-[14px]">group</span>
+                5 matching leads
+              </div>
+              <div
+                class="bottom-sm left-sm px-sm py-xs font-label-caps text-label-caps absolute rounded border border-[#64748b]/20 bg-[#64748b]/10 text-[#64748b] backdrop-blur-sm"
+              >
+                Sold
+              </div>
+            </div>
+            <div class="p-md flex flex-1 flex-col">
+              <h3 class="font-title-sm text-title-sm text-on-surface mb-xs truncate">
+                Oakwood Villa
+              </h3>
+              <p
+                class="font-body-sm text-body-sm text-on-surface-variant gap-xs mb-md flex items-center"
+              >
+                <span class="material-symbols-outlined text-[16px]">location_on</span>
+                Westside Suburbs
+              </p>
+              <div class="mt-auto">
+                <div class="text-display-lg-mobile font-display-lg-mobile text-on-surface mb-sm">
+                  $1,250,000
+                </div>
+                <div class="gap-md border-outline-variant pt-sm flex border-t">
+                  <div class="gap-xs text-on-surface-variant flex items-center">
+                    <span class="material-symbols-outlined text-[16px]">bed</span>
+                    <span class="font-body-sm text-body-sm">4 BHK</span>
+                  </div>
+                  <div class="gap-xs text-on-surface-variant flex items-center">
+                    <span class="material-symbols-outlined text-[16px]">square_foot</span>
+                    <span class="font-body-sm text-body-sm">3,200 sqft</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Card 3 -->
+          <div
+            class="bg-surface-container-lowest border-outline-variant soft-shadow group hover:border-primary-fixed-dim flex flex-col overflow-hidden rounded-xl border transition-colors"
+          >
+            <div class="relative h-48 overflow-hidden">
+              <img
+                alt="Nexus Tech Park Office"
+                class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                data-alt="Interior shot of a sleek, modern commercial office space with floor-to-ceiling windows. Bright natural light, minimalist furniture, corporate aesthetic."
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAdxqmgsIXfIJ2tKyzfbXqidsK1eVUqXLBCn66MrXMf-6aFetXWRCp15KzgPDJT5JQvO9Nwk_pKQLjxFyKpsrvaN5PNTaavuW-AgFLGInEz4iVkpkaQ4SvkNuw9lkNV4GmnX2w3T5u0v7FDzIW8B0BrqgsgRJyzdxBJcOFuEw8TPUEUgb-YsS6O42eaj9kCMurCd4pGhmJ1OeLLxOauQMtVJ_qh0MG2XUrpmMwOVlJh3dg2v41kwSHH"
+              />
+              <div
+                class="top-sm right-sm bg-surface-container-lowest/90 text-primary-container px-sm py-xs font-label-caps text-label-caps gap-xs absolute flex items-center rounded shadow-sm backdrop-blur"
+              >
+                <span class="material-symbols-outlined text-[14px]">group</span>
+                28 matching leads
+              </div>
+              <div
+                class="bottom-sm left-sm px-sm py-xs font-label-caps text-label-caps absolute rounded border border-[#3b82f6]/20 bg-[#3b82f6]/10 text-[#3b82f6] backdrop-blur-sm"
+              >
+                Rented
+              </div>
+            </div>
+            <div class="p-md flex flex-1 flex-col">
+              <h3 class="font-title-sm text-title-sm text-on-surface mb-xs truncate">
+                Nexus Tech Park Unit 4B
+              </h3>
+              <p
+                class="font-body-sm text-body-sm text-on-surface-variant gap-xs mb-md flex items-center"
+              >
+                <span class="material-symbols-outlined text-[16px]">location_on</span>
+                Innovation District
+              </p>
+              <div class="mt-auto">
+                <div class="text-display-lg-mobile font-display-lg-mobile text-on-surface mb-sm">
+                  $4,500/mo
+                </div>
+                <div class="gap-md border-outline-variant pt-sm flex border-t">
+                  <div class="gap-xs text-on-surface-variant flex items-center">
+                    <span class="material-symbols-outlined text-[16px]">corporate_fare</span>
+                    <span class="font-body-sm text-body-sm">Commercial</span>
+                  </div>
+                  <div class="gap-xs text-on-surface-variant flex items-center">
+                    <span class="material-symbols-outlined text-[16px]">square_foot</span>
+                    <span class="font-body-sm text-body-sm">2,500 sqft</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>
