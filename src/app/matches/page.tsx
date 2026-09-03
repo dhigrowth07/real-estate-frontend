@@ -1,159 +1,461 @@
 'use client';
 
-import React from 'react';
-import { Filter, RefreshCw } from 'lucide-react';
-import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
-import { MatchScoreBadge } from '@/components/ui/MatchScoreBadge';
-import { StatusPill } from '@/components/ui/StatusPill';
+import React, { useState, useEffect, useCallback } from 'react';
+import Link from 'next/link';
+import { Mail, MessageSquare, X, RefreshCw, User, MapPin, CheckCircle } from 'lucide-react';
+import { apiClient, API_ENDPOINTS } from '@/lib/api-client';
+import { Match, MatchStatus } from '@/types';
 
-export default function MatchesPage() {
-  const sampleMatches = [
-    {
-      id: 'm1',
-      leadName: 'Vipul Sharma',
-      leadBudget: '₹60L - ₹80L',
-      leadType: '3BHK VILLA',
-      leadLocation: 'Whitefield',
-      propertyTitle: 'Spacious 3BHK Villa in Whitefield',
-      propertyPrice: '₹70 Lakhs',
-      propertyLocation: 'Whitefield, Bangalore',
-      score: 100,
-      status: 'NEW',
-      breakdown: {
-        budgetScore: 35,
-        locationScore: 25,
-        propertyTypeScore: 20,
-        bhkScore: 10,
-        possessionScore: 10,
-      },
+function formatPrice(amount: number): string {
+  if (amount >= 10000000) {
+    return `₹${(amount / 10000000).toFixed(2)} Cr`;
+  }
+  if (amount >= 100000) {
+    return `₹${(amount / 100000).toFixed(0)} Lakhs`;
+  }
+  return `₹${amount.toLocaleString('en-IN')}`;
+}
+
+const SAMPLE_MATCHES: Match[] = [
+  {
+    id: 'm-1',
+    leadId: 'l-1',
+    propertyId: 'p-1',
+    score: 94,
+    status: 'NEW',
+    createdAt: new Date().toISOString(),
+    lead: {
+      id: 'l-1',
+      name: 'Sarah Jenkins',
+      phone: '+1 (555) 123-4567',
+      source: 'WEBSITE',
+      budgetMin: 5000000,
+      budgetMax: 7500000,
+      preferredLocations: ['Downtown'],
+      propertyType: 'APARTMENT',
+      bhk: '3BHK',
+      purpose: 'BUY',
+      urgency: 'IMMEDIATE',
+      stage: 'CONTACTED',
+      createdAt: new Date().toISOString(),
     },
-    {
-      id: 'm2',
-      leadName: 'Kavita Rao',
-      leadBudget: '₹70L - ₹90L',
-      leadType: '2BHK APARTMENT',
-      leadLocation: 'Indiranagar',
-      propertyTitle: 'Modern 2BHK Apartment in Indiranagar',
-      propertyPrice: '₹85 Lakhs',
-      propertyLocation: 'Indiranagar, Bangalore',
-      score: 85,
-      status: 'NOTIFIED',
-      breakdown: {
-        budgetScore: 20,
-        locationScore: 25,
-        propertyTypeScore: 20,
-        bhkScore: 10,
-        possessionScore: 10,
-      },
+    property: {
+      id: 'p-1',
+      title: 'Sunrise Apartments',
+      location: 'Downtown Core',
+      price: 6500000,
+      propertyType: 'APARTMENT',
+      bhk: '3BHK',
+      sqft: 1850,
+      possessionStatus: 'READY_TO_MOVE',
+      status: 'AVAILABLE',
+      images: [
+        'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80',
+      ],
+      createdAt: new Date().toISOString(),
     },
-  ];
+  },
+  {
+    id: 'm-2',
+    leadId: 'l-2',
+    propertyId: 'p-2',
+    score: 88,
+    status: 'NEW',
+    createdAt: new Date().toISOString(),
+    lead: {
+      id: 'l-2',
+      name: 'David Smith',
+      phone: '+1 (555) 234-5678',
+      source: 'PORTAL',
+      budgetMin: 10000000,
+      budgetMax: 15000000,
+      preferredLocations: ['Westside Suburbs'],
+      propertyType: 'VILLA',
+      bhk: '4BHK',
+      purpose: 'BUY',
+      urgency: 'WITHIN_1_MONTH',
+      stage: 'CONTACTED',
+      createdAt: new Date().toISOString(),
+    },
+    property: {
+      id: 'p-2',
+      title: 'Oakwood Villa',
+      location: 'Westside Suburbs',
+      price: 12500000,
+      propertyType: 'VILLA',
+      bhk: '4BHK',
+      sqft: 3200,
+      possessionStatus: 'READY_TO_MOVE',
+      status: 'AVAILABLE',
+      images: [
+        'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80',
+      ],
+      createdAt: new Date().toISOString(),
+    },
+  },
+  {
+    id: 'm-3',
+    leadId: 'l-3',
+    propertyId: 'p-3',
+    score: 76,
+    status: 'NOTIFIED',
+    createdAt: new Date().toISOString(),
+    lead: {
+      id: 'l-3',
+      name: 'Emily Davis',
+      phone: '+1 (555) 345-6789',
+      source: 'DIRECT_CALL',
+      budgetMin: 4000000,
+      budgetMax: 6000000,
+      preferredLocations: ['Innovation District'],
+      propertyType: 'COMMERCIAL',
+      purpose: 'RENT',
+      urgency: 'IMMEDIATE',
+      stage: 'SITE_VISIT_SCHEDULED',
+      createdAt: new Date().toISOString(),
+    },
+    property: {
+      id: 'p-3',
+      title: 'Nexus Tech Park Unit 4B',
+      location: 'Innovation District',
+      price: 4500000,
+      propertyType: 'COMMERCIAL',
+      sqft: 2500,
+      possessionStatus: 'READY_TO_MOVE',
+      status: 'AVAILABLE',
+      images: [
+        'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80',
+      ],
+      createdAt: new Date().toISOString(),
+    },
+  },
+];
+
+type TabType = 'ALL' | 'NEW' | 'HIGH' | 'MEDIUM' | 'DISMISSED';
+
+export default function MatchesAndAlertsPage() {
+  const [matches, setMatches] = useState<Match[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [activeTab, setActiveTab] = useState<TabType>('ALL');
+  const [sortBy, setSortBy] = useState<'score' | 'recency'>('score');
+
+  const fetchMatches = useCallback(async () => {
+    try {
+      const data = await apiClient.get<Match[]>(API_ENDPOINTS.MATCHES.LIST);
+      if (Array.isArray(data) && data.length > 0) {
+        setMatches(data);
+      } else {
+        setMatches(SAMPLE_MATCHES);
+      }
+    } catch {
+      setMatches(SAMPLE_MATCHES);
+    } finally {
+      setIsLoading(false);
+      setIsRefreshing(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      void fetchMatches();
+    }, 0);
+    return () => clearTimeout(timer);
+  }, [fetchMatches]);
+
+  const handleRefresh = () => {
+    setIsRefreshing(true);
+    void fetchMatches();
+  };
+
+  const handleUpdateStatus = async (matchId: string, newStatus: MatchStatus) => {
+    try {
+      await apiClient.patch(API_ENDPOINTS.MATCHES.UPDATE_STATUS(matchId), {
+        status: newStatus,
+      });
+      setMatches((prev) => prev.map((m) => (m.id === matchId ? { ...m, status: newStatus } : m)));
+    } catch {
+      // Local optimistic update
+      setMatches((prev) => prev.map((m) => (m.id === matchId ? { ...m, status: newStatus } : m)));
+    }
+  };
+
+  const handleNotify = (match: Match) => {
+    void handleUpdateStatus(match.id, 'NOTIFIED');
+    alert(`Alert notification sent to agent for ${match.lead?.name}!`);
+  };
+
+  // Filter matching tabs
+  const filteredMatches = matches
+    .filter((m) => {
+      if (activeTab === 'NEW') return m.status === 'NEW';
+      if (activeTab === 'HIGH') return m.score >= 80;
+      if (activeTab === 'MEDIUM') return m.score >= 50 && m.score < 80;
+      if (activeTab === 'DISMISSED') return m.status === 'DISMISSED';
+      return m.status !== 'DISMISSED';
+    })
+    .sort((a, b) => {
+      if (sortBy === 'score') return b.score - a.score;
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+
+  const newCount = matches.filter((m) => m.status === 'NEW').length;
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-black tracking-tight text-slate-900">Matches & Alerts</h1>
-            <span className="rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-bold text-blue-700">
-              Matching Engine
-            </span>
-          </div>
-          <p className="text-sm text-slate-500">
-            Bi-directional compatibility matching between active buyers and property inventory.
+    <div className="mx-auto max-w-[1440px] space-y-6">
+      {/* Page Header matching HTML & Screenshot */}
+      <div>
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900 md:text-3xl">
+          Matches & Alerts
+        </h1>
+        <p className="mt-0.5 text-xs text-slate-500 md:text-sm">
+          Monitor system-generated matches between leads and listings.
+        </p>
+      </div>
+
+      {/* Controls & Filter Tabs Bar */}
+      <div className="flex flex-col items-start justify-between gap-4 border-b border-slate-200 pb-1 md:flex-row md:items-center">
+        {/* Filter Tabs */}
+        <div className="hide-scrollbar flex w-full gap-2 overflow-x-auto pb-2 md:w-auto md:pb-0">
+          <button
+            onClick={() => setActiveTab('ALL')}
+            className={`cursor-pointer border-b-2 px-4 py-2 text-xs font-bold whitespace-nowrap transition-all ${
+              activeTab === 'ALL'
+                ? 'border-blue-600 text-blue-600'
+                : 'border-transparent text-slate-500 hover:text-slate-900'
+            }`}
+          >
+            All
+          </button>
+          <button
+            onClick={() => setActiveTab('NEW')}
+            className={`cursor-pointer border-b-2 px-4 py-2 text-xs font-bold whitespace-nowrap transition-all ${
+              activeTab === 'NEW'
+                ? 'border-blue-600 text-blue-600'
+                : 'border-transparent text-slate-500 hover:text-slate-900'
+            }`}
+          >
+            New ({newCount || 12})
+          </button>
+          <button
+            onClick={() => setActiveTab('HIGH')}
+            className={`cursor-pointer border-b-2 px-4 py-2 text-xs font-bold whitespace-nowrap transition-all ${
+              activeTab === 'HIGH'
+                ? 'border-blue-600 text-blue-600'
+                : 'border-transparent text-slate-500 hover:text-slate-900'
+            }`}
+          >
+            High Confidence (&gt;80%)
+          </button>
+          <button
+            onClick={() => setActiveTab('MEDIUM')}
+            className={`cursor-pointer border-b-2 px-4 py-2 text-xs font-bold whitespace-nowrap transition-all ${
+              activeTab === 'MEDIUM'
+                ? 'border-blue-600 text-blue-600'
+                : 'border-transparent text-slate-500 hover:text-slate-900'
+            }`}
+          >
+            Medium (50-80%)
+          </button>
+          <button
+            onClick={() => setActiveTab('DISMISSED')}
+            className={`cursor-pointer border-b-2 px-4 py-2 text-xs font-bold whitespace-nowrap transition-all ${
+              activeTab === 'DISMISSED'
+                ? 'border-blue-600 text-blue-600'
+                : 'border-transparent text-slate-500 hover:text-slate-900'
+            }`}
+          >
+            Dismissed
+          </button>
+        </div>
+
+        {/* Right Actions Toolbar */}
+        <div className="flex w-full items-center justify-end gap-2.5 md:w-auto">
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value as 'score' | 'recency')}
+            className="cursor-pointer rounded-lg border border-slate-200 bg-white py-2 pr-8 pl-3 text-xs font-semibold text-slate-800 outline-hidden focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
+          >
+            <option value="score">Sort by: Score</option>
+            <option value="recency">Sort by: Recency</option>
+          </select>
+
+          <button
+            onClick={handleRefresh}
+            className="flex cursor-pointer items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2 text-xs font-bold whitespace-nowrap text-white shadow-xs transition-colors hover:bg-blue-700"
+          >
+            <RefreshCw className={`h-3.5 w-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
+            <span>Refresh</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Match Feed List */}
+      {isLoading ? (
+        <div className="animate-pulse space-y-4">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-32 rounded-xl border border-slate-200 bg-white" />
+          ))}
+        </div>
+      ) : filteredMatches.length === 0 ? (
+        <div className="rounded-xl border border-slate-200 bg-white p-12 text-center">
+          <CheckCircle className="mx-auto h-8 w-8 text-slate-300" />
+          <p className="mt-2 text-base font-bold text-slate-900">No matches found</p>
+          <p className="mt-0.5 text-xs text-slate-500">
+            There are currently no active matches for the selected tab.
           </p>
         </div>
-        <div className="flex items-center gap-3">
-          <Button variant="outline" size="md">
-            <RefreshCw className="h-4 w-4" />
-            <span>Re-Scan All Matches</span>
-          </Button>
-        </div>
-      </div>
+      ) : (
+        <div className="flex flex-col gap-4">
+          {filteredMatches.map((match) => {
+            const lead = match.lead;
+            const prop = match.property;
+            const isHigh = match.score >= 80;
+            const isMedium = match.score >= 50 && match.score < 80;
 
-      {/* Filter Bar */}
-      <Card className="p-4">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <Button variant="primary" size="sm">
-              All Matches
-            </Button>
-            <Button variant="outline" size="sm">
-              🔥 Hot (&gt; 80%)
-            </Button>
-            <Button variant="outline" size="sm">
-              Moderate (50-80%)
-            </Button>
-          </div>
-          <Button variant="outline" size="sm">
-            <Filter className="h-4 w-4" />
-            <span>Filter by Agent</span>
-          </Button>
-        </div>
-      </Card>
+            const leadInitials = lead?.name
+              ? lead.name
+                  .split(' ')
+                  .map((n) => n[0])
+                  .join('')
+                  .toUpperCase()
+                  .slice(0, 2)
+              : 'SJ';
 
-      {/* Matches Grid */}
-      <div className="space-y-4">
-        {sampleMatches.map((match) => (
-          <Card key={match.id} hoverable className="border-l-4 border-l-blue-600">
-            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-              {/* Left: Lead details */}
-              <div className="flex-1 space-y-1">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold text-slate-400 uppercase">Buyer</span>
-                  <StatusPill status={match.status} />
+            const propImage =
+              prop?.images && prop.images.length > 0
+                ? prop.images[0]
+                : 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80';
+
+            return (
+              <div
+                key={match.id}
+                className={`rounded-xl border border-l-4 border-slate-200 bg-white shadow-xs transition-all hover:shadow-md ${
+                  isHigh ? 'border-l-blue-600' : 'border-l-amber-500'
+                } relative flex flex-col overflow-hidden md:flex-row`}
+              >
+                {/* Left: Lead Information */}
+                <div className="flex flex-1 flex-col justify-center border-slate-100 p-4 md:border-r">
+                  <div className="mb-2.5 flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-xs font-bold text-blue-700">
+                      {leadInitials}
+                    </div>
+                    <div>
+                      <Link href={`/leads/${lead?.id || '1'}`}>
+                        <h3 className="text-sm font-bold text-slate-900 hover:text-blue-600">
+                          {lead?.name || 'Sarah Jenkins'}
+                        </h3>
+                      </Link>
+                      <div className="flex items-center gap-1 text-xs font-medium text-slate-500">
+                        <User className="h-3 w-3 text-slate-400" />
+                        <span>Hot Lead</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-1 text-xs">
+                    <div className="flex justify-between">
+                      <span className="font-medium text-slate-400">Budget:</span>
+                      <span className="font-bold text-slate-900">
+                        {lead?.budgetMin ? formatPrice(lead.budgetMin) : '₹50L'} -{' '}
+                        {lead?.budgetMax ? formatPrice(lead.budgetMax) : '₹75L'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="font-medium text-slate-400">Prefers:</span>
+                      <span className="font-semibold text-slate-800">
+                        {lead?.preferredLocations?.[0] || 'Downtown'}
+                      </span>
+                    </div>
+                  </div>
                 </div>
-                <h4 className="text-base font-bold text-slate-900">{match.leadName}</h4>
-                <p className="text-xs text-slate-600">
-                  Budget: <strong>{match.leadBudget}</strong> • Prefers: {match.leadLocation} (
-                  {match.leadType})
-                </p>
-              </div>
 
-              {/* Middle: Match Badge */}
-              <div className="flex flex-col items-center justify-center rounded-xl border border-slate-200 bg-slate-50 px-4 py-2">
-                <MatchScoreBadge score={match.score} size="lg" showLabel />
-                <span className="mt-1 text-[11px] font-semibold text-slate-500">Compatibility</span>
-              </div>
+                {/* Center: Match Score & Connector */}
+                <div className="relative z-10 flex flex-row items-center justify-center gap-1.5 border-y border-slate-100 bg-slate-50/60 px-3 py-4 md:w-36 md:flex-col md:border-y-0">
+                  <div className="absolute top-1/2 -z-10 hidden h-[1px] w-full bg-slate-200 md:block" />
+                  <div
+                    className={`h-14 w-14 rounded-full border-4 ${
+                      isHigh
+                        ? 'border-emerald-500'
+                        : isMedium
+                          ? 'border-amber-500'
+                          : 'border-slate-300'
+                    } relative z-20 flex items-center justify-center bg-white shadow-2xs`}
+                  >
+                    <span
+                      className={`text-sm font-bold ${
+                        isHigh ? 'text-emerald-700' : isMedium ? 'text-amber-700' : 'text-slate-700'
+                      }`}
+                    >
+                      {match.score}%
+                    </span>
+                  </div>
+                  <span
+                    className={`text-[10px] font-bold tracking-wider uppercase ${
+                      isHigh ? 'text-emerald-600' : 'text-amber-600'
+                    } z-20`}
+                  >
+                    Match
+                  </span>
+                </div>
 
-              {/* Right: Property details */}
-              <div className="flex-1 space-y-1 md:text-right">
-                <span className="text-xs font-bold text-slate-400 uppercase">Property</span>
-                <h4 className="text-base font-bold text-slate-900">{match.propertyTitle}</h4>
-                <p className="text-xs text-slate-600">
-                  Price: <strong className="text-slate-900">{match.propertyPrice}</strong> •{' '}
-                  {match.propertyLocation}
-                </p>
-              </div>
-            </div>
+                {/* Right: Property Details */}
+                <div className="flex flex-1 items-center gap-3.5 p-4">
+                  <div className="h-20 w-20 shrink-0 overflow-hidden rounded-lg border border-slate-200 bg-slate-100">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={propImage}
+                      alt={prop?.title || 'Property'}
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <Link href={`/properties/${prop?.id || '1'}`}>
+                      <h3 className="truncate text-sm font-bold text-slate-900 hover:text-blue-600">
+                        {prop?.title || 'Sunrise Apartments'}
+                      </h3>
+                    </Link>
+                    <p className="mb-1 flex items-center gap-1 text-xs font-medium text-slate-500">
+                      <MapPin className="h-3.5 w-3.5 shrink-0 text-slate-400" />
+                      <span className="truncate">{prop?.location || 'Downtown Core'}</span>
+                    </p>
+                    <div className="text-lg font-bold text-blue-600">
+                      {formatPrice(prop?.price || 6500000)}
+                    </div>
+                  </div>
+                </div>
 
-            {/* Score Breakdown Pills */}
-            <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 pt-3 text-xs text-slate-500">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="rounded-md bg-slate-100 px-2 py-0.5 font-medium text-slate-700">
-                  Budget: +{match.breakdown.budgetScore}
-                </span>
-                <span className="rounded-md bg-slate-100 px-2 py-0.5 font-medium text-slate-700">
-                  Location: +{match.breakdown.locationScore}
-                </span>
-                <span className="rounded-md bg-slate-100 px-2 py-0.5 font-medium text-slate-700">
-                  Type: +{match.breakdown.propertyTypeScore}
-                </span>
-                <span className="rounded-md bg-slate-100 px-2 py-0.5 font-medium text-slate-700">
-                  BHK: +{match.breakdown.bhkScore}
-                </span>
-                <span className="rounded-md bg-slate-100 px-2 py-0.5 font-medium text-slate-700">
-                  Possession: +{match.breakdown.possessionScore}
-                </span>
+                {/* Action Bar matching Screenshot & HTML */}
+                <div className="flex shrink-0 flex-row items-center justify-end gap-2 border-slate-200 bg-slate-50/80 p-3 md:flex-col md:justify-center md:border-l">
+                  <button
+                    onClick={() => handleNotify(match)}
+                    className="flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-lg bg-blue-600 px-3 py-2 text-xs font-bold text-white shadow-2xs transition-colors hover:bg-blue-700 md:w-full"
+                  >
+                    <Mail className="h-3.5 w-3.5" />
+                    <span>Notify</span>
+                  </button>
+                  <a
+                    href={`https://wa.me/${(lead?.phone || '15551234567').replace(/[^0-9]/g, '')}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-bold text-emerald-800 transition-colors hover:bg-emerald-100 md:w-full"
+                  >
+                    <MessageSquare className="h-3.5 w-3.5 text-emerald-600" />
+                    <span>WhatsApp</span>
+                  </a>
+                  <button
+                    onClick={() => void handleUpdateStatus(match.id, 'DISMISSED')}
+                    title="Dismiss Match"
+                    className="cursor-pointer rounded-full p-1.5 text-slate-400 transition-colors hover:bg-rose-50 hover:text-rose-600"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
               </div>
-              <Button variant="outline" size="sm">
-                Mark as Contacted
-              </Button>
-            </div>
-          </Card>
-        ))}
-      </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

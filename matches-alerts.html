@@ -1,0 +1,468 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>EstateNexus - Matches &amp; Alerts</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              'on-primary-container': '#eeefff',
+              tertiary: '#943700',
+              'primary-fixed-dim': '#b4c5ff',
+              'tertiary-container': '#bc4800',
+              'outline-variant': '#c3c6d7',
+              'on-primary-fixed': '#00174b',
+              'tertiary-fixed-dim': '#ffb596',
+              'on-primary': '#ffffff',
+              'surface-container-high': '#e7e7f3',
+              'inverse-surface': '#2e3039',
+              'secondary-fixed-dim': '#b7c8e1',
+              'tertiary-fixed': '#ffdbcd',
+              primary: '#004ac6',
+              'on-secondary-fixed-variant': '#38485d',
+              'error-container': '#ffdad6',
+              'on-surface-variant': '#434655',
+              'on-tertiary': '#ffffff',
+              secondary: '#505f76',
+              'on-secondary': '#ffffff',
+              'inverse-primary': '#b4c5ff',
+              'surface-bright': '#faf8ff',
+              background: '#faf8ff',
+              'on-tertiary-fixed-variant': '#7d2d00',
+              'on-secondary-fixed': '#0b1c30',
+              'primary-fixed': '#dbe1ff',
+              surface: '#faf8ff',
+              'surface-tint': '#0053db',
+              'on-tertiary-fixed': '#360f00',
+              'on-tertiary-container': '#ffede6',
+              'surface-container-low': '#f3f3fe',
+              outline: '#737686',
+              'inverse-on-surface': '#f0f0fb',
+              'on-background': '#191b23',
+              'primary-container': '#2563eb',
+              'on-error-container': '#93000a',
+              'surface-container-lowest': '#ffffff',
+              'on-surface': '#191b23',
+              'surface-container-highest': '#e1e2ed',
+              'surface-container': '#ededf9',
+              'secondary-container': '#d0e1fb',
+              'on-secondary-container': '#54647a',
+              'surface-dim': '#d9d9e5',
+              'secondary-fixed': '#d3e4fe',
+              'on-error': '#ffffff',
+              'on-primary-fixed-variant': '#003ea8',
+              'surface-variant': '#e1e2ed',
+              error: '#ba1a1a',
+            },
+            borderRadius: {
+              DEFAULT: '0.25rem',
+              lg: '0.5rem',
+              xl: '0.75rem',
+              full: '9999px',
+            },
+            spacing: {
+              xs: '4px',
+              gutter: '24px',
+              'sidebar-collapsed': '72px',
+              'sidebar-width': '260px',
+              md: '16px',
+              sm: '8px',
+              'margin-mobile': '16px',
+              xl: '32px',
+              lg: '24px',
+              'margin-desktop': '32px',
+              base: '4px',
+            },
+            fontFamily: {
+              'label-caps': ['Inter'],
+              'display-lg': ['Inter'],
+              'display-lg-mobile': ['Inter'],
+              'body-md': ['Inter'],
+              'headline-md': ['Inter'],
+              'title-sm': ['Inter'],
+              'body-sm': ['Inter'],
+            },
+            fontSize: {
+              'label-caps': [
+                '12px',
+                {
+                  lineHeight: '16px',
+                  letterSpacing: '0.05em',
+                  fontWeight: '600',
+                },
+              ],
+              'display-lg': [
+                '36px',
+                {
+                  lineHeight: '44px',
+                  letterSpacing: '-0.02em',
+                  fontWeight: '700',
+                },
+              ],
+              'display-lg-mobile': [
+                '28px',
+                {
+                  lineHeight: '34px',
+                  letterSpacing: '-0.02em',
+                  fontWeight: '700',
+                },
+              ],
+              'body-md': [
+                '16px',
+                {
+                  lineHeight: '24px',
+                  fontWeight: '400',
+                },
+              ],
+              'headline-md': [
+                '24px',
+                {
+                  lineHeight: '32px',
+                  letterSpacing: '-0.01em',
+                  fontWeight: '600',
+                },
+              ],
+              'title-sm': [
+                '18px',
+                {
+                  lineHeight: '28px',
+                  fontWeight: '600',
+                },
+              ],
+              'body-sm': [
+                '14px',
+                {
+                  lineHeight: '20px',
+                  fontWeight: '400',
+                },
+              ],
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      body {
+        background-color: #f8fafc; /* Custom override as requested by the ambient depth rules */
+        color: #191b23;
+      }
+      .soft-shadow {
+        box-shadow: 0 2px 4px rgba(30, 41, 59, 0.05);
+      }
+      .match-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(30, 41, 59, 0.1);
+      }
+    </style>
+  </head>
+  <body class="font-body-md text-on-surface flex antialiased">
+    <!-- SideNavBar -->
+    <nav
+      class="w-sidebar-width border-outline-variant bg-surface dark:bg-inverse-surface border-outline-variant dark:border-outline flat no shadows fixed top-0 left-0 z-40 hidden h-screen flex-col border-r transition-all duration-200 ease-in-out md:flex"
+    >
+      <div class="p-lg border-outline-variant dark:border-outline border-b">
+        <h1
+          class="font-headline-md text-headline-md text-primary dark:text-primary-fixed-dim font-bold"
+        >
+          EstateNexus
+        </h1>
+        <p class="font-body-sm text-body-sm text-on-surface-variant dark:text-surface-variant">
+          Professional Suite
+        </p>
+      </div>
+      <div class="py-md gap-sm flex flex-1 flex-col overflow-y-auto">
+        <a
+          class="gap-md px-lg py-sm font-label-caps text-label-caps text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-secondary-fixed-dim/20 flex items-center transition-colors duration-200 ease-in-out"
+          href="#"
+        >
+          <span class="material-symbols-outlined" data-weight="regular">dashboard</span>
+          Dashboard
+        </a>
+        <a
+          class="gap-md px-lg py-sm font-label-caps text-label-caps text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-secondary-fixed-dim/20 flex items-center transition-colors duration-200 ease-in-out"
+          href="#"
+        >
+          <span class="material-symbols-outlined" data-weight="regular">person_search</span>
+          Leads
+        </a>
+        <a
+          class="gap-md px-lg py-sm font-label-caps text-label-caps text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-secondary-fixed-dim/20 flex items-center transition-colors duration-200 ease-in-out"
+          href="#"
+        >
+          <span class="material-symbols-outlined" data-weight="regular">domain</span>
+          Inventory
+        </a>
+        <a
+          class="gap-md px-lg py-sm font-label-caps text-label-caps text-primary dark:text-primary-fixed-dim border-primary dark:border-primary-fixed-dim bg-surface-container-low dark:bg-secondary-fixed-dim/10 flex items-center border-l-4 transition-colors duration-200 ease-in-out"
+          href="#"
+        >
+          <span
+            class="material-symbols-outlined"
+            data-weight="fill"
+            style="font-variation-settings: 'FILL' 1"
+            >notifications_active</span
+          >
+          Matches
+        </a>
+        <a
+          class="gap-md px-lg py-sm font-label-caps text-label-caps text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-secondary-fixed-dim/20 flex items-center transition-colors duration-200 ease-in-out"
+          href="#"
+        >
+          <span class="material-symbols-outlined" data-weight="regular">view_kanban</span>
+          Pipeline
+        </a>
+        <a
+          class="gap-md px-lg py-sm font-label-caps text-label-caps text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-secondary-fixed-dim/20 flex items-center transition-colors duration-200 ease-in-out"
+          href="#"
+        >
+          <span class="material-symbols-outlined" data-weight="regular">group</span>
+          Team
+        </a>
+        <a
+          class="gap-md px-lg py-sm font-label-caps text-label-caps text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-secondary-fixed-dim/20 flex items-center transition-colors duration-200 ease-in-out"
+          href="#"
+        >
+          <span class="material-symbols-outlined" data-weight="regular">settings</span>
+          Settings
+        </a>
+      </div>
+    </nav>
+    <!-- Main Content Wrapper -->
+    <div class="md:ml-sidebar-width ml-0 flex min-h-screen flex-1 flex-col">
+      <!-- TopAppBar -->
+      <header
+        class="md:left-sidebar-width px-lg bg-surface/80 dark:bg-inverse-surface/80 border-outline-variant dark:border-outline docked full-width fixed top-0 right-0 left-0 z-30 flex h-16 items-center justify-between border-b shadow-sm backdrop-blur-md transition-all duration-200 dark:shadow-none"
+      >
+        <div class="flex flex-1 items-center">
+          <div class="relative hidden w-full max-w-md md:block">
+            <span
+              class="material-symbols-outlined left-sm text-outline absolute top-1/2 -translate-y-1/2 transform"
+              data-weight="regular"
+              >search</span
+            >
+            <input
+              class="pl-xl pr-sm py-xs border-outline-variant rounded-DEFAULT bg-surface-container-lowest font-body-sm text-body-sm focus:border-primary focus:ring-primary w-full border transition-colors outline-none focus:ring-1"
+              placeholder="Search matches..."
+              type="text"
+            />
+          </div>
+          <!-- Mobile Menu Button -->
+          <button class="text-on-surface p-sm md:hidden">
+            <span class="material-symbols-outlined">menu</span>
+          </button>
+        </div>
+        <div class="gap-md flex items-center">
+          <button
+            class="text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-200"
+          >
+            <span class="material-symbols-outlined">notifications</span>
+          </button>
+          <button
+            class="text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-200"
+          >
+            <span class="material-symbols-outlined">help_outline</span>
+          </button>
+          <div
+            class="bg-secondary-container border-outline-variant flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border"
+          >
+            <img
+              alt="User profile"
+              class="h-full w-full object-cover"
+              data-alt="A small, professional headshot photo of an energetic real estate agent with a bright, welcoming smile, brightly lit against a neutral modern office background, optimized for a UI avatar circle."
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuAil22i7_SP7rcvSUOTjbrhaHC3pbK-Bti-m9e5F5RSZpRxSirHIPx4ezEn-HL9LPJyz5S1QI7AZQbl3lnpfgYj9ybMuKWbav03yeZdJbzrdWCsiCcd6m5BDfkpv2j3xbRP0JPW1JPrA2l4J63FTxuvIGRbin28KmKnXwxi4WUgcWCwqIYH4LnD-J4Ta3AxuLCvhBuGOX4-j5J2laT-L5C1QxjCsiBG7f6mEV0oReThQSqPp7jpvtcq"
+            />
+          </div>
+        </div>
+      </header>
+      <!-- Canvas -->
+      <main class="p-gutter mx-auto w-full max-w-[1440px] flex-1 pt-[80px]">
+        <!-- Page Header -->
+        <div class="mb-lg">
+          <h2 class="font-display-lg text-display-lg text-on-surface mb-xs">
+            Matches &amp; Alerts
+          </h2>
+          <p class="font-body-md text-body-md text-on-surface-variant">
+            Monitor system-generated matches between leads and listings.
+          </p>
+        </div>
+        <!-- Controls & Filters -->
+        <div
+          class="gap-md mb-lg flex flex-col items-start justify-between md:flex-row md:items-center"
+        >
+          <!-- Filter Tabs -->
+          <div
+            class="gap-sm pb-sm scrollbar-hide border-outline-variant flex w-full overflow-x-auto border-b md:w-auto md:pb-0"
+          >
+            <button
+              class="px-md py-sm font-label-caps text-label-caps text-primary border-primary border-b-2 font-bold whitespace-nowrap"
+            >
+              All
+            </button>
+            <button
+              class="px-md py-sm font-label-caps text-label-caps text-on-surface-variant hover:text-primary whitespace-nowrap transition-colors"
+            >
+              New (12)
+            </button>
+            <button
+              class="px-md py-sm font-label-caps text-label-caps text-on-surface-variant hover:text-primary whitespace-nowrap transition-colors"
+            >
+              High Confidence (&gt;80%)
+            </button>
+            <button
+              class="px-md py-sm font-label-caps text-label-caps text-on-surface-variant hover:text-primary whitespace-nowrap transition-colors"
+            >
+              Medium (50-80%)
+            </button>
+            <button
+              class="px-md py-sm font-label-caps text-label-caps text-on-surface-variant hover:text-primary whitespace-nowrap transition-colors"
+            >
+              Dismissed
+            </button>
+          </div>
+          <!-- Actions -->
+          <div class="gap-sm flex w-full items-center md:w-auto">
+            <div class="relative">
+              <select
+                class="pl-md pr-xl py-sm bg-surface-container-lowest border-outline-variant rounded-DEFAULT font-body-sm text-body-sm text-on-surface focus:border-primary focus:ring-primary cursor-pointer appearance-none border outline-none focus:ring-1"
+              >
+                <option>Sort by: Score</option>
+                <option>Sort by: Recency</option>
+              </select>
+              <span
+                class="material-symbols-outlined right-sm text-outline pointer-events-none absolute top-1/2 -translate-y-1/2 transform text-sm"
+                >arrow_drop_down</span
+              >
+            </div>
+            <button
+              class="gap-xs px-md py-sm bg-primary-container text-on-primary-container rounded-DEFAULT font-label-caps text-label-caps flex items-center whitespace-nowrap shadow-sm transition-opacity hover:opacity-90"
+            >
+              <span class="material-symbols-outlined text-[18px]">refresh</span>
+              Refresh
+            </button>
+          </div>
+        </div>
+        <!-- Match Feed Grid/List -->
+        <div class="gap-md flex flex-col">
+          <!-- Card 1: High Confidence, New -->
+          <div
+            class="match-card bg-surface-container-lowest border-outline-variant soft-shadow border-l-primary-container relative flex flex-col overflow-hidden rounded-lg border border-l-[4px] transition-all duration-200 md:flex-row"
+          >
+            <!-- Left: Lead -->
+            <div
+              class="p-md border-outline-variant flex flex-1 flex-col justify-center md:border-r"
+            >
+              <div class="gap-sm mb-sm flex items-center">
+                <div
+                  class="bg-secondary-container text-primary flex h-10 w-10 items-center justify-center rounded-full font-bold"
+                >
+                  SJ
+                </div>
+                <div>
+                  <h3 class="font-title-sm text-title-sm text-on-surface">Sarah Jenkins</h3>
+                  <div
+                    class="gap-xs text-on-surface-variant font-body-sm text-body-sm flex items-center"
+                  >
+                    <span class="material-symbols-outlined text-[16px]">account_circle</span>
+                    <span class="">Hot Lead</span>
+                  </div>
+                </div>
+              </div>
+              <div class="gap-xs font-body-sm text-body-sm flex flex-col">
+                <div class="flex justify-between">
+                  <span class="text-outline">Budget:</span>
+                  <span class="text-on-surface font-bold">$500k - $750k</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-outline">Prefers:</span>
+                  <span class="text-on-surface">Downtown</span>
+                </div>
+              </div>
+            </div>
+            <!-- Center: Score & Connector -->
+            <div
+              class="py-md px-sm gap-sm bg-surface-bright relative z-10 flex flex-row items-center justify-center md:w-32 md:flex-col"
+            >
+              <div
+                class="bg-outline-variant absolute top-1/2 -z-10 hidden h-[1px] w-full md:block"
+              ></div>
+              <div
+                class="relative z-20 mb-1 flex h-16 w-16 items-center justify-center rounded-full border-4 border-emerald-500 bg-white"
+              >
+                <span class="font-headline-sm text-headline-sm font-bold text-emerald-700"
+                  >94%</span
+                >
+              </div>
+              <span
+                class="font-label-sm text-label-sm z-20 font-bold tracking-wider text-emerald-600 uppercase"
+                >Match</span
+              >
+            </div>
+            <!-- Right: Property -->
+            <div class="p-md gap-md flex flex-1 items-center">
+              <div
+                class="border-outline-variant h-20 w-20 flex-shrink-0 overflow-hidden rounded-md border"
+              >
+                <img
+                  class="h-full w-full object-cover"
+                  data-alt="A highly detailed, ultra-realistic architectural photograph of a luxurious modern apartment exterior in a bustling downtown core, bathed in golden hour sunlight, exuding a premium, high-end real estate aesthetic."
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuBna1EU86h0DX8ylQF-2OmcgGYYZ1JxFhbyvECHRte-_IbzE14Y_3NgKHRHAd6xszkmM8gG-ku7bfUtcKatGtietBXJYl-WJCjgNiJ2ZtktjQYuWZM5XBHjJyg6bCdgI3O7_okGW69DN1D8ZhPMkjUWVXxYE__II_DLGUTFruD1X5JWgEUValUPX_ycIENAO9XA9bMzEfCtNG3qZTUldylpaJiO3CnUoClrI3uqF1MUs1q_UzHBR8gI"
+                />
+              </div>
+              <div class="flex-1">
+                <h3 class="font-title-sm text-title-sm text-on-surface">Sunrise Apartments</h3>
+                <div
+                  class="gap-xs text-on-surface-variant font-body-sm text-body-sm mb-xs flex items-center"
+                >
+                  <span class="material-symbols-outlined text-[16px]">location_on</span>
+                  <span class="">Downtown Core</span>
+                </div>
+                <div class="font-headline-md text-headline-md text-primary font-bold">$650,000</div>
+              </div>
+            </div>
+            <!-- Action Bar (Bottom on mobile, Right edge on desktop) -->
+            <div
+              class="bg-surface-container gap-sm p-sm border-outline-variant flex flex-row items-center justify-end md:flex-col md:justify-center md:border-l"
+            >
+              <button
+                class="gap-xs px-sm py-sm bg-primary-container text-on-primary-container rounded-DEFAULT font-label-caps text-label-caps flex flex-1 items-center justify-center transition-opacity hover:opacity-90 md:w-full"
+              >
+                <span class="material-symbols-outlined text-[16px]">mail</span>
+                Notify
+              </button>
+              <button
+                class="gap-xs px-sm py-sm rounded-DEFAULT font-label-caps text-label-caps flex flex-1 items-center justify-center border border-[#25D366]/30 bg-[#25D366]/10 text-[#075E54] transition-colors hover:bg-[#25D366]/20 md:w-full"
+              >
+                <span class="material-symbols-outlined text-[16px]">chat</span>
+                WhatsApp
+              </button>
+              <button
+                class="p-sm text-outline hover:text-error hover:bg-error-container/50 rounded-full transition-colors"
+              >
+                <span class="material-symbols-outlined">close</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>
