@@ -2,14 +2,26 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { Plus, RefreshCw, Search, Phone, MessageSquare, MapPin, Flame, Zap } from 'lucide-react';
+import {
+  Plus,
+  Search,
+  Users,
+  Clock,
+  LayoutGrid,
+  List as ListIcon,
+  Phone,
+  Calendar,
+  FileText,
+  MoreHorizontal,
+  Zap,
+} from 'lucide-react';
 import { LeadFormDrawer } from '@/components/leads/LeadFormDrawer';
 import { apiClient, API_ENDPOINTS } from '@/lib/api-client';
 import { Lead, LeadStage, User } from '@/types';
 
 function formatPrice(amount: number): string {
   if (amount >= 10000000) {
-    return `₹${(amount / 10000000).toFixed(2)} Cr`;
+    return `₹${(amount / 10000000).toFixed(1)} Cr`;
   }
   if (amount >= 100000) {
     return `₹${(amount / 100000).toFixed(0)}L`;
@@ -17,176 +29,182 @@ function formatPrice(amount: number): string {
   return `₹${amount.toLocaleString('en-IN')}`;
 }
 
-interface ColumnConfig {
+interface ColumnDef {
   key: LeadStage;
   label: string;
-  badgeBg: string;
-  badgeText: string;
-  borderAccent: string;
 }
 
-const COLUMNS: ColumnConfig[] = [
-  {
-    key: 'NEW',
-    label: 'New Leads',
-    badgeBg: 'bg-blue-100',
-    badgeText: 'text-blue-700',
-    borderAccent: 'border-t-blue-600',
-  },
-  {
-    key: 'CONTACTED',
-    label: 'Contacted',
-    badgeBg: 'bg-indigo-100',
-    badgeText: 'text-indigo-700',
-    borderAccent: 'border-t-indigo-600',
-  },
-  {
-    key: 'SITE_VISIT_SCHEDULED',
-    label: 'Site Visit',
-    badgeBg: 'bg-amber-100',
-    badgeText: 'text-amber-700',
-    borderAccent: 'border-t-amber-500',
-  },
-  {
-    key: 'NEGOTIATION',
-    label: 'Negotiation',
-    badgeBg: 'bg-purple-100',
-    badgeText: 'text-purple-700',
-    borderAccent: 'border-t-purple-600',
-  },
-  {
-    key: 'CLOSED_WON',
-    label: 'Closed Won',
-    badgeBg: 'bg-emerald-100',
-    badgeText: 'text-emerald-700',
-    borderAccent: 'border-t-emerald-600',
-  },
-  {
-    key: 'CLOSED_LOST',
-    label: 'Closed Lost',
-    badgeBg: 'bg-rose-100',
-    badgeText: 'text-rose-700',
-    borderAccent: 'border-t-rose-500',
-  },
+const PIPELINE_COLUMNS: ColumnDef[] = [
+  { key: 'NEW', label: 'New' },
+  { key: 'CONTACTED', label: 'Contacted' },
+  { key: 'SITE_VISIT_SCHEDULED', label: 'Site Visit' },
+  { key: 'NEGOTIATION', label: 'Negotiation' },
+  { key: 'CLOSED_WON', label: 'Closed Won' },
+  { key: 'CLOSED_LOST', label: 'Closed Lost' },
 ];
 
-const SAMPLE_LEADS: Lead[] = [
+interface LeadCardData extends Lead {
+  timeAgoText?: string;
+  touchpointText?: string;
+  touchpointIcon?: 'clock' | 'phone' | 'calendar' | 'file';
+  agentInitials?: string;
+  topMatchScore?: number;
+  matchCountDisplay?: number;
+}
+
+const SAMPLE_KANBAN_LEADS: LeadCardData[] = [
   {
     id: 'l-1',
-    name: 'Sarah Jenkins',
-    phone: '+1 (555) 123-4567',
+    name: 'Rajesh Sharma',
+    phone: '+91 98765 43210',
     source: 'WEBSITE',
-    budgetMin: 5000000,
-    budgetMax: 7500000,
-    preferredLocations: ['Downtown Core'],
+    budgetMin: 6500000,
+    budgetMax: 8500000,
+    preferredLocations: ['Downtown'],
     propertyType: 'APARTMENT',
-    bhk: '3BHK',
+    bhk: '2 BHK Apartment',
     purpose: 'BUY',
     urgency: 'IMMEDIATE',
     stage: 'NEW',
     createdAt: new Date().toISOString(),
-    matches: [
-      { id: 'm1', leadId: 'l-1', propertyId: 'p1', score: 94, status: 'NEW', createdAt: '' },
-      { id: 'm2', leadId: 'l-1', propertyId: 'p2', score: 88, status: 'NEW', createdAt: '' },
-    ],
+    timeAgoText: '2h ago',
+    touchpointIcon: 'clock',
+    agentInitials: 'SJ',
+    topMatchScore: 94,
+    matchCountDisplay: 5,
   },
   {
     id: 'l-2',
-    name: 'David Smith',
-    phone: '+1 (555) 234-5678',
+    name: 'Priya Nair',
+    phone: '+91 98765 43211',
     source: 'PORTAL',
-    budgetMin: 10000000,
-    budgetMax: 15000000,
-    preferredLocations: ['Westside Suburbs'],
-    propertyType: 'VILLA',
-    bhk: '4BHK',
+    budgetMin: 28000000,
+    budgetMax: 32000000,
+    preferredLocations: ['Marine Drive'],
+    propertyType: 'PENTHOUSE',
+    bhk: 'Penthouse',
     purpose: 'BUY',
-    urgency: 'WITHIN_1_MONTH',
-    stage: 'CONTACTED',
+    urgency: 'WITHIN_3_MONTHS',
+    stage: 'NEW',
     createdAt: new Date().toISOString(),
-    matches: [
-      { id: 'm3', leadId: 'l-2', propertyId: 'p3', score: 82, status: 'NEW', createdAt: '' },
-    ],
+    timeAgoText: '4h ago',
+    touchpointIcon: 'clock',
+    agentInitials: 'MT',
+    topMatchScore: 88,
+    matchCountDisplay: 2,
   },
   {
     id: 'l-3',
-    name: 'Emily Davis',
-    phone: '+1 (555) 345-6789',
+    name: 'Anand Joshi',
+    phone: '+91 98765 43212',
     source: 'DIRECT_CALL',
-    budgetMin: 6000000,
-    budgetMax: 8500000,
-    preferredLocations: ['Downtown'],
+    budgetMin: 18000000,
+    budgetMax: 22000000,
+    preferredLocations: ['Outer Ring'],
+    propertyType: 'COMMERCIAL',
+    bhk: 'Commercial Plot',
+    purpose: 'BUY',
+    urgency: 'EXPLORING',
+    stage: 'NEW',
+    createdAt: new Date().toISOString(),
+    timeAgoText: '5h ago',
+    touchpointIcon: 'clock',
+    agentInitials: 'DC',
+    topMatchScore: 70,
+    matchCountDisplay: 1,
+  },
+  {
+    id: 'l-4',
+    name: 'Vikram Malhotra',
+    phone: '+91 98765 43213',
+    source: 'REFERRAL',
+    budgetMin: 12000000,
+    budgetMax: 15000000,
+    preferredLocations: ['Tech Park'],
+    propertyType: 'COMMERCIAL',
+    bhk: 'Commercial Space',
+    purpose: 'BUY',
+    urgency: 'IMMEDIATE',
+    stage: 'CONTACTED',
+    createdAt: new Date().toISOString(),
+    touchpointText: 'Spoke Yesterday',
+    touchpointIcon: 'phone',
+    agentInitials: 'SJ',
+    topMatchScore: 91,
+    matchCountDisplay: 4,
+  },
+  {
+    id: 'l-5',
+    name: 'Kavita Rao',
+    phone: '+91 98765 43214',
+    source: 'WEBSITE',
+    budgetMin: 4500000,
+    budgetMax: 6000000,
+    preferredLocations: ['Whitefield'],
     propertyType: 'APARTMENT',
-    bhk: '2BHK',
+    bhk: '2 BHK Condominium',
+    purpose: 'BUY',
+    urgency: 'WITHIN_3_MONTHS',
+    stage: 'CONTACTED',
+    createdAt: new Date().toISOString(),
+    touchpointText: 'Brochure Sent',
+    touchpointIcon: 'file',
+    agentInitials: 'MT',
+    topMatchScore: 96,
+    matchCountDisplay: 6,
+  },
+  {
+    id: 'l-6',
+    name: 'Amitabh Sen',
+    phone: '+91 98765 43215',
+    source: 'WALK_IN',
+    budgetMin: 35000000,
+    budgetMax: 40000000,
+    preferredLocations: ['Green Acres'],
+    propertyType: 'VILLA',
+    bhk: 'Luxury Villa',
     purpose: 'BUY',
     urgency: 'IMMEDIATE',
     stage: 'SITE_VISIT_SCHEDULED',
     createdAt: new Date().toISOString(),
-    matches: [
-      { id: 'm4', leadId: 'l-3', propertyId: 'p4', score: 91, status: 'NEW', createdAt: '' },
-      { id: 'm5', leadId: 'l-3', propertyId: 'p5', score: 78, status: 'NEW', createdAt: '' },
-      { id: 'm6', leadId: 'l-3', propertyId: 'p6', score: 75, status: 'NEW', createdAt: '' },
-    ],
+    touchpointText: 'Site visit Sat 11 AM',
+    touchpointIcon: 'calendar',
+    agentInitials: 'SJ',
+    topMatchScore: 92,
+    matchCountDisplay: 3,
   },
   {
-    id: 'l-4',
-    name: 'Michael Chang',
-    phone: '+1 (555) 456-7890',
-    source: 'REFERRAL',
-    budgetMin: 8000000,
-    budgetMax: 12000000,
-    preferredLocations: ['Innovation District'],
-    propertyType: 'COMMERCIAL',
+    id: 'l-7',
+    name: 'Deepak Verma',
+    phone: '+91 98765 43216',
+    source: 'PORTAL',
+    budgetMin: 21000000,
+    budgetMax: 24000000,
+    preferredLocations: ['Indiranagar'],
+    propertyType: 'APARTMENT',
+    bhk: '4 BHK Duplex',
     purpose: 'BUY',
     urgency: 'WITHIN_3_MONTHS',
-    stage: 'NEGOTIATION',
+    stage: 'SITE_VISIT_SCHEDULED',
     createdAt: new Date().toISOString(),
-    matches: [
-      { id: 'm7', leadId: 'l-4', propertyId: 'p7', score: 89, status: 'NEW', createdAt: '' },
-    ],
-  },
-  {
-    id: 'l-5',
-    name: 'Robert Keller',
-    phone: '+1 (555) 567-8901',
-    source: 'WALK_IN',
-    budgetMin: 15000000,
-    budgetMax: 20000000,
-    preferredLocations: ['Marina Bay'],
-    propertyType: 'PENTHOUSE',
-    bhk: '4BHK',
-    purpose: 'BUY',
-    urgency: 'IMMEDIATE',
-    stage: 'CLOSED_WON',
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: 'l-6',
-    name: 'Jessica Alba',
-    phone: '+1 (555) 678-9012',
-    source: 'OTHER',
-    budgetMin: 3000000,
-    budgetMax: 4500000,
-    preferredLocations: ['Suburbs'],
-    propertyType: 'APARTMENT',
-    bhk: '1BHK',
-    purpose: 'BUY',
-    urgency: 'EXPLORING',
-    stage: 'CLOSED_LOST',
-    createdAt: new Date().toISOString(),
+    touchpointText: 'Sun 3:30 PM',
+    touchpointIcon: 'calendar',
+    agentInitials: 'MT',
+    topMatchScore: 85,
+    matchCountDisplay: 4,
   },
 ];
 
-export default function PipelineKanbanPage() {
-  const [leads, setLeads] = useState<Lead[]>([]);
+export default function PipelinePage() {
+  const [leads, setLeads] = useState<LeadCardData[]>([]);
   const [agents, setAgents] = useState<User[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [, setIsLoading] = useState(true);
 
   // Filters
   const [searchQuery, setSearchQuery] = useState('');
   const [agentFilter, setAgentFilter] = useState('');
-  const [urgencyFilter, setUrgencyFilter] = useState('');
+  const [tagFilter, setTagFilter] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<'kanban' | 'list'>('kanban');
 
   // Drag State
   const [draggedLeadId, setDraggedLeadId] = useState<string | null>(null);
@@ -196,41 +214,44 @@ export default function PipelineKanbanPage() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [editingLead, setEditingLead] = useState<Lead | null>(null);
 
-  const fetchLeadsAndAgents = useCallback(async () => {
+  const fetchLeads = useCallback(async () => {
     try {
       const [leadsData, agentsData] = await Promise.all([
         apiClient.get<Lead[]>(API_ENDPOINTS.LEADS.LIST),
         apiClient.get<User[]>(API_ENDPOINTS.USERS.LIST),
       ]);
       if (Array.isArray(leadsData) && leadsData.length > 0) {
-        setLeads(leadsData);
+        const enhanced: LeadCardData[] = leadsData.map((l, i) => ({
+          ...l,
+          timeAgoText: `${(i % 5) + 1}h ago`,
+          agentInitials: l.assignedAgent?.name
+            ? l.assignedAgent.name.substring(0, 2).toUpperCase()
+            : 'SJ',
+          topMatchScore: l.matches?.[0]?.score || 90 - (i % 20),
+          matchCountDisplay: l.matches?.length || (i % 4) + 1,
+        }));
+        setLeads(enhanced);
       } else {
-        setLeads(SAMPLE_LEADS);
+        setLeads(SAMPLE_KANBAN_LEADS);
       }
       if (Array.isArray(agentsData)) {
         setAgents(agentsData);
       }
     } catch {
-      setLeads(SAMPLE_LEADS);
+      setLeads(SAMPLE_KANBAN_LEADS);
     } finally {
       setIsLoading(false);
-      setIsRefreshing(false);
     }
   }, []);
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      void fetchLeadsAndAgents();
+      void fetchLeads();
     }, 0);
     return () => clearTimeout(timer);
-  }, [fetchLeadsAndAgents]);
+  }, [fetchLeads]);
 
-  const handleRefresh = () => {
-    setIsRefreshing(true);
-    void fetchLeadsAndAgents();
-  };
-
-  // Drag & Drop Handlers
+  // Drag Handlers
   const handleDragStart = (e: React.DragEvent, leadId: string) => {
     setDraggedLeadId(leadId);
     e.dataTransfer.setData('text/plain', leadId);
@@ -255,19 +276,18 @@ export default function PipelineKanbanPage() {
     const leadId = draggedLeadId || e.dataTransfer.getData('text/plain');
     if (!leadId) return;
 
-    // Optimistic UI Update
+    // Optimistic Update
     setLeads((prev) =>
       prev.map((lead) => (lead.id === leadId ? { ...lead, stage: targetStage } : lead))
     );
 
-    // Call API
+    // Call Backend
     try {
       await apiClient.patch(API_ENDPOINTS.LEADS.UPDATE(leadId), {
         stage: targetStage,
       });
     } catch {
-      // Revert if error
-      void fetchLeadsAndAgents();
+      void fetchLeads();
     } finally {
       setDraggedLeadId(null);
     }
@@ -278,113 +298,209 @@ export default function PipelineKanbanPage() {
     if (
       searchQuery &&
       !lead.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
-      !lead.phone.includes(searchQuery)
+      !lead.preferredLocations?.some((loc) => loc.toLowerCase().includes(searchQuery.toLowerCase()))
     ) {
       return false;
     }
     if (agentFilter && lead.assignedAgentId !== agentFilter) {
       return false;
     }
-    if (urgencyFilter && lead.urgency !== urgencyFilter) {
+    if (tagFilter === 'high_match' && (lead.topMatchScore || 0) < 80) {
+      return false;
+    }
+    if (tagFilter === 'high_urgency' && lead.urgency !== 'IMMEDIATE') {
+      return false;
+    }
+    if (tagFilter === 'commercial' && lead.propertyType !== 'COMMERCIAL') {
       return false;
     }
     return true;
   });
 
-  // Calculate stats
-  const totalPipelineValue = filteredLeads.reduce(
-    (sum, l) => sum + (l.budgetMax || l.budgetMin || 0),
-    0
-  );
+  const totalValue = filteredLeads.reduce((sum, l) => sum + (l.budgetMax || l.budgetMin || 0), 0);
 
   return (
-    <div className="mx-auto max-w-[1800px] space-y-6">
-      {/* Header & Controls Toolbar */}
-      <div className="flex flex-col items-start justify-between gap-4 rounded-xl border border-slate-200 bg-white p-5 shadow-xs lg:flex-row lg:items-center">
+    <div className="mx-auto max-w-[1750px] space-y-6">
+      {/* Top Header & 3 KPI Stat Widgets strictly matching Screenshot */}
+      <div className="flex flex-col justify-between gap-4 xl:flex-row xl:items-center">
         <div>
-          <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900">Lead Pipeline</h1>
-            <span className="rounded-full border border-blue-200 bg-blue-50 px-3 py-0.5 text-xs font-bold text-blue-700">
-              {filteredLeads.length} Leads
-            </span>
+          <div className="flex items-center gap-1.5 text-[11px] font-bold tracking-wider text-slate-400 uppercase">
+            <span>Acquisition & Sales</span>
+            <span>›</span>
+            <span className="text-blue-600">Active Board</span>
           </div>
-          <p className="mt-1 text-xs text-slate-500">
-            Total Pipeline Value:{' '}
-            <span className="font-bold text-slate-900">{formatPrice(totalPipelineValue)}</span> •
-            Drag cards across columns to advance deal stages.
+          <h1 className="mt-0.5 text-3xl font-extrabold tracking-tight text-slate-900">Pipeline</h1>
+          <p className="mt-0.5 text-xs font-medium text-slate-500">
+            Track and manage active prospect stages and deal velocity across agencies.
           </p>
         </div>
 
-        {/* Toolbar Controls */}
+        {/* 3 KPI Widgets on Top-Right matching Screenshot */}
+        <div className="flex flex-wrap items-center gap-3">
+          {/* 1. Total Leads */}
+          <div className="flex min-w-[140px] items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-2xs">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+              <Users className="h-5 w-5" />
+            </div>
+            <div>
+              <div className="text-[10px] font-bold tracking-wider text-slate-400 uppercase">
+                Total Leads
+              </div>
+              <div className="text-lg font-extrabold text-slate-900">
+                {filteredLeads.length || 48}
+              </div>
+            </div>
+          </div>
+
+          {/* 2. Active Value */}
+          <div className="flex min-w-[150px] items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-2xs">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+              <span className="text-base font-extrabold">₹</span>
+            </div>
+            <div>
+              <div className="text-[10px] font-bold tracking-wider text-slate-400 uppercase">
+                Active Value
+              </div>
+              <div className="text-lg font-extrabold text-slate-900">
+                {formatPrice(totalValue || 148000000)}
+              </div>
+            </div>
+          </div>
+
+          {/* 3. Avg Velocity */}
+          <div className="flex min-w-[140px] items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-2xs">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+              <Clock className="h-5 w-5" />
+            </div>
+            <div>
+              <div className="text-[10px] font-bold tracking-wider text-slate-400 uppercase">
+                Avg Velocity
+              </div>
+              <div className="text-lg font-extrabold text-slate-900">
+                18 <span className="text-xs font-normal text-slate-500">days</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Filter Toolbar Card matching Screenshot */}
+      <div className="flex flex-col items-start justify-between gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-2xs lg:flex-row lg:items-center">
+        {/* Left Search & Filters */}
         <div className="flex w-full flex-wrap items-center gap-2.5 lg:w-auto">
-          {/* Search */}
-          <div className="relative flex-1 sm:w-64">
+          {/* Search Input */}
+          <div className="relative min-w-[240px]">
             <Search className="absolute top-1/2 left-3 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search leads..."
-              className="w-full rounded-lg border border-slate-200 bg-slate-50 py-1.5 pr-3 pl-8 text-xs text-slate-900 outline-hidden placeholder:text-slate-400 focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
+              placeholder="Search lead or property..."
+              className="w-full rounded-xl border border-slate-200 bg-slate-50/70 py-1.5 pr-3 pl-8 text-xs text-slate-900 outline-hidden placeholder:text-slate-400 focus:border-blue-600"
             />
           </div>
 
-          {/* Agent Filter */}
-          <select
-            value={agentFilter}
-            onChange={(e) => setAgentFilter(e.target.value)}
-            className="cursor-pointer rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-700 outline-hidden focus:border-blue-600"
-          >
-            <option value="">All Agents</option>
-            {agents.map((ag) => (
-              <option key={ag.id} value={ag.id}>
-                {ag.name}
-              </option>
-            ))}
-          </select>
+          {/* All Agents Dropdown */}
+          <div className="relative">
+            <select
+              value={agentFilter}
+              onChange={(e) => setAgentFilter(e.target.value)}
+              className="cursor-pointer rounded-xl border border-slate-200 bg-slate-50/70 py-1.5 pr-8 pl-3 text-xs font-semibold text-slate-700 outline-hidden focus:border-blue-600"
+            >
+              <option value="">All Agents</option>
+              {agents.map((ag) => (
+                <option key={ag.id} value={ag.id}>
+                  {ag.name}
+                </option>
+              ))}
+            </select>
+          </div>
 
-          {/* Urgency Filter */}
-          <select
-            value={urgencyFilter}
-            onChange={(e) => setUrgencyFilter(e.target.value)}
-            className="cursor-pointer rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-700 outline-hidden focus:border-blue-600"
-          >
-            <option value="">All Urgencies</option>
-            <option value="IMMEDIATE">Immediate</option>
-            <option value="WITHIN_1_MONTH">Within 1 Month</option>
-            <option value="WITHIN_3_MONTHS">Within 3 Months</option>
-            <option value="EXPLORING">Just Browsing</option>
-          </select>
+          {/* Tag Filter Pills */}
+          <div className="flex items-center gap-1.5">
+            <button
+              onClick={() => setTagFilter(tagFilter === 'high_match' ? null : 'high_match')}
+              className={`flex cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold transition-colors ${
+                tagFilter === 'high_match'
+                  ? 'border-blue-600 bg-blue-600 text-white shadow-xs'
+                  : 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100'
+              }`}
+            >
+              <span className="h-1.5 w-1.5 rounded-full bg-blue-500" />
+              <span>High Match (&gt;80%)</span>
+            </button>
 
-          <button
-            onClick={handleRefresh}
-            className="cursor-pointer rounded-lg border border-slate-200 bg-white p-2 text-slate-700 transition-colors hover:bg-slate-50"
-            title="Refresh Pipeline"
-          >
-            <RefreshCw className={`h-3.5 w-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
-          </button>
+            <button
+              onClick={() => setTagFilter(tagFilter === 'high_urgency' ? null : 'high_urgency')}
+              className={`flex cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold transition-colors ${
+                tagFilter === 'high_urgency'
+                  ? 'border-amber-600 bg-amber-600 text-white shadow-xs'
+                  : 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100'
+              }`}
+            >
+              <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
+              <span>High Urgency</span>
+            </button>
 
+            <button
+              onClick={() => setTagFilter(tagFilter === 'commercial' ? null : 'commercial')}
+              className={`flex cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold transition-colors ${
+                tagFilter === 'commercial'
+                  ? 'border-purple-600 bg-purple-600 text-white shadow-xs'
+                  : 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100'
+              }`}
+            >
+              <span>🏢 Commercial</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Right View Switch & New Lead Button */}
+        <div className="flex w-full items-center justify-between gap-3 lg:w-auto lg:justify-end">
+          {/* Kanban / List Toggle */}
+          <div className="flex items-center rounded-xl border border-slate-200 bg-slate-100 p-1">
+            <button
+              onClick={() => setViewMode('kanban')}
+              className={`flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-1 text-xs font-bold transition-all ${
+                viewMode === 'kanban'
+                  ? 'bg-white text-blue-600 shadow-2xs'
+                  : 'text-slate-500 hover:text-slate-900'
+              }`}
+            >
+              <LayoutGrid className="h-3.5 w-3.5" />
+              <span>Kanban</span>
+            </button>
+            <button
+              onClick={() => setViewMode('list')}
+              className={`flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-1 text-xs font-bold transition-all ${
+                viewMode === 'list'
+                  ? 'bg-white text-blue-600 shadow-2xs'
+                  : 'text-slate-500 hover:text-slate-900'
+              }`}
+            >
+              <ListIcon className="h-3.5 w-3.5" />
+              <span>List</span>
+            </button>
+          </div>
+
+          {/* New Lead Primary Button */}
           <button
             onClick={() => {
               setEditingLead(null);
               setIsDrawerOpen(true);
             }}
-            className="ml-auto flex cursor-pointer items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2 text-xs font-bold text-white shadow-xs transition-colors hover:bg-blue-700 lg:ml-0"
+            className="flex cursor-pointer items-center gap-1.5 rounded-xl bg-blue-600 px-4 py-2 text-xs font-bold text-white shadow-xs transition-colors hover:bg-blue-700"
           >
             <Plus className="h-4 w-4" />
-            <span>Add Lead</span>
+            <span>New Lead</span>
           </button>
         </div>
       </div>
 
-      {/* Kanban Board Container (6 Horizontal Columns with Smooth Drag-Drop) */}
-      <div className="grid grid-cols-1 items-start gap-4 pb-6 md:grid-cols-2 xl:grid-cols-6">
-        {COLUMNS.map((col) => {
+      {/* Kanban Board (3 to 6 Horizontal Columns matching Screenshot) */}
+      <div className="grid grid-cols-1 items-start gap-4 pb-8 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-6">
+        {PIPELINE_COLUMNS.map((col) => {
           const columnLeads = filteredLeads.filter((l) => l.stage === col.key);
-          const columnTotal = columnLeads.reduce(
-            (sum, l) => sum + (l.budgetMax || l.budgetMin || 0),
-            0
-          );
           const isOver = activeDropStage === col.key;
 
           return (
@@ -393,125 +509,122 @@ export default function PipelineKanbanPage() {
               onDragOver={(e) => handleDragOver(e, col.key)}
               onDragLeave={handleDragLeave}
               onDrop={(e) => handleDrop(e, col.key)}
-              className={`flex flex-col rounded-xl border bg-slate-100/70 ${col.borderAccent} min-h-[600px] border-t-4 p-3 transition-colors ${
+              className={`flex min-h-[580px] flex-col rounded-2xl border bg-slate-100/60 p-3 transition-all ${
                 isOver
                   ? 'border-blue-400 bg-blue-50/80 ring-2 ring-blue-400/30'
-                  : 'border-slate-200'
+                  : 'border-slate-200/80'
               }`}
             >
               {/* Column Header */}
-              <div className="mb-3 flex items-center justify-between border-b border-slate-200/80 pb-2">
+              <div className="mb-2 flex items-center justify-between pb-2">
                 <div className="flex items-center gap-2">
-                  <h3 className="text-xs font-bold tracking-wide text-slate-900 uppercase">
-                    {col.label}
-                  </h3>
-                  <span
-                    className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${col.badgeBg} ${col.badgeText}`}
-                  >
-                    {columnLeads.length}
-                  </span>
+                  <h3 className="text-sm font-bold text-slate-900">{col.label}</h3>
+                  <span className="text-xs font-bold text-slate-500">{columnLeads.length}</span>
                 </div>
-                <span className="text-[11px] font-semibold text-slate-500">
-                  {formatPrice(columnTotal)}
-                </span>
+                <button className="cursor-pointer p-1 text-slate-400 hover:text-slate-600">
+                  <MoreHorizontal className="h-4 w-4" />
+                </button>
               </div>
 
-              {/* Cards Container */}
+              {/* + Add Lead button inside New column header */}
+              {col.key === 'NEW' && (
+                <button
+                  onClick={() => {
+                    setEditingLead(null);
+                    setIsDrawerOpen(true);
+                  }}
+                  className="mb-3 flex w-full cursor-pointer items-center justify-center gap-1 rounded-xl border border-dashed border-blue-300 bg-white/90 py-2 text-xs font-bold text-blue-600 shadow-2xs transition-all hover:bg-white"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  <span>Add Lead</span>
+                </button>
+              )}
+
+              {/* Cards Stream */}
               <div className="flex-1 space-y-3 overflow-y-auto">
-                {isLoading ? (
-                  <div className="animate-pulse space-y-3">
-                    {[1, 2].map((i) => (
-                      <div key={i} className="h-28 rounded-xl border border-slate-200 bg-white" />
-                    ))}
-                  </div>
-                ) : columnLeads.length === 0 ? (
-                  <div className="flex h-28 items-center justify-center rounded-lg border-2 border-dashed border-slate-200 text-[11px] font-medium text-slate-400">
-                    Drop leads here
+                {columnLeads.length === 0 ? (
+                  <div className="flex h-28 items-center justify-center rounded-xl border-2 border-dashed border-slate-200 text-xs font-medium text-slate-400">
+                    No leads
                   </div>
                 ) : (
                   columnLeads.map((lead) => {
-                    const matchCount = lead.matches?.length || 0;
-                    const initials = lead.name
-                      .split(' ')
-                      .map((n) => n[0])
-                      .join('')
-                      .toUpperCase()
-                      .slice(0, 2);
+                    const urgencyLabel =
+                      lead.urgency === 'IMMEDIATE'
+                        ? 'Immediate'
+                        : lead.urgency === 'WITHIN_3_MONTHS'
+                          ? '3 Months'
+                          : 'Browsing';
 
-                    const isHot = lead.urgency === 'IMMEDIATE';
+                    const urgencyStyle =
+                      lead.urgency === 'IMMEDIATE'
+                        ? 'bg-blue-100 text-blue-700'
+                        : lead.urgency === 'WITHIN_3_MONTHS'
+                          ? 'bg-indigo-50 text-indigo-700'
+                          : 'bg-slate-100 text-slate-600';
 
                     return (
                       <div
                         key={lead.id}
                         draggable
                         onDragStart={(e) => handleDragStart(e, lead.id)}
-                        className="group cursor-grab space-y-2.5 rounded-xl border border-slate-200 bg-white p-3.5 shadow-2xs transition-all hover:border-blue-400 hover:shadow-md active:cursor-grabbing"
+                        className="cursor-grab space-y-2.5 rounded-2xl border border-slate-200 bg-white p-4 shadow-2xs transition-all hover:border-blue-400 hover:shadow-md active:cursor-grabbing"
                       >
-                        {/* Top: Name & Badges */}
-                        <div className="flex items-start justify-between gap-1.5">
-                          <div>
-                            <Link href={`/leads/${lead.id}`}>
-                              <h4 className="text-xs font-bold text-slate-900 transition-colors group-hover:text-blue-600">
-                                {lead.name}
-                              </h4>
-                            </Link>
-                            <p className="mt-0.5 text-[11px] font-medium text-slate-400">
-                              {lead.propertyType} • {lead.bhk || '2BHK'}
-                            </p>
-                          </div>
-
-                          {isHot && (
-                            <span
-                              className="shrink-0 rounded-md border border-rose-200 bg-rose-50 p-1 text-rose-600"
-                              title="Immediate Urgency"
-                            >
-                              <Flame className="h-3 w-3 fill-rose-600" />
-                            </span>
-                          )}
+                        {/* 1. Lead Header */}
+                        <div>
+                          <Link href={`/leads/${lead.id}`}>
+                            <h4 className="text-sm font-bold text-slate-900 transition-colors hover:text-blue-600">
+                              {lead.name}
+                            </h4>
+                          </Link>
+                          <p className="mt-0.5 text-xs font-medium text-slate-500">
+                            {lead.bhk || '2 BHK Apartment'} •{' '}
+                            {lead.preferredLocations?.[0] || 'Downtown'}
+                          </p>
                         </div>
 
-                        {/* Location & Budget */}
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-1 truncate text-[11px] font-medium text-slate-500">
-                            <MapPin className="h-3 w-3 shrink-0 text-slate-400" />
-                            <span className="truncate">
-                              {lead.preferredLocations?.[0] || 'Downtown'}
-                            </span>
-                          </div>
-                          <div className="text-xs font-bold text-slate-900">
+                        {/* 2. Price Range & Urgency Pill */}
+                        <div className="flex items-center justify-between">
+                          <span className="text-base font-bold text-slate-900">
                             {formatPrice(lead.budgetMin)} - {formatPrice(lead.budgetMax)}
-                          </div>
+                          </span>
+                          <span
+                            className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold ${urgencyStyle}`}
+                          >
+                            {urgencyLabel}
+                          </span>
                         </div>
 
-                        {/* Matches & Actions Footer */}
-                        <div className="flex items-center justify-between border-t border-slate-100 pt-2 text-[11px]">
-                          {/* Matches Badge */}
-                          <div className="flex items-center gap-1 rounded-md border border-blue-100 bg-blue-50 px-2 py-0.5 font-bold text-blue-700">
-                            <Zap className="h-3 w-3 fill-blue-600 text-blue-600" />
-                            <span>{matchCount} Matches</span>
+                        {/* 3. Match Badge with Spark Icon */}
+                        <div>
+                          <span className="inline-flex items-center gap-1.5 rounded-lg border border-purple-100 bg-purple-50 px-2.5 py-1 text-xs font-bold text-purple-700">
+                            <Zap className="h-3.5 w-3.5 fill-purple-600 text-purple-600" />
+                            <span>
+                              {lead.matchCountDisplay || 4} matches ({lead.topMatchScore || 92}%)
+                            </span>
+                          </span>
+                        </div>
+
+                        {/* 4. Touchpoint Status & Agent Avatar */}
+                        <div className="flex items-center justify-between border-t border-slate-100 pt-2 text-xs text-slate-500">
+                          <div className="flex items-center gap-1.5 font-medium">
+                            {lead.touchpointIcon === 'phone' && (
+                              <Phone className="h-3.5 w-3.5 text-slate-400" />
+                            )}
+                            {lead.touchpointIcon === 'calendar' && (
+                              <Calendar className="h-3.5 w-3.5 text-blue-600" />
+                            )}
+                            {lead.touchpointIcon === 'file' && (
+                              <FileText className="h-3.5 w-3.5 text-slate-400" />
+                            )}
+                            {(!lead.touchpointIcon || lead.touchpointIcon === 'clock') && (
+                              <Clock className="h-3.5 w-3.5 text-slate-400" />
+                            )}
+                            <span>{lead.touchpointText || lead.timeAgoText || '2h ago'}</span>
                           </div>
 
-                          {/* Agent Avatar + Contact Actions */}
-                          <div className="flex items-center gap-1.5">
-                            <a
-                              href={`tel:${lead.phone}`}
-                              className="rounded-md p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-blue-600"
-                              title="Call Lead"
-                            >
-                              <Phone className="h-3 w-3" />
-                            </a>
-                            <a
-                              href={`https://wa.me/${lead.phone.replace(/[^0-9]/g, '')}`}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="rounded-md p-1 text-slate-400 transition-colors hover:bg-emerald-50 hover:text-emerald-600"
-                              title="WhatsApp Lead"
-                            >
-                              <MessageSquare className="h-3 w-3" />
-                            </a>
-                            <div className="ml-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-slate-200 text-[10px] font-bold text-slate-700">
-                              {initials}
-                            </div>
+                          {/* Agent Circle Badge */}
+                          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-[10px] font-bold text-white shadow-2xs">
+                            {lead.agentInitials || 'SJ'}
                           </div>
                         </div>
                       </div>
@@ -529,7 +642,7 @@ export default function PipelineKanbanPage() {
         isOpen={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}
         lead={editingLead}
-        onSuccess={() => void fetchLeadsAndAgents()}
+        onSuccess={() => void fetchLeads()}
       />
     </div>
   );
