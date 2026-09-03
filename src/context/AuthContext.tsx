@@ -1,12 +1,6 @@
 'use client';
 
-import React, {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  useCallback,
-} from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { User, AuthSession } from '@/types';
 import { apiClient, API_ENDPOINTS } from '@/lib/api-client';
@@ -35,10 +29,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const fetchCurrentUser = useCallback(async () => {
     try {
-      const token =
-        typeof window !== 'undefined'
-          ? localStorage.getItem('auth_token')
-          : null;
+      const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
       if (!token) {
         setUser(null);
         setAccessToken(null);
@@ -70,9 +61,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (isLoading) return;
 
-    const isPublicRoute = PUBLIC_ROUTES.some((route) =>
-      pathname.startsWith(route)
-    );
+    const isPublicRoute = PUBLIC_ROUTES.some((route) => pathname.startsWith(route));
 
     if (!user && !isPublicRoute) {
       router.push('/login');
