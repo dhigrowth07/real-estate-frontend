@@ -1,5 +1,7 @@
 export type UserRole = 'ADMIN' | 'AGENT';
 
+export type AgentVisibilityMode = 'ASSIGNED_ONLY' | 'ALL';
+
 export type LeadSource = 'WEBSITE' | 'REFERRAL' | 'DIRECT_CALL' | 'PORTAL' | 'WALK_IN' | 'OTHER';
 
 export type LeadPurpose = 'BUY' | 'RENT' | 'INVESTMENT';
@@ -24,6 +26,8 @@ export type PropertyStatus = 'AVAILABLE' | 'UNDER_OFFER' | 'SOLD' | 'INACTIVE';
 
 export type MatchStatus = 'NEW' | 'NOTIFIED' | 'VIEWED' | 'DISMISSED';
 
+export type NotificationType = 'MATCH_ALERT' | 'SYSTEM';
+
 export type InteractionChannel = 'CALL' | 'WHATSAPP' | 'EMAIL' | 'MEETING' | 'SMS' | 'NOTE';
 
 export type InteractionType =
@@ -34,6 +38,33 @@ export interface User {
   name: string;
   email: string;
   role: UserRole;
+  createdAt: string;
+}
+
+export interface AgencySetting {
+  id: string;
+  agentVisibilityMode: AgentVisibilityMode;
+  matchingWeights?: {
+    budgetFullMatch: number;
+    budgetPartialMatch: number;
+    locationMatch: number;
+    propertyTypeMatch: number;
+    bhkMatch: number;
+    possessionMatch: number;
+  };
+  minAlertScore: number;
+  updatedAt: string;
+}
+
+export interface Invite {
+  id: string;
+  email: string;
+  token: string;
+  role: UserRole;
+  expiresAt: string;
+  usedAt?: string | null;
+  createdById: string;
+  createdBy?: { id: string; name: string; email: string };
   createdAt: string;
 }
 
@@ -55,6 +86,10 @@ export interface Lead {
   assignedAgent?: User;
   createdAt: string;
   updatedAt?: string;
+  _count?: {
+    matches: number;
+    interactions: number;
+  };
 }
 
 export interface Property {
@@ -70,8 +105,13 @@ export interface Property {
   ownerContact: string;
   images: string[];
   status: PropertyStatus;
+  assignedAgentId?: string;
+  assignedAgent?: User;
   createdAt: string;
   updatedAt?: string;
+  _count?: {
+    matches: number;
+  };
 }
 
 export interface Match {
@@ -90,6 +130,27 @@ export interface Match {
     possessionScore: number;
   };
   createdAt: string;
+  updatedAt?: string;
+}
+
+export interface Notification {
+  id: string;
+  userId: string;
+  matchId?: string;
+  match?: Match;
+  type: NotificationType;
+  title: string;
+  message: string;
+  metadata?: {
+    score?: number;
+    leadId?: string;
+    leadName?: string;
+    propertyId?: string;
+    propertyTitle?: string;
+  };
+  isRead: boolean;
+  readAt?: string | null;
+  createdAt: string;
 }
 
 export interface Interaction {
@@ -101,6 +162,21 @@ export interface Interaction {
   timestamp: string;
   agentId: string;
   agent?: User;
+}
+
+export interface DashboardStats {
+  kpis: {
+    totalActiveLeads: number;
+    totalProperties: number;
+    hotMatchesToday: number;
+    dealsClosedThisMonth: number;
+  };
+  distributions: {
+    leadsBySource: { source: LeadSource; count: number }[];
+    leadsByStage: { stage: LeadStage; count: number }[];
+  };
+  recentLeads: Lead[];
+  agingInventory: Property[];
 }
 
 export interface ApiResponse<T> {
