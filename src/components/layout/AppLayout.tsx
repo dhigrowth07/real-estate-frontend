@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { Sidebar } from './Sidebar';
 import { TopBar } from './TopBar';
@@ -15,6 +15,7 @@ const AUTH_ROUTES = ['/login', '/signup', '/accept-invite'];
 export function AppLayout({ children }: AppLayoutProps) {
   const pathname = usePathname();
   const { user, logout, isLoading } = useAuth();
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
 
   const isAuthRoute = AUTH_ROUTES.some((route) => pathname.startsWith(route));
 
@@ -35,18 +36,35 @@ export function AppLayout({ children }: AppLayoutProps) {
 
   return (
     <div className="flex min-h-screen bg-slate-50 text-slate-900">
-      {/* Sidebar navigation */}
+      {/* Desktop Sidebar navigation */}
       <Sidebar className="fixed inset-y-0 left-0 z-40 hidden lg:flex" />
+
+      {/* Mobile Sidebar with Backdrop */}
+      {isMobileNavOpen && (
+        <div className="fixed inset-0 z-50 flex lg:hidden">
+          {/* Backdrop */}
+          <div
+            onClick={() => setIsMobileNavOpen(false)}
+            className="animate-in fade-in fixed inset-0 bg-slate-900/40 backdrop-blur-xs transition-opacity"
+          />
+
+          {/* Slide-out Sidebar */}
+          <div className="animate-in slide-in-from-left relative z-10 h-full w-64 bg-white shadow-2xl duration-200">
+            <Sidebar className="h-full w-full border-none" />
+          </div>
+        </div>
+      )}
 
       {/* Main content area */}
       <div className="flex flex-1 flex-col lg:pl-64">
         <TopBar
-          userName={user?.name || 'User'}
+          userName={user?.name || 'Alex Mercer'}
           userRole={user?.role || 'AGENT'}
-          userEmail={user?.email || ''}
+          userEmail={user?.email || 'alex.mercer@estatenexus.com'}
           onLogout={logout}
+          onMenuToggle={() => setIsMobileNavOpen(true)}
         />
-        <main className="mx-auto w-full max-w-7xl flex-1 p-6 md:p-8">{children}</main>
+        <main className="mx-auto w-full max-w-7xl flex-1 p-4 md:p-8">{children}</main>
       </div>
     </div>
   );
