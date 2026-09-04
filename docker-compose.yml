@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  frontend:
+    image: ${AWS_ECR_REGISTRY:-375291783713.dkr.ecr.us-east-1.amazonaws.com}/${ECR_REPOSITORY_FRONTEND:-infragen-web}:${IMAGE_TAG:-latest}
+    container_name: infragen_web
+    restart: unless-stopped
+    ports:
+      - "3010:3000"
