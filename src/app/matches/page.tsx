@@ -1,8 +1,19 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef, Suspense } from 'react';
 import Link from 'next/link';
-import { Mail, MessageSquare, X, RefreshCw, User, MapPin, CheckCircle } from 'lucide-react';
+import { useSearchParams, useRouter } from 'next/navigation';
+import {
+  Mail,
+  MessageSquare,
+  X,
+  RefreshCw,
+  User,
+  MapPin,
+  CheckCircle,
+  Filter,
+  Sparkles,
+} from 'lucide-react';
 import { apiClient, API_ENDPOINTS } from '@/lib/api-client';
 import { Match, MatchStatus } from '@/types';
 
@@ -18,12 +29,21 @@ function formatPrice(amount: number): string {
 
 type TabType = 'ALL' | 'NEW' | 'HIGH' | 'MEDIUM' | 'DISMISSED';
 
-export default function MatchesAndAlertsPage() {
+function MatchesContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const matchIdParam = searchParams.get('matchId');
+  const leadIdParam = searchParams.get('leadId');
+  const propertyIdParam = searchParams.get('propertyId');
+
   const [matches, setMatches] = useState<Match[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>('ALL');
   const [sortBy, setSortBy] = useState<'score' | 'recency'>('score');
+  const [highlightedMatchId, setHighlightedMatchId] = useState<string | null>(matchIdParam);
+
+  const scrolledRef = useRef(false);
 
   const fetchMatches = useCallback(async () => {
     try {
@@ -44,9 +64,34 @@ export default function MatchesAndAlertsPage() {
     return () => clearTimeout(timer);
   }, [fetchMatches]);
 
+  useEffect(() => {
+    if (matchIdParam) {
+      setHighlightedMatchId(matchIdParam);
+    }
+  }, [matchIdParam]);
+
+  // Auto-scroll to target match card when matches load or URL changes
+  useEffect(() => {
+    if (!isLoading && matches.length > 0 && !scrolledRef.current) {
+      const targetId = matchIdParam || (leadIdParam ? matches.find(m => m.leadId === leadIdParam)?.id : null);
+      if (targetId) {
+        const el = document.getElementById(`match-${targetId}`);
+        if (el) {
+          scrolledRef.current = true;
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }
+    }
+  }, [isLoading, matches, matchIdParam, leadIdParam]);
+
   const handleRefresh = () => {
     setIsRefreshing(true);
     void fetchMatches();
+  };
+
+  const handleClearFilters = () => {
+    setHighlightedMatchId(null);
+    router.push('/matches');
   };
 
   const handleUpdateStatus = async (matchId: string, newStatus: MatchStatus) => {
@@ -66,9 +111,12 @@ export default function MatchesAndAlertsPage() {
     alert(`Alert notification sent to agent for ${match.lead?.name}!`);
   };
 
-  // Filter matching tabs
+  // Filter matching tabs + URL query parameters (if leadId or propertyId is specified)
   const filteredMatches = matches
     .filter((m) => {
+      if (leadIdParam && m.leadId !== leadIdParam && m.id !== matchIdParam) return false;
+      if (propertyIdParam && m.propertyId !== propertyIdParam && m.id !== matchIdParam) return false;
+
       if (activeTab === 'NEW') return m.status === 'NEW';
       if (activeTab === 'HIGH') return m.score >= 80;
       if (activeTab === 'MEDIUM') return m.score >= 50 && m.score < 80;
@@ -76,15 +124,21 @@ export default function MatchesAndAlertsPage() {
       return m.status !== 'DISMISSED';
     })
     .sort((a, b) => {
+      // Pin targeted match to the top if highlighted
+      if (highlightedMatchId) {
+        if (a.id === highlightedMatchId) return -1;
+        if (b.id === highlightedMatchId) return 1;
+      }
       if (sortBy === 'score') return b.score - a.score;
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
 
   const newCount = matches.filter((m) => m.status === 'NEW').length;
+  const hasActiveUrlFilter = Boolean(matchIdParam || leadIdParam || propertyIdParam);
 
   return (
     <div className="mx-auto max-w-[1440px] space-y-6">
-      {/* Page Header matching HTML & Screenshot */}
+      {/* Page Header */}
       <div>
         <h1 className="text-2xl font-bold tracking-tight text-slate-900 md:text-3xl">
           Matches & Alerts
@@ -93,6 +147,29 @@ export default function MatchesAndAlertsPage() {
           Monitor system-generated matches between leads and listings.
         </p>
       </div>
+
+      {/* Active Filter Notification Banner */}
+      {hasActiveUrlFilter && (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-blue-200 bg-blue-50/70 p-3.5 shadow-2xs">
+          <div className="flex items-center gap-2 text-xs font-semibold text-blue-900">
+            <Sparkles className="h-4 w-4 text-blue-600" />
+            <span>
+              {matchIdParam
+                ? 'Viewing targeted match alert'
+                : leadIdParam
+                  ? 'Showing high-compatibility matches for the selected lead'
+                  : 'Showing matched buyers for the selected property'}
+            </span>
+          </div>
+          <button
+            onClick={handleClearFilters}
+            className="flex cursor-pointer items-center gap-1 rounded-lg border border-blue-300 bg-white px-2.5 py-1 text-xs font-bold text-blue-700 shadow-2xs hover:bg-blue-50"
+          >
+            <X className="h-3.5 w-3.5" />
+            <span>Clear Filter (Show All)</span>
+          </button>
+        </div>
+      )}
 
       {/* Controls & Filter Tabs Bar */}
       <div className="flex flex-col items-start justify-between gap-4 border-b border-slate-200 pb-1 md:flex-row md:items-center">
@@ -116,7 +193,7 @@ export default function MatchesAndAlertsPage() {
                 : 'border-transparent text-slate-500 hover:text-slate-900'
             }`}
           >
-            New ({newCount || 12})
+            New ({newCount || 0})
           </button>
           <button
             onClick={() => setActiveTab('HIGH')}
@@ -183,8 +260,19 @@ export default function MatchesAndAlertsPage() {
           <CheckCircle className="mx-auto h-8 w-8 text-slate-300" />
           <p className="mt-2 text-base font-bold text-slate-900">No matches found</p>
           <p className="mt-0.5 text-xs text-slate-500">
-            There are currently no active matches for the selected tab.
+            {hasActiveUrlFilter
+              ? 'No matches match your current query filters.'
+              : 'There are currently no active matches for the selected tab.'}
           </p>
+          {hasActiveUrlFilter && (
+            <button
+              onClick={handleClearFilters}
+              className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-blue-700"
+            >
+              <Filter className="h-3.5 w-3.5" />
+              <span>Show All Matches</span>
+            </button>
+          )}
         </div>
       ) : (
         <div className="flex flex-col gap-4">
@@ -193,6 +281,7 @@ export default function MatchesAndAlertsPage() {
             const prop = match.property;
             const isHigh = match.score >= 80;
             const isMedium = match.score >= 50 && match.score < 80;
+            const isTargeted = match.id === highlightedMatchId || match.id === matchIdParam;
 
             const leadInitials = lead?.name
               ? lead.name
@@ -211,8 +300,13 @@ export default function MatchesAndAlertsPage() {
             return (
               <div
                 key={match.id}
-                className={`rounded-xl border border-l-4 border-slate-200 bg-white shadow-xs transition-all hover:shadow-md ${
-                  isHigh ? 'border-l-blue-600' : 'border-l-amber-500'
+                id={`match-${match.id}`}
+                className={`rounded-xl border border-l-4 bg-white shadow-xs transition-all hover:shadow-md ${
+                  isTargeted
+                    ? 'border-blue-600 ring-2 ring-blue-600/30'
+                    : isHigh
+                      ? 'border-slate-200 border-l-blue-600'
+                      : 'border-slate-200 border-l-amber-500'
                 } relative flex flex-col overflow-hidden md:flex-row`}
               >
                 {/* Left: Lead Information */}
@@ -230,6 +324,11 @@ export default function MatchesAndAlertsPage() {
                       <div className="flex items-center gap-1 text-xs font-medium text-slate-500">
                         <User className="h-3 w-3 text-slate-400" />
                         <span>Hot Lead</span>
+                        {isTargeted && (
+                          <span className="ml-1 rounded-sm bg-blue-100 px-1 py-0.5 text-[9px] font-bold text-blue-700">
+                            Target Alert
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -306,7 +405,7 @@ export default function MatchesAndAlertsPage() {
                   </div>
                 </div>
 
-                {/* Action Bar matching Screenshot & HTML */}
+                {/* Action Bar */}
                 <div className="flex shrink-0 flex-row items-center justify-end gap-2 border-slate-200 bg-slate-50/80 p-3 md:flex-col md:justify-center md:border-l">
                   <button
                     onClick={() => handleNotify(match)}
@@ -338,5 +437,20 @@ export default function MatchesAndAlertsPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function MatchesAndAlertsPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="mx-auto max-w-[1440px] animate-pulse space-y-4">
+          <div className="h-8 w-48 rounded-md bg-slate-200" />
+          <div className="h-32 rounded-xl border border-slate-200 bg-white" />
+        </div>
+      }
+    >
+      <MatchesContent />
+    </Suspense>
   );
 }

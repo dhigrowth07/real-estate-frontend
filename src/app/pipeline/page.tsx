@@ -18,6 +18,7 @@ import {
 import { LeadFormDrawer } from '@/components/leads/LeadFormDrawer';
 import { apiClient, API_ENDPOINTS } from '@/lib/api-client';
 import { Lead, LeadStage, User } from '@/types';
+import { formatTimeAgo } from '@/lib/utils';
 
 function formatPrice(amount: number): string {
   if (amount >= 10000000) {
@@ -78,14 +79,44 @@ export default function PipelinePage() {
         apiClient.get<User[]>(API_ENDPOINTS.USERS.LIST),
       ]);
       if (Array.isArray(leadsData)) {
-        const enhanced: LeadCardData[] = leadsData.map((l) => ({
-          ...l,
-          agentInitials: l.assignedAgent?.name
-            ? l.assignedAgent.name.substring(0, 2).toUpperCase()
-            : undefined,
-          topMatchScore: l.matches?.[0]?.score,
-          matchCountDisplay: l.matches?.length,
-        }));
+        const enhanced: LeadCardData[] = leadsData.map((l) => {
+          const latestInteraction =
+            l.interactions && l.interactions.length > 0
+              ? [...l.interactions].sort(
+                  (a, b) =>
+                    new Date(b.timestamp || (b as any).createdAt).getTime() -
+                    new Date(a.timestamp || (a as any).createdAt).getTime()
+                )[0]
+              : null;
+
+          let touchpointIcon: LeadCardData['touchpointIcon'] = 'clock';
+          let touchpointText = formatTimeAgo(l.updatedAt || l.createdAt);
+
+          if (latestInteraction) {
+            const channel = latestInteraction.channel;
+            if (channel === 'CALL') touchpointIcon = 'phone';
+            else if (channel === 'MEETING' || latestInteraction.type === 'SITE_VISIT')
+              touchpointIcon = 'calendar';
+            else if (channel === 'EMAIL' || channel === 'NOTE') touchpointIcon = 'file';
+            else touchpointIcon = 'phone';
+
+            touchpointText = formatTimeAgo(
+              latestInteraction.timestamp || (latestInteraction as any).createdAt
+            );
+          }
+
+          return {
+            ...l,
+            agentInitials: l.assignedAgent?.name
+              ? l.assignedAgent.name.substring(0, 2).toUpperCase()
+              : undefined,
+            topMatchScore: l.matches?.[0]?.score ? Math.round(l.matches[0].score) : undefined,
+            matchCountDisplay: l._count?.matches ?? l.matches?.length,
+            timeAgoText: formatTimeAgo(l.updatedAt || l.createdAt),
+            touchpointText,
+            touchpointIcon,
+          };
+        });
         setLeads(enhanced);
       } else {
         setLeads([]);
@@ -472,7 +503,11 @@ export default function PipelinePage() {
                             {(!lead.touchpointIcon || lead.touchpointIcon === 'clock') && (
                               <Clock className="h-3.5 w-3.5 text-slate-400" />
                             )}
-                            <span>{lead.touchpointText || lead.timeAgoText || '2h ago'}</span>
+                            <span>
+                              {lead.touchpointText ||
+                                lead.timeAgoText ||
+                                formatTimeAgo(lead.updatedAt || lead.createdAt)}
+                            </span>
                           </div>
 
                           {/* Agent Circle Badge */}
