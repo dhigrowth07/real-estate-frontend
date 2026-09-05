@@ -124,6 +124,8 @@ export interface Match {
   property?: Property;
   score: number;
   status: MatchStatus;
+  isExplicit?: boolean;
+  breakdown?: Record<string, unknown>;
   createdAt: string;
   updatedAt?: string;
 }

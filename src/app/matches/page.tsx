@@ -279,6 +279,7 @@ function MatchesContent() {
           {filteredMatches.map((match) => {
             const lead = match.lead;
             const prop = match.property;
+            const isExplicit = match.isExplicit || (match.breakdown as any)?.isExplicit;
             const isHigh = match.score >= 80;
             const isMedium = match.score >= 50 && match.score < 80;
             const isTargeted = match.id === highlightedMatchId || match.id === matchIdParam;
@@ -304,9 +305,11 @@ function MatchesContent() {
                 className={`rounded-xl border border-l-4 bg-white shadow-xs transition-all hover:shadow-md ${
                   isTargeted
                     ? 'border-blue-600 ring-2 ring-blue-600/30'
-                    : isHigh
-                      ? 'border-slate-200 border-l-blue-600'
-                      : 'border-slate-200 border-l-amber-500'
+                    : isExplicit
+                      ? 'border-indigo-200 border-l-indigo-600 bg-indigo-50/10'
+                      : isHigh
+                        ? 'border-slate-200 border-l-emerald-600'
+                        : 'border-slate-200 border-l-amber-500'
                 } relative flex flex-col overflow-hidden md:flex-row`}
               >
                 {/* Left: Lead Information */}
@@ -324,7 +327,13 @@ function MatchesContent() {
                       <div className="flex items-center gap-1 text-xs font-medium text-slate-500">
                         <User className="h-3 w-3 text-slate-400" />
                         <span>Hot Lead</span>
-                        {isTargeted && (
+                        {isExplicit && (
+                          <span className="ml-1 inline-flex items-center gap-1 rounded-sm bg-indigo-100 px-1.5 py-0.5 text-[9px] font-bold text-indigo-700">
+                            <Sparkles className="h-2.5 w-2.5 text-indigo-600" />
+                            Direct Inquiry
+                          </span>
+                        )}
+                        {isTargeted && !isExplicit && (
                           <span className="ml-1 rounded-sm bg-blue-100 px-1 py-0.5 text-[9px] font-bold text-blue-700">
                             Target Alert
                           </span>
@@ -355,16 +364,24 @@ function MatchesContent() {
                   <div className="absolute top-1/2 -z-10 hidden h-[1px] w-full bg-slate-200 md:block" />
                   <div
                     className={`h-14 w-14 rounded-full border-4 ${
-                      isHigh
-                        ? 'border-emerald-500'
-                        : isMedium
-                          ? 'border-amber-500'
-                          : 'border-slate-300'
+                      isExplicit
+                        ? 'border-indigo-500 ring-2 ring-indigo-200'
+                        : isHigh
+                          ? 'border-emerald-500'
+                          : isMedium
+                            ? 'border-amber-500'
+                            : 'border-slate-300'
                     } relative z-20 flex items-center justify-center bg-white shadow-2xs`}
                   >
                     <span
                       className={`text-sm font-bold ${
-                        isHigh ? 'text-emerald-700' : isMedium ? 'text-amber-700' : 'text-slate-700'
+                        isExplicit
+                          ? 'text-indigo-700'
+                          : isHigh
+                            ? 'text-emerald-700'
+                            : isMedium
+                              ? 'text-amber-700'
+                              : 'text-slate-700'
                       }`}
                     >
                       {match.score}%
@@ -372,10 +389,14 @@ function MatchesContent() {
                   </div>
                   <span
                     className={`text-[10px] font-bold tracking-wider uppercase ${
-                      isHigh ? 'text-emerald-600' : 'text-amber-600'
+                      isExplicit
+                        ? 'text-indigo-600'
+                        : isHigh
+                          ? 'text-emerald-600'
+                          : 'text-amber-600'
                     } z-20`}
                   >
-                    Match
+                    {isExplicit ? 'Direct' : 'Match'}
                   </span>
                 </div>
 
