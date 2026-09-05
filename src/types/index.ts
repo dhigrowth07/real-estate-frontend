@@ -75,6 +75,7 @@ export interface Lead {
   phone: string;
   email?: string;
   source: LeadSource;
+  sources?: string[];
   budgetMin: number;
   budgetMax: number;
   preferredLocations: string[];
@@ -91,6 +92,7 @@ export interface Lead {
   interestedProperty?: Property;
   matches?: Match[];
   interactions?: Interaction[];
+  conversations?: Conversation[];
   createdAt: string;
   updatedAt?: string;
   _count?: {
