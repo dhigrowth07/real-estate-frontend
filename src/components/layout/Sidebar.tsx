@@ -10,6 +10,7 @@ import {
   Building2,
   BellRing,
   Kanban,
+  MessageSquare,
   Users2,
   Settings,
 } from 'lucide-react';
@@ -17,6 +18,7 @@ import { useAuth } from '@/hooks/useAuth';
 
 const NAV_ITEMS = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
+  { name: 'Inbox', href: '/inbox', icon: MessageSquare },
   { name: 'Leads', href: '/leads', icon: UserSearch },
   { name: 'Inventory', href: '/properties', icon: Building2 },
   { name: 'Matches', href: '/matches', icon: BellRing },

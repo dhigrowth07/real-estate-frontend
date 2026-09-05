@@ -85,6 +85,10 @@ export interface Lead {
   stage: LeadStage;
   assignedAgentId?: string;
   assignedAgent?: User;
+  instagramUserId?: string;
+  whatsappOptIn?: boolean;
+  interestedPropertyId?: string;
+  interestedProperty?: Property;
   matches?: Match[];
   interactions?: Interaction[];
   createdAt: string;
@@ -182,4 +186,37 @@ export interface AuthSession {
   user: User;
   token?: string;
   accessToken?: string;
+}
+
+export type ChannelType = 'WHATSAPP' | 'INSTAGRAM';
+
+export type MessageDirection = 'INBOUND' | 'OUTBOUND';
+
+export type MessageType = 'TEXT' | 'TEMPLATE' | 'AUTO_REPLY';
+
+export type MessageStatus = 'RECEIVED' | 'SENT' | 'DELIVERED' | 'READ' | 'FAILED';
+
+export interface Message {
+  id: string;
+  conversationId: string;
+  direction: MessageDirection;
+  rawText: string;
+  messageType: MessageType;
+  externalMessageId?: string | null;
+  status: MessageStatus;
+  createdAt: string;
+}
+
+export interface Conversation {
+  id: string;
+  leadId?: string | null;
+  lead?: Lead | null;
+  channel: ChannelType;
+  externalId: string;
+  windowOpenUntil?: string | null;
+  messages?: Message[];
+  lastMessage?: Message | null;
+  unreadCount?: number;
+  createdAt: string;
+  updatedAt: string;
 }

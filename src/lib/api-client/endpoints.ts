@@ -55,6 +55,12 @@ export const API_ENDPOINTS = {
     CREATE: '/post-mappings',
     DELETE: (id: string) => `/post-mappings/${encodeURIComponent(id)}`,
   },
+  CONVERSATIONS: {
+    LIST: '/conversations',
+    DETAIL: (id: string) => `/conversations/${encodeURIComponent(id)}`,
+    SEND_MESSAGE: (id: string) => `/conversations/${encodeURIComponent(id)}/messages`,
+    MARK_READ: (id: string) => `/conversations/${encodeURIComponent(id)}/read`,
+  },
   SETTINGS: {
     GET: '/settings',
     UPDATE: '/settings',
