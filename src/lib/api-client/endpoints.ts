@@ -49,6 +49,12 @@ export const API_ENDPOINTS = {
     RECENT_LEADS: '/dashboard/recent-leads',
     AGING_INVENTORY: '/dashboard/aging-inventory',
   },
+  POST_MAPPINGS: {
+    LIST: '/post-mappings',
+    BY_PROPERTY: (propertyId: string) => `/post-mappings?propertyId=${encodeURIComponent(propertyId)}`,
+    CREATE: '/post-mappings',
+    DELETE: (id: string) => `/post-mappings/${encodeURIComponent(id)}`,
+  },
   SETTINGS: {
     GET: '/settings',
     UPDATE: '/settings',

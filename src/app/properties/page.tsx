@@ -18,6 +18,24 @@ import { apiClient, API_ENDPOINTS } from '@/lib/api-client';
 import { Property, PropertyStatus } from '@/types';
 import { getImageUrl } from '@/lib/utils';
 
+function InstagramIcon({ className = 'h-4 w-4' }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+      <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+    </svg>
+  );
+}
+
 function formatPrice(amount: number): string {
   if (amount >= 10000000) {
     return `₹${(amount / 10000000).toFixed(2)} Cr`;
@@ -247,6 +265,14 @@ export default function PropertiesPage() {
             >
               <RefreshCw className={`h-3.5 w-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
             </button>
+
+            <Link
+              href="/properties/post-mappings"
+              className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-pink-200 bg-pink-50/70 px-3 py-2 text-xs font-bold text-pink-700 shadow-2xs transition-colors hover:bg-pink-100"
+            >
+              <InstagramIcon className="h-3.5 w-3.5" />
+              <span>Instagram Links</span>
+            </Link>
 
             {/* Add Property Primary Button */}
             <button

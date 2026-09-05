@@ -20,6 +20,7 @@ import {
   Cpu,
 } from 'lucide-react';
 import { PropertyFormDrawer } from '@/components/properties/PropertyFormDrawer';
+import { PropertyPostMappings } from '@/components/properties/PropertyPostMappings';
 import { apiClient, API_ENDPOINTS } from '@/lib/api-client';
 import { Property, Match, PropertyStatus } from '@/types';
 import { getImageUrl } from '@/lib/utils';
@@ -356,6 +357,14 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
             </button>
           </div>
         </div>
+      </div>
+
+      {/* Stage P2-12: Post-to-Property Instagram Linking Section */}
+      <div className="mt-8">
+        <PropertyPostMappings
+          propertyId={property.id}
+          propertyTitle={property.title}
+        />
       </div>
 
       {/* Matching Leads Section matching Screenshot & HTML */}

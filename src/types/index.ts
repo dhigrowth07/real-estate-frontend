@@ -130,6 +130,14 @@ export interface Match {
   updatedAt?: string;
 }
 
+export interface PostPropertyMapping {
+  id: string;
+  instagramMediaId: string;
+  propertyId: string;
+  property?: Property;
+  createdAt: string;
+}
+
 export interface Interaction {
   id: string;
   leadId: string;
