@@ -10,16 +10,23 @@ export interface AppLayoutProps {
   children: React.ReactNode;
 }
 
-const AUTH_ROUTES = ['/login', '/signup', '/accept-invite'];
+const PUBLIC_ROUTES = [
+  '/login',
+  '/signup',
+  '/accept-invite',
+  '/privacy',
+  '/terms',
+  '/data-deletion',
+];
 
 export function AppLayout({ children }: AppLayoutProps) {
   const pathname = usePathname();
   const { user, logout, isLoading } = useAuth();
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
 
-  const isAuthRoute = AUTH_ROUTES.some((route) => pathname.startsWith(route));
+  const isPublicRoute = PUBLIC_ROUTES.some((route) => pathname.startsWith(route));
 
-  if (isAuthRoute) {
+  if (isPublicRoute) {
     return <div className="min-h-screen bg-slate-50">{children}</div>;
   }
 
