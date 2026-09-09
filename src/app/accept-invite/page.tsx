@@ -87,7 +87,7 @@ function AcceptInviteForm() {
             <div>
               <p className="font-bold">Agent Onboarding</p>
               <p className="mt-0.5 text-emerald-800">
-                You have been invited to join the Infragen matching workspace. Set your name and
+                You have been invited to join the PropCRM matching workspace. Set your name and
                 secure password below.
               </p>
             </div>

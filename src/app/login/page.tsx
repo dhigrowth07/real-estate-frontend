@@ -50,11 +50,11 @@ export default function LoginPage() {
         {/* Brand Logo & Header */}
         <div className="flex justify-center">
           <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-600 text-xl font-black text-white shadow-lg shadow-blue-500/30">
-            IG
+            PC
           </div>
         </div>
         <h2 className="mt-4 text-center text-2xl font-black tracking-tight text-slate-900 sm:text-3xl">
-          Infragen
+          PropCRM
         </h2>
         <p className="mt-1 text-center text-sm text-slate-500">Sign in to your workspace</p>
       </div>

@@ -21,7 +21,7 @@ export interface TopBarProps {
 export function TopBar({
   userName = 'Alex Mercer',
   userRole = 'AGENT',
-  userEmail = 'alex.mercer@infragen.io',
+  userEmail = 'alex.mercer@propcrm.io',
   onSearch,
   onLogout,
   onMenuToggle,

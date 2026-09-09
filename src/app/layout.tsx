@@ -4,9 +4,9 @@ import { AuthProvider } from '@/context/AuthContext';
 import { AppLayout } from '@/components/layout/AppLayout';
 
 export const metadata: Metadata = {
-  title: 'Infragen • Smart Real Estate CRM',
+  title: 'PropCRM • Smart Real Estate CRM',
   description:
-    'Infragen — Intelligent lead-property matching CRM with automated follow-ups, real-time alerts, and pipeline management for real estate agencies.',
+    'PropCRM — Intelligent lead-property matching CRM with automated follow-ups, real-time alerts, and pipeline management for real estate agencies.',
 };
 
 export default function RootLayout({

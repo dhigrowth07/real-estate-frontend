@@ -60,7 +60,7 @@ export function AppLayout({ children }: AppLayoutProps) {
         <TopBar
           userName={user?.name || 'Alex Mercer'}
           userRole={user?.role || 'AGENT'}
-          userEmail={user?.email || 'alex.mercer@infragen.io'}
+          userEmail={user?.email || 'alex.mercer@propcrm.io'}
           onLogout={logout}
           onMenuToggle={() => setIsMobileNavOpen(true)}
         />
