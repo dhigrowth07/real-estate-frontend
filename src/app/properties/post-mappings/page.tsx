@@ -60,7 +60,9 @@ export default function PostMappingsManagementPage() {
         apiClient.get<any>(API_ENDPOINTS.PROPERTIES.LIST),
       ]);
 
-      if (mappingsRes && 'data' in mappingsRes && Array.isArray(mappingsRes.data)) {
+      if (mappingsRes && 'mappings' in mappingsRes && Array.isArray(mappingsRes.mappings)) {
+        setMappings(mappingsRes.mappings);
+      } else if (mappingsRes && 'data' in mappingsRes && Array.isArray(mappingsRes.data)) {
         setMappings(mappingsRes.data);
       } else if (Array.isArray(mappingsRes)) {
         setMappings(mappingsRes);

@@ -37,10 +37,11 @@ interface PropertyPostMappingsProps {
 }
 
 interface PostMappingsApiResponse {
-  data: PostPropertyMapping[];
-  total: number;
-  page: number;
-  limit: number;
+  mappings?: PostPropertyMapping[];
+  data?: PostPropertyMapping[];
+  total?: number;
+  page?: number;
+  limit?: number;
 }
 
 export function PropertyPostMappings({
@@ -62,7 +63,9 @@ export function PropertyPostMappings({
       const res = await apiClient.get<PostMappingsApiResponse | PostPropertyMapping[]>(
         API_ENDPOINTS.POST_MAPPINGS.BY_PROPERTY(propertyId)
       );
-      if (res && 'data' in res && Array.isArray(res.data)) {
+      if (res && 'mappings' in res && Array.isArray(res.mappings)) {
+        setMappings(res.mappings);
+      } else if (res && 'data' in res && Array.isArray(res.data)) {
         setMappings(res.data);
       } else if (Array.isArray(res)) {
         setMappings(res);
