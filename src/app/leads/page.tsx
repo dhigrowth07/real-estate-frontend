@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { LeadFormDrawer } from '@/components/leads/LeadFormDrawer';
+import { QualificationPill } from '@/components/ui/QualificationPill';
 import { apiClient, API_ENDPOINTS } from '@/lib/api-client';
 import { Lead } from '@/types';
 
@@ -89,6 +90,7 @@ export default function LeadsPage() {
   // Filters
   const [sourceFilter, setSourceFilter] = useState<string>('ALL');
   const [stageFilter, setStageFilter] = useState<string>('ALL');
+  const [qualificationFilter, setQualificationFilter] = useState<string>('ALL');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
   // Pagination
@@ -104,6 +106,7 @@ export default function LeadsPage() {
       const params: Record<string, string | undefined> = {};
       if (sourceFilter !== 'ALL') params.source = sourceFilter;
       if (stageFilter !== 'ALL') params.stage = stageFilter;
+      if (qualificationFilter !== 'ALL') params.qualificationStatus = qualificationFilter;
       if (searchQuery) params.search = searchQuery;
 
       const data = await apiClient.get<Lead[]>(API_ENDPOINTS.LEADS.LIST, params);
@@ -114,7 +117,7 @@ export default function LeadsPage() {
       setIsLoading(false);
       setIsRefreshing(false);
     }
-  }, [sourceFilter, stageFilter, searchQuery]);
+  }, [sourceFilter, stageFilter, qualificationFilter, searchQuery]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -142,10 +145,24 @@ export default function LeadsPage() {
     void fetchLeads();
   };
 
+  // Filter leads locally in case backend filtering is partial
+  const filteredLeads = leads.filter((lead) => {
+    if (qualificationFilter !== 'ALL') {
+      const status = lead.qualificationStatus || 'UNQUALIFIED';
+      if (status !== qualificationFilter) return false;
+    }
+    return true;
+  });
+
+  // Count leads needing human attention (REQUESTED_AGENT)
+  const requestedAgentCount = leads.filter(
+    (l) => l.qualificationStatus === 'REQUESTED_AGENT'
+  ).length;
+
   // Pagination calculation
-  const totalLeads = leads.length;
+  const totalLeads = filteredLeads.length;
   const totalPages = Math.ceil(totalLeads / pageSize) || 1;
-  const paginatedLeads = leads.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  const paginatedLeads = filteredLeads.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   return (
     <div className="space-y-6">
@@ -196,6 +213,8 @@ export default function LeadsPage() {
               <option value="REFERRAL">Referral</option>
               <option value="DIRECT_CALL">Direct Call</option>
               <option value="WALK_IN">Walk-in</option>
+              <option value="INSTAGRAM">Instagram</option>
+              <option value="WHATSAPP">WhatsApp</option>
             </select>
             <ChevronDown className="pointer-events-none absolute top-1/2 right-2.5 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
           </div>
@@ -218,6 +237,29 @@ export default function LeadsPage() {
               <option value="NEGOTIATION">Negotiation</option>
               <option value="CLOSED_WON">Closed Won</option>
               <option value="CLOSED_LOST">Closed Lost</option>
+            </select>
+            <ChevronDown className="pointer-events-none absolute top-1/2 right-2.5 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
+          </div>
+
+          {/* Qualification Filter Dropdown */}
+          <div className="relative">
+            <select
+              value={qualificationFilter}
+              onChange={(e) => {
+                setQualificationFilter(e.target.value);
+                setCurrentPage(1);
+              }}
+              className={`cursor-pointer appearance-none rounded-lg border py-2 pr-8 pl-3.5 text-xs font-semibold shadow-xs focus:ring-1 focus:ring-blue-600 focus:outline-hidden ${
+                qualificationFilter === 'REQUESTED_AGENT'
+                  ? 'border-blue-300 bg-blue-50 text-blue-800'
+                  : 'border-slate-200 bg-white text-slate-700'
+              }`}
+            >
+              <option value="ALL">All Qualification</option>
+              <option value="REQUESTED_AGENT">👤 Requested Agent {requestedAgentCount > 0 ? `(${requestedAgentCount})` : ''}</option>
+              <option value="IN_PROGRESS">⏳ In Progress</option>
+              <option value="QUALIFIED">✅ Qualified</option>
+              <option value="UNQUALIFIED">⚪ Unqualified</option>
             </select>
             <ChevronDown className="pointer-events-none absolute top-1/2 right-2.5 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
           </div>
@@ -278,6 +320,7 @@ export default function LeadsPage() {
                   <th className="px-4 py-3 whitespace-nowrap">Lead Name</th>
                   <th className="px-4 py-3 whitespace-nowrap">Contact</th>
                   <th className="px-4 py-3 whitespace-nowrap">Budget & Location</th>
+                  <th className="px-4 py-3 whitespace-nowrap">Qualification</th>
                   <th className="px-4 py-3 whitespace-nowrap">Stage</th>
                   <th className="px-4 py-3 text-center whitespace-nowrap">Matches</th>
                   <th className="px-4 py-3 whitespace-nowrap">Agent</th>
@@ -286,7 +329,8 @@ export default function LeadsPage() {
               </thead>
               <tbody className="divide-y divide-slate-100 text-sm font-normal">
                 {paginatedLeads.map((lead) => {
-                  const initials = lead.name
+                  const displayName = lead.name || 'Unnamed Lead';
+                  const initials = displayName
                     .split(' ')
                     .map((n) => n[0])
                     .join('')
@@ -316,7 +360,7 @@ export default function LeadsPage() {
                           </div>
                           <div className="min-w-0">
                             <p className="truncate font-bold text-slate-900 transition-colors group-hover:text-blue-600">
-                              {lead.name}
+                              {displayName}
                             </p>
                             <p className="truncate text-xs text-slate-500">
                               Looking for {lead.bhk ? `${lead.bhk} ` : ''}
@@ -342,12 +386,26 @@ export default function LeadsPage() {
                       {/* Budget & Location */}
                       <td className="px-4 py-3.5">
                         <p className="font-bold text-slate-900">
-                          ₹{(lead.budgetMin / 100000).toFixed(0)}L - ₹
-                          {(lead.budgetMax / 100000).toFixed(0)}L
+                          {lead.budgetMin != null && lead.budgetMax != null
+                            ? `₹${(lead.budgetMin / 100000).toFixed(0)}L - ₹${(lead.budgetMax / 100000).toFixed(0)}L`
+                            : lead.budgetMax != null
+                            ? `Up to ₹${(lead.budgetMax / 100000).toFixed(0)}L`
+                            : lead.budgetMin != null
+                            ? `From ₹${(lead.budgetMin / 100000).toFixed(0)}L`
+                            : 'Budget Unspecified'}
                         </p>
                         <p className="max-w-[160px] truncate text-xs text-slate-500">
                           {lead.preferredLocations?.join(', ') || 'Any Location'}
                         </p>
+                      </td>
+
+                      {/* Qualification */}
+                      <td className="px-4 py-3.5 whitespace-nowrap">
+                        <QualificationPill
+                          status={lead.qualificationStatus}
+                          lead={lead}
+                          showProgress
+                        />
                       </td>
 
                       {/* Stage */}

@@ -33,6 +33,8 @@ import {
   Radio,
 } from 'lucide-react';
 import { LeadFormDrawer } from '@/components/leads/LeadFormDrawer';
+import { QualificationPill } from '@/components/ui/QualificationPill';
+import { InteractiveChatMessage } from '@/components/ui/InteractiveChatMessage';
 import { apiClient, API_ENDPOINTS } from '@/lib/api-client';
 import {
   Lead,
@@ -396,6 +398,12 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
             <span className="rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-bold text-blue-800">
               {lead.stage.replace(/_/g, ' ')}
             </span>
+            <QualificationPill
+              status={lead.qualificationStatus}
+              lead={lead}
+              showProgress={true}
+              size="md"
+            />
             {isHighUrgency && (
               <span className="flex items-center gap-1 rounded-full border border-rose-200 bg-rose-50 px-2.5 py-0.5 text-xs font-semibold text-rose-700">
                 <Flame className="h-3 w-3 fill-rose-600" />
@@ -515,7 +523,7 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2 text-sm font-bold text-slate-900">
                 <SlidersHorizontal className="h-4 w-4 text-slate-600" />
-                <span>Preferences</span>
+                <span>Requirements</span>
               </div>
               <button
                 onClick={() => setIsEditOpen(true)}
@@ -525,13 +533,85 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
               </button>
             </div>
 
+            {/* Qualification Progress Card */}
+            <div className="rounded-xl border border-slate-100 bg-slate-50/80 p-3">
+              <div className="flex items-center justify-between gap-2 mb-2">
+                <span className="text-[10px] font-bold tracking-wider text-slate-400 uppercase">
+                  Bot Qualification
+                </span>
+                <QualificationPill
+                  status={lead.qualificationStatus}
+                  lead={lead}
+                  showProgress={true}
+                  size="sm"
+                />
+              </div>
+
+              {/* Requirement Checklist */}
+              <div className="space-y-1.5 pt-1 text-xs">
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-500">1. Property Type</span>
+                  {lead.propertyType ? (
+                    <span className="flex items-center gap-1 font-semibold text-emerald-700">
+                      <Check className="h-3 w-3" />
+                      <span>{lead.propertyType}</span>
+                    </span>
+                  ) : (
+                    <span className="text-slate-400 italic">Pending</span>
+                  )}
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-500">2. Budget Range</span>
+                  {lead.budgetMin != null || lead.budgetMax != null ? (
+                    <span className="flex items-center gap-1 font-semibold text-emerald-700">
+                      <Check className="h-3 w-3" />
+                      <span>Specified</span>
+                    </span>
+                  ) : (
+                    <span className="text-slate-400 italic">Pending</span>
+                  )}
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-500">3. Preferred Location</span>
+                  {lead.preferredLocations && lead.preferredLocations.length > 0 ? (
+                    <span className="flex items-center gap-1 font-semibold text-emerald-700">
+                      <Check className="h-3 w-3" />
+                      <span>{lead.preferredLocations[0]}</span>
+                    </span>
+                  ) : (
+                    <span className="text-slate-400 italic">Pending</span>
+                  )}
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-500">4. Move-in Timeline</span>
+                  {lead.urgency ? (
+                    <span className="flex items-center gap-1 font-semibold text-emerald-700">
+                      <Check className="h-3 w-3" />
+                      <span>{lead.urgency.replace(/_/g, ' ')}</span>
+                    </span>
+                  ) : (
+                    <span className="text-slate-400 italic">Pending</span>
+                  )}
+                </div>
+              </div>
+            </div>
+
             {/* Budget */}
             <div>
               <div className="text-[10px] font-bold tracking-wider text-slate-400 uppercase">
                 Budget
               </div>
               <div className="mt-0.5 text-base font-extrabold text-slate-900">
-                {formatPrice(lead.budgetMin)} - {formatPrice(lead.budgetMax)}
+                {lead.budgetMin != null && lead.budgetMax != null
+                  ? `${formatPrice(lead.budgetMin)} - ${formatPrice(lead.budgetMax)}`
+                  : lead.budgetMax != null
+                  ? `Up to ${formatPrice(lead.budgetMax)}`
+                  : lead.budgetMin != null
+                  ? `From ${formatPrice(lead.budgetMin)}`
+                  : 'Unspecified'}
               </div>
             </div>
 
@@ -542,7 +622,7 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
                   Location
                 </div>
                 <span className="inline-block rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-700">
-                  {lead.preferredLocations?.[0] || 'Downtown'}
+                  {lead.preferredLocations?.[0] || 'Any Location'}
                 </span>
               </div>
               <div>
@@ -550,7 +630,7 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
                   Type
                 </div>
                 <div className="mt-1 text-xs font-bold text-slate-900">
-                  {lead.propertyType === 'APARTMENT' ? 'Apartment' : lead.propertyType}
+                  {lead.propertyType ? (lead.propertyType === 'APARTMENT' ? 'Apartment' : lead.propertyType) : 'Unspecified'}
                 </div>
               </div>
             </div>
@@ -562,7 +642,7 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
               </div>
               <div className="flex items-center gap-1.5">
                 <span className="rounded-md border border-slate-200 bg-white px-2 py-0.5 text-[11px] font-semibold text-slate-700">
-                  {lead.bhk || '2BHK / 3BHK'}
+                  {lead.bhk || 'Not specified'}
                 </span>
               </div>
             </div>
@@ -574,7 +654,7 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
               </div>
               <div className="flex items-center gap-1 rounded-xl border border-blue-100 bg-blue-50/70 px-3 py-1.5 text-xs font-bold text-blue-700">
                 <Zap className="h-3.5 w-3.5 fill-blue-600 text-blue-600" />
-                <span>{lead.urgency.replace(/_/g, ' ')}</span>
+                <span>{lead.urgency ? lead.urgency.replace(/_/g, ' ') : 'Flexible / Unspecified'}</span>
               </div>
             </div>
           </div>
@@ -889,7 +969,7 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
                     </div>
                   )}
 
-                  {/* Chat Container */}
+                    {/* Chat Container */}
                   <div className="h-[420px] overflow-y-auto rounded-xl border border-slate-200 bg-slate-50/60 p-4 space-y-3">
                     {isLoadingMessages ? (
                       <div className="h-full flex items-center justify-center text-slate-400">
@@ -901,55 +981,14 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
                         No messages in this channel yet.
                       </div>
                     ) : (
-                      activeConversation.messages.map((msg) => {
-                        const isInbound = msg.direction === 'INBOUND';
-                        const isTemplate = msg.messageType === 'TEMPLATE';
-
-                        return (
-                          <div
-                            key={msg.id}
-                            className={`flex flex-col ${
-                              isInbound ? 'items-start' : 'items-end'
-                            }`}
-                          >
-                            <div
-                              className={`max-w-[80%] rounded-2xl px-4 py-2.5 shadow-2xs ${
-                                isInbound
-                                  ? 'bg-white border border-slate-200 text-slate-900 rounded-tl-xs'
-                                  : 'bg-blue-600 text-white rounded-tr-xs'
-                              }`}
-                            >
-                              {isTemplate && (
-                                <div className="mb-1 flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-blue-200">
-                                  <Sparkles className="h-3 w-3" />
-                                  <span>Brochure Template</span>
-                                </div>
-                              )}
-                              <p className="text-xs leading-relaxed whitespace-pre-wrap select-text font-normal">
-                                {msg.rawText}
-                              </p>
-                              <div
-                                className={`mt-1 flex items-center justify-end gap-1 text-[10px] ${
-                                  isInbound ? 'text-slate-400' : 'text-blue-200'
-                                }`}
-                              >
-                                <span>{formatTime(msg.createdAt)}</span>
-                                {!isInbound && (
-                                  <span>
-                                    {msg.status === 'READ' ? (
-                                      <CheckCheck className="h-3 w-3 text-sky-200 inline" />
-                                    ) : msg.status === 'DELIVERED' ? (
-                                      <CheckCheck className="h-3 w-3 text-blue-200 inline" />
-                                    ) : (
-                                      <Check className="h-3 w-3 text-blue-200 inline" />
-                                    )}
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })
+                      activeConversation.messages.map((msg, idx) => (
+                        <InteractiveChatMessage
+                          key={msg.id}
+                          message={msg}
+                          nextMessage={activeConversation.messages?.[idx + 1]}
+                          formatTime={formatTime}
+                        />
+                      ))
                     )}
                     <div ref={messagesEndRef} />
                   </div>

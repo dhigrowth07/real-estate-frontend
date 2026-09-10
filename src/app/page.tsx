@@ -159,7 +159,7 @@ export default function DashboardPage() {
     stats?.recentLeads && stats.recentLeads.length > 0
       ? stats.recentLeads.map((l) => ({
           id: l.id,
-          name: l.name,
+          name: l.name || 'Unnamed Lead',
           source: l.source,
           stage: l.stage,
           agentName: l.assignedAgent?.name || 'Unassigned',

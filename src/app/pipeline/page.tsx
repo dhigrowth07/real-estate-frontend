@@ -184,7 +184,7 @@ export default function PipelinePage() {
   const filteredLeads = leads.filter((lead) => {
     if (
       searchQuery &&
-      !lead.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
+      !(lead.name || '').toLowerCase().includes(searchQuery.toLowerCase()) &&
       !lead.preferredLocations?.some((loc) => loc.toLowerCase().includes(searchQuery.toLowerCase()))
     ) {
       return false;
@@ -456,8 +456,8 @@ export default function PipelinePage() {
                         {/* 1. Lead Header */}
                         <div>
                           <Link href={`/leads/${lead.id}`}>
-                            <h4 className="text-sm font-bold text-slate-900 transition-colors hover:text-blue-600">
-                              {lead.name}
+                            <h4 className="truncate text-sm font-bold text-slate-900 transition-colors group-hover:text-blue-600">
+                              {lead.name || 'Unnamed Lead'}
                             </h4>
                           </Link>
                           <p className="mt-0.5 text-xs font-medium text-slate-500">
@@ -469,7 +469,13 @@ export default function PipelinePage() {
                         {/* 2. Price Range & Urgency Pill */}
                         <div className="flex items-center justify-between">
                           <span className="text-base font-bold text-slate-900">
-                            {formatPrice(lead.budgetMin)} - {formatPrice(lead.budgetMax)}
+                            {lead.budgetMin != null && lead.budgetMax != null
+                              ? `${formatPrice(lead.budgetMin)} - ${formatPrice(lead.budgetMax)}`
+                              : lead.budgetMax != null
+                              ? `Up to ${formatPrice(lead.budgetMax)}`
+                              : lead.budgetMin != null
+                              ? `From ${formatPrice(lead.budgetMin)}`
+                              : 'Unspecified'}
                           </span>
                           <span
                             className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold ${urgencyStyle}`}

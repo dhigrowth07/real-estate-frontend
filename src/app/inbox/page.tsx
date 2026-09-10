@@ -23,6 +23,8 @@ import {
 import { apiClient, API_ENDPOINTS } from '@/lib/api-client';
 import { Conversation, Message, ChannelType, Property } from '@/types';
 import { getImageUrl } from '@/lib/utils';
+import { QualificationPill } from '@/components/ui/QualificationPill';
+import { InteractiveChatMessage } from '@/components/ui/InteractiveChatMessage';
 
 // Lightweight inline icons for channels
 function WhatsAppIcon({ className = 'h-4 w-4' }: { className?: string }) {
@@ -459,12 +461,20 @@ export default function InboxPage() {
                         )}
                       </div>
 
-                      {/* Phone or ID tag */}
-                      {conv.externalId && (
-                        <p className="text-[10px] font-mono text-slate-400 mt-1 truncate">
-                          {conv.externalId}
-                        </p>
-                      )}
+                      {/* Phone or ID tag & Qualification Status */}
+                      <div className="flex items-center justify-between gap-1 mt-1">
+                        {conv.externalId ? (
+                          <p className="text-[10px] font-mono text-slate-400 truncate">
+                            {conv.externalId}
+                          </p>
+                        ) : <span />}
+                        {conv.lead?.qualificationStatus && (
+                          <QualificationPill
+                            status={conv.lead.qualificationStatus}
+                            size="sm"
+                          />
+                        )}
+                      </div>
                     </div>
                   </button>
                 );
@@ -538,7 +548,16 @@ export default function InboxPage() {
                 </div>
 
                 {/* Status Badges */}
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
+                  {activeConversation.lead?.qualificationStatus && (
+                    <QualificationPill
+                      status={activeConversation.lead.qualificationStatus}
+                      lead={activeConversation.lead}
+                      showProgress={true}
+                      size="sm"
+                    />
+                  )}
+
                   {activeConversation.channel === 'WHATSAPP' && (
                     <div className="flex items-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-800">
                       <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />
@@ -599,68 +618,14 @@ export default function InboxPage() {
                     <p className="text-xs">No messages recorded in this conversation yet.</p>
                   </div>
                 ) : (
-                  activeConversation.messages.map((msg) => {
-                    const isInbound = msg.direction === 'INBOUND';
-                    const isTemplate = msg.messageType === 'TEMPLATE';
-                    const isAutoReply = msg.messageType === 'AUTO_REPLY';
-
-                    return (
-                      <div
-                        key={msg.id}
-                        className={`flex flex-col ${
-                          isInbound ? 'items-start' : 'items-end'
-                        }`}
-                      >
-                        {/* Message Bubble Container */}
-                        <div
-                          className={`max-w-[75%] rounded-2xl px-4 py-2.5 shadow-2xs transition-all ${
-                            isInbound
-                              ? 'bg-white border border-slate-200 text-slate-900 rounded-tl-xs'
-                              : 'bg-blue-600 text-white rounded-tr-xs'
-                          }`}
-                        >
-                          {/* Type Badges */}
-                          {isTemplate && (
-                            <div className="mb-1 flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-blue-200">
-                              <Sparkles className="h-3 w-3" />
-                              <span>Brochure Template</span>
-                            </div>
-                          )}
-
-                          {isAutoReply && (
-                            <div className="mb-1 text-[10px] font-bold uppercase tracking-wider text-blue-200">
-                              Auto-Reply
-                            </div>
-                          )}
-
-                          {/* Message Content */}
-                          <p className="text-xs leading-relaxed whitespace-pre-wrap select-text font-normal">
-                            {msg.rawText}
-                          </p>
-
-                          {/* Time & Delivery Status Footer */}
-                          <div
-                            className={`mt-1 flex items-center justify-end gap-1 text-[10px] ${
-                              isInbound ? 'text-slate-400' : 'text-blue-200'
-                            }`}
-                          >
-                            <span>{formatTime(msg.createdAt)}</span>
-                            {!isInbound && (
-                              <span>
-                                {msg.status === 'READ' ? (
-                                  <CheckCheck className="h-3 w-3 text-sky-200 inline" />
-                                ) : msg.status === 'DELIVERED' ? (
-                                  <CheckCheck className="h-3 w-3 text-blue-200 inline" />
-                                ) : (
-                                  <Check className="h-3 w-3 text-blue-200 inline" />
-                                )}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })
+                  activeConversation.messages.map((msg, idx) => (
+                    <InteractiveChatMessage
+                      key={msg.id}
+                      message={msg}
+                      nextMessage={activeConversation.messages?.[idx + 1]}
+                      formatTime={formatTime}
+                    />
+                  ))
                 )}
                 <div ref={messagesEndRef} />
               </div>

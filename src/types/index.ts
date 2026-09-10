@@ -8,7 +8,10 @@ export type LeadPurpose = 'BUY' | 'RENT' | 'INVESTMENT' | 'INVEST';
 
 export type LeadUrgency = 'IMMEDIATE' | 'WITHIN_1_MONTH' | 'WITHIN_3_MONTHS' | 'EXPLORING';
 
+export type LeadQualificationStatus = 'UNQUALIFIED' | 'IN_PROGRESS' | 'QUALIFIED' | 'REQUESTED_AGENT';
+
 export type LeadStage =
+  | 'UNQUALIFIED'
   | 'NEW'
   | 'CONTACTED'
   | 'REQUIREMENT_GATHERED'
@@ -71,19 +74,20 @@ export interface Invite {
 
 export interface Lead {
   id: string;
-  name: string;
+  name?: string | null;
   phone: string;
   email?: string;
   source: LeadSource;
   sources?: string[];
-  budgetMin: number;
-  budgetMax: number;
+  budgetMin?: number | null;
+  budgetMax?: number | null;
   preferredLocations: string[];
-  propertyType: PropertyType;
+  propertyType?: PropertyType | null;
   bhk?: string;
-  purpose: LeadPurpose;
-  urgency: LeadUrgency;
+  purpose?: LeadPurpose | null;
+  urgency?: LeadUrgency | null;
   stage: LeadStage;
+  qualificationStatus?: LeadQualificationStatus;
   assignedAgentId?: string;
   assignedAgent?: User;
   instagramUserId?: string;
@@ -209,6 +213,14 @@ export interface Message {
   createdAt: string;
 }
 
+export type OnboardingStep =
+  | 'NOT_STARTED'
+  | 'ASK_PROPERTY_TYPE'
+  | 'ASK_BUDGET'
+  | 'ASK_LOCATION'
+  | 'ASK_TIMELINE'
+  | 'COMPLETE';
+
 export interface Conversation {
   id: string;
   leadId?: string | null;
@@ -216,6 +228,7 @@ export interface Conversation {
   channel: ChannelType;
   externalId: string;
   windowOpenUntil?: string | null;
+  onboardingStep?: OnboardingStep;
   messages?: Message[];
   lastMessage?: Message | null;
   unreadCount?: number;
