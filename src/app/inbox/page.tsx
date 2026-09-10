@@ -118,10 +118,13 @@ export default function InboxPage() {
         const list = Array.isArray(res) ? res : [];
         setConversations(list);
 
-        // Auto-select first conversation if none selected
-        if ((!preserveSelection || !selectedConvId) && list.length > 0) {
-          setSelectedConvId(list[0].id);
-        }
+        // Auto-select first conversation if none selected, or keep currently active conversation
+        setSelectedConvId((prev) => {
+          if (preserveSelection && prev && list.some((c) => c.id === prev)) {
+            return prev;
+          }
+          return list[0]?.id || null;
+        });
       } catch (err) {
         console.error('Failed to load conversations:', err);
       } finally {
@@ -129,7 +132,7 @@ export default function InboxPage() {
         setIsRefreshing(false);
       }
     },
-    [channelFilter, searchQuery, selectedConvId]
+    [channelFilter, searchQuery]
   );
 
   // 2. Fetch Single Conversation Detail & Messages
@@ -157,12 +160,9 @@ export default function InboxPage() {
     }
   }, []);
 
-  // Initial list load
+  // Initial list load and reload when filters change
   useEffect(() => {
-    const timer = setTimeout(() => {
-      void fetchConversations(false);
-    }, 0);
-    return () => clearTimeout(timer);
+    void fetchConversations(true);
   }, [fetchConversations]);
 
   // Load detail whenever selected conversation changes

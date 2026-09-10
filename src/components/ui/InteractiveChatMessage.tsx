@@ -1,5 +1,5 @@
 import React from 'react';
-import { Check, CheckCheck, Sparkles, CheckCircle2, ChevronDown } from 'lucide-react';
+import { Check, CheckCheck, Sparkles, CheckCircle2, ChevronDown, AlertCircle } from 'lucide-react';
 import { Message } from '@/types';
 
 export interface InteractiveChatMessageProps {
@@ -117,6 +117,8 @@ export function InteractiveChatMessage({
         className={`max-w-[85%] sm:max-w-[75%] rounded-2xl px-4 py-3 shadow-2xs transition-all ${
           isInbound
             ? 'bg-white border border-slate-200 text-slate-900 rounded-tl-xs'
+            : message.status === 'FAILED'
+            ? 'bg-red-600/90 text-white rounded-tr-xs border border-red-500'
             : 'bg-blue-600 text-white rounded-tr-xs'
         }`}
       >
@@ -150,21 +152,23 @@ export function InteractiveChatMessage({
                 {parsedInteractive.buttons.map((btn, idx) => {
                   const isSelected =
                     nextInboundText &&
-                    (nextInboundText.includes(btn.toLowerCase()) ||
-                      btn.toLowerCase().includes(nextInboundText));
+                    (nextInboundText === btn.toLowerCase() ||
+                      (btn.toLowerCase().includes('apartment') && nextInboundText.includes('apartment')) ||
+                      (btn.toLowerCase().includes('villa') && nextInboundText.includes('villa')) ||
+                      (btn.toLowerCase().includes('plot') && nextInboundText.includes('plot')));
 
                   return (
                     <span
                       key={idx}
-                      className={`inline-flex items-center gap-1 px-3 py-1 rounded-lg text-xs font-semibold tracking-wide border transition-colors ${
+                      className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold shadow-2xs transition-all ${
                         isSelected
-                          ? 'bg-emerald-500 border-emerald-400 text-white shadow-xs font-bold'
-                          : 'bg-white/15 border-white/25 text-white'
+                          ? 'bg-white text-emerald-700 ring-2 ring-emerald-400 font-bold'
+                          : 'bg-blue-700/80 text-white border border-blue-400/40'
                       }`}
                     >
-                      {isSelected && <CheckCircle2 className="h-3 w-3 text-white" />}
+                      {isSelected && <Check className="h-3 w-3 text-emerald-600" />}
                       <span>{btn}</span>
-                      {isSelected && <span className="text-[10px] font-normal opacity-90">(Selected)</span>}
+                      {isSelected && <span className="text-[10px] text-emerald-600 ml-0.5">(Selected)</span>}
                     </span>
                   );
                 })}
@@ -177,12 +181,14 @@ export function InteractiveChatMessage({
               {parsedInteractive.bodyText}
             </p>
 
-            {/* Render List Options */}
+            {/* Render List Items */}
             <div className="mt-2.5 pt-2 border-t border-blue-500/40 space-y-1.5">
               <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-blue-200 mb-1">
-                <span>List Options ({parsedInteractive.buttonTitle})</span>
+                <span>List Menu ({parsedInteractive.buttonTitle})</span>
+                <ChevronDown className="h-3 w-3" />
               </div>
-              <div className="grid grid-cols-1 gap-1">
+
+              <div className="space-y-1">
                 {parsedInteractive.items.map((item, idx) => {
                   const isSelected =
                     nextInboundText &&
@@ -192,10 +198,10 @@ export function InteractiveChatMessage({
                   return (
                     <div
                       key={idx}
-                      className={`flex items-center justify-between px-2.5 py-1.5 rounded-lg border text-xs ${
+                      className={`flex items-center justify-between p-2 rounded-lg text-xs transition-all ${
                         isSelected
-                          ? 'bg-emerald-500 border-emerald-400 text-white font-bold shadow-xs'
-                          : 'bg-white/15 border-white/20 text-white'
+                          ? 'bg-emerald-600 text-white ring-2 ring-emerald-300 font-bold'
+                          : 'bg-blue-700/60 text-white border border-blue-400/30'
                       }`}
                     >
                       <div>
@@ -244,6 +250,11 @@ export function InteractiveChatMessage({
                 <span title="Read"><CheckCheck className="h-3 w-3 text-emerald-300 inline" /></span>
               ) : message.status === 'DELIVERED' ? (
                 <span title="Delivered"><CheckCheck className="h-3 w-3 text-blue-200 inline" /></span>
+              ) : message.status === 'FAILED' ? (
+                <span title="Failed to deliver via Meta WhatsApp Cloud API" className="inline-flex items-center gap-1 text-red-200 font-semibold bg-red-800/60 px-1.5 py-0.5 rounded">
+                  <AlertCircle className="h-3 w-3 text-red-300 inline shrink-0" />
+                  <span>Delivery Failed</span>
+                </span>
               ) : (
                 <span title="Sent"><Check className="h-3 w-3 text-blue-200 inline" /></span>
               )}
